@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>思明试卷情报系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{$=url_for('static', filename='css/bootstrap-3.3.6.min.css')}">
+    <link rel="stylesheet" type="text/css" href="{$=url_for('static', filename='css/app.css')}">
+</head>
+<body>
+<div class="login-page container">
+
+    <h1 class="page-heading text-center">思明试卷情报系统</h1>
+
+    <form>
+        <h2 class="form-heading text-center">登录</h2>
+        <div class="form-group">
+            <input type="text" class="form-control input-lg"
+                   id="userName"
+                   placeholder="手机号/用户名"
+                   required
+                   autofocus>
+        </div>
+        <div class="form-group">
+            <input type="password" class="form-control input-lg"
+                   id="password"
+                   placeholder="密码"
+                   required>
+        </div>
+
+        <label for="rememberMe">
+            <input id="rememberMe" type="checkbox" value="remember-me" />
+            使我保持登录状态
+        </label>
+
+        <div class="row">
+            <div class="col-md-12">
+                <button id="btnLogin" type="submit" class="btn btn-primary pull-right">
+                    <i class="glyphicon glyphicon-log-in"></i> 登录
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <footer>
+      <a href="/register">注册</span>
+      <a href="/forget">忘记密码</span>
+    </footer>
+
+    <div id="particles"></div>
+
+</div>
+<script src="{$=url_for('static', filename='js/jquery-2.2.4.min.js')}"></script>
+<script src="{$=url_for('static', filename='js/bootstrap-3.3.6.min.js')}"></script>
+<script src="{$=url_for('static', filename='js/jquery.particleground.min.js')}"></script>
+<script>
+    $('#particles').particleground({
+        dotColor: '#ddd',
+        lineColor: '#ddd',
+        parallax: false
+    })
+</script>
+
+<script>
+    $("form").on('submit', function (e) {
+        e.preventDefault();
+        $.getJSON("/api/login", {
+            "userName": $("#userName").val(),
+            "password": $("#password").val(),
+            "rememberMe": !!$("#rememberMe:checked").length
+        }, function (json) {
+            if (!json.code) {
+                location.href = "/index";
+            }
+            else {
+                alert(json.msg);
+            }
+        })
+    });
+</script>
+</body>
+</html>

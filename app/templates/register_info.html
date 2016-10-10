@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>思明试卷情报系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{$=url_for('static', filename='css/bootstrap-3.3.6.min.css')}">
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+      <h4 style="color: #337AB7">请完善信息完成注册</h4>
+    </div>
+    <div class="col-sm-6 col-sm-offset-3">
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <form class="form-horizontal" role="form">
+              <div class="form-group">
+                <label for="userName" class="col-sm-3 control-label">用户名</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control" id="userName" placeholder="用户名">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="password" class="col-sm-3 control-label">密码</label>
+                <div class="col-sm-8">
+                  <input type="password" class="form-control" id="password" placeholder="密码">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="repassword" class="col-sm-3 control-label">确认密码</label>
+                <div class="col-sm-8">
+                  <input type="password" class="form-control" id="repassword" placeholder="确认密码">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="email" class="col-sm-3 control-label">邮箱</label>
+                <div class="col-sm-8">
+                  <input type="email" class="form-control" id="email" placeholder="邮箱">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="province" class="col-sm-3 control-label">所在城市</label>
+                <div class="col-sm-4">
+                  <select class="form-control" id="province">
+                      <option>福建省</option>
+                  </select>
+                </div>
+                <div class="col-sm-4">
+                  <select class="form-control" id="city">
+                      <option>福州市</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="school" class="col-sm-3 control-label">学校</label>
+                <div class="col-sm-8">
+                  <select class="form-control">
+                      <option>1</option>
+                      <option>2</option>
+                      <option>3</option>
+                      <option>4</option>
+                      <option>5</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="grade" class="col-sm-3 control-label">年级</label>
+                <div class="col-sm-8">
+                  <select class="form-control">
+                      <option>1</option>
+                      <option>2</option>
+                      <option>3</option>
+                      <option>4</option>
+                      <option>5</option>
+                  </select>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-sm-offset-3 text-right">
+        <button class="btn btn-warning"><span class="glyphicon glyphicon-chevron-left"></span> 上一步</button>
+        <button class="btn btn-primary">&nbsp;&nbsp;保存&nbsp;&nbsp;</button>
+    </div>
+</div>
+</body>
+</html>
