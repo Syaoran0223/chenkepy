@@ -57,3 +57,4 @@ venv3/
 venv/
 
 *.sqlite
+app/static/public/*
