@@ -1,4 +1,5 @@
 from flask import render_template, request, jsonify
+from app.exceptions import JsonOutputException
 from . import main
 
 @main.app_errorhandler(404)
@@ -18,3 +19,9 @@ def internal_server_error(e):
         response.status_code = 500
         return response
     return render_template('commons/500.html'), 500
+
+@main.app_errorhandler(JsonOutputException)
+def json_output(e):
+    response = jsonify({'code': '400', 'msg': str(e)})
+    response.status_code = 200
+    return response

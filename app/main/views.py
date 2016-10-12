@@ -1,17 +1,37 @@
+from flask import render_template, request, url_for, flash, redirect, session
+from flask.ext.login import login_user
+
 from . import main
-from flask import render_template
-from flask import jsonify
+from app.models import User
+from app.exceptions import JsonOutputException
 
-@main.route('/login')
-def login():
-    return render_template('login.html')
-
-@main.route('/register')
+@main.route('/register/', methods=['GET', 'POST'])
 def register():
+    if request.method == 'POST':
+        phone = request.form.get('phone')
+        if not phone:
+            raise JsonOutputException('请输入正确的手机号')
+        session['phone'] = phone
+        return {'code': 0}
+    if session.get('phone'):
+        return redirect(url_for('main.register_info'))
     return render_template('register.html')
 
-@main.route('/register/info')
+@main.route('/login/', methods=['GET', 'POST'])
+def login():
+    # form = LoginFrom()
+    # if form.validate_on_submit():
+    #     user = User.query.filter_by(email=form.email.data).first()
+    #     if user is not None and user.verify_password(form.password.data):
+    #         login_user(user)
+    #         return redirect(request.args.get('next') or url_for('admin.get_blogs'))
+    #     flash('password error')
+    return render_template('login.html')
+
+@main.route('/register/info/')
 def register_info():
+    if not session.get('phone'):
+        return redirect('main.register')
     return render_template('register_info.html')
 
 @main.route('/')
@@ -26,4 +46,4 @@ def todo():
         'data': [],
         'msg': None
     }
-    return jsonify(res)
+    return res
