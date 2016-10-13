@@ -16,7 +16,7 @@ def register_info():
 
 @main.route('/')
 def index():
-    site_url = 'http://127.0.0.1:5000'
+    site_url = 'http://192.168.146.130:5000'
     return render_template('index.html', site_url=site_url)
 
 @main.route('/todo')
