@@ -6,7 +6,7 @@ from app import db, login_manager
 from ._base import SessionMixin
 
 class User(db.Model, SessionMixin, UserMixin):
-    __tablename__ = 'users'
+    __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
     email = db.Column(db.String(128))

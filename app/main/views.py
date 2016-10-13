@@ -2,7 +2,7 @@ from flask import render_template, request, url_for, flash, redirect, session
 from flask.ext.login import login_user
 
 from . import main
-from app.models import User
+from app.models import User, Region, School
 from app.exceptions import JsonOutputException
 
 @main.route('/register/', methods=['GET', 'POST'])
@@ -32,7 +32,15 @@ def login():
 def register_info():
     if not session.get('phone'):
         return redirect('main.register')
-    return render_template('register_info.html')
+    provinces = Region.get_province()
+    cities = Region.get_city(1257)
+    areas = Region.get_area(1258)
+    schools = School.get_schools_by_ctid(1260)
+    return render_template('register_info.html',
+        provinces=provinces,
+        cities=cities,
+        areas=areas,
+        schools=schools)
 
 @main.route('/')
 def index():

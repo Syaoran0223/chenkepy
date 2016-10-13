@@ -3,3 +3,6 @@ class UserAlreadyExistsException(ValueError):
 
 class JsonOutputException(ValueError):
     pass
+
+class ValidationError(ValueError):
+    pass

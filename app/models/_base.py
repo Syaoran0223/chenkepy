@@ -2,14 +2,18 @@
 import datetime
 
 class SessionMixin(object):
-    def to_dict(self, *columns):
-        dct = {}
-        for col in columns:
-            value = getattr(self, col)
-            if isinstance(value, datetime.datetime):
-                value = value.strftime('%Y-%m-%d %H:%M:%S')
-            dct[col] = value
-        return dct
+    def to_dict(self):
+        dictionary = self.__dict__.copy()
+        res = {}
+        for k, v in dictionary.items():
+            if k == '_sa_instance_state':
+                continue
+            if k in getattr(self, 'protected_field', ()):
+                continue
+            if isinstance(v, datetime.datetime):
+                v = v.strftime('%Y-%m-%d %H:%M:%S')
+            res[k] = v
+        return res
 
     def save(self):
         db.session.add(self)
