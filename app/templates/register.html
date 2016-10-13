@@ -68,18 +68,23 @@
 <script>
     $("form").on('submit', function (e) {
         e.preventDefault();
-        $.getJSON("/api/login", {
-            "userName": $("#userName").val(),
-            "password": $("#password").val(),
-            "rememberMe": !!$("#rememberMe:checked").length
-        }, function (json) {
-            if (!json.code) {
-                location.href = "/index";
-            }
-            else {
-                alert(json.msg);
-            }
-        })
+        $.ajax({
+            type: 'POST',
+            url: "/register/",
+            // contentType: "application/json",
+            data: {
+                "phone": $("#phone").val()
+            },
+            success: function (json) {
+                if (!json.code) {
+                    location.href = "/register/info";
+                }
+                else {
+                    alert(json.msg);
+                }
+            },
+            dataType: 'json'
+        });
     });
 </script>
 </body>

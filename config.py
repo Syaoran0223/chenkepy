@@ -16,13 +16,14 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     #mysql数据库IP地址
-    MYSQL_ADDR = os.getenv('MYSQL_PORT_3306_TCP_ADDR')
-    DB_NAME = 'test'
-    USER_NAME = 'root'
-    PASSWORD = 'ztesoft'
+    MYSQL_ADDR = '117.27.143.66'
+    MYQSL_PORT = 8333
+    DB_NAME = 'pdb'
+    USER_NAME = 'smpdb'
+    PASSWORD = 'lasdl32rwlerldfa,jkljl23r.lwrdf'
 
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{username}:{password}@{mysql_addr}/{db_name}'.\
-        format(username=USER_NAME, password=PASSWORD, mysql_addr=MYSQL_ADDR, db_name=DB_NAME)
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{username}:{password}@{mysql_addr}:{mysql_port}/{db_name}'.\
+        format(username=USER_NAME, password=PASSWORD, mysql_addr=MYSQL_ADDR, db_name=DB_NAME, mysql_port=MYQSL_PORT)
 class TestingConfig(Config):
     TESTING = True
     WTF_CSRF_ENABLED = False
