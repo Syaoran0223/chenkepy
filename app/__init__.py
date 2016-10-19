@@ -6,6 +6,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
 from factories import Jinja2
 from config import config
+from flask.ext.cache import Cache
 from app._flask import make_response, extends_db
 
 bootstrap = Bootstrap()
@@ -16,6 +17,7 @@ jinja2 = Jinja2()
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'login'
+cache = Cache()
 
 def create_app(config_name):
     Flask.make_response = make_response
@@ -31,6 +33,7 @@ def create_app(config_name):
     login_manager.init_app(app)
     
     register_routes(app)
+    cache.init_app(app)
     
     return app
 

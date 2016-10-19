@@ -3,6 +3,7 @@ from flask import request
 
 from . import api_blueprint
 from app.models import Region
+from app.sms import SmsServer
 
 @api_blueprint.route('/province/')
 def province():
@@ -30,3 +31,24 @@ def area():
     return {
         'data': areas
     }
+
+@api_blueprint.route('/sms/')
+def send_msg():
+    phone = request.args.get('phone')
+    sms = SmsServer()
+    success, code = sms.generate_code(phone)
+    if not success:
+        return {
+            'code': 15,
+            'msg': '请求太频繁，请稍后重试'
+        }
+    return sms.send_code(code, phone)
+
+
+
+
+
+
+
+
+
