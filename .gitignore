@@ -58,3 +58,6 @@ venv/
 
 *.sqlite
 app/static/public/*
+
+.idea/
+run.sh

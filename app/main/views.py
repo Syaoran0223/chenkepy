@@ -1,10 +1,11 @@
 #coding: utf-8
 
 from flask import render_template, request, url_for, flash, redirect, session
-from flask.ext.login import login_user,logout_user,login_required
+from flask.ext.login import login_user,logout_user,login_required,current_user
 
 from . import main
-from .forms import LoginForm
+from .forms import LoginForm,PasswordResetRequestForm,PasswordResetForm
+from app.email import send_email
 from app.models import User, Region, School
 from app.exceptions import JsonOutputException
 

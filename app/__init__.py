@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.moment import Moment
+from flask_mail import Mail
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
 from factories import Jinja2
@@ -8,6 +9,7 @@ from config import config
 from app._flask import make_response, extends_db
 
 bootstrap = Bootstrap()
+mail = Mail()
 moment = Moment()
 db = SQLAlchemy()
 jinja2 = Jinja2()
