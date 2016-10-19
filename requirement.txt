@@ -23,3 +23,6 @@ flask-restful
 ipython
 forgerypy
 gunicorn
+requests
+redis==2.10.5
+Flask-Cache==0.13.1

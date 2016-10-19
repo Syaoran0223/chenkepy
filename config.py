@@ -22,6 +22,8 @@ class DevelopmentConfig(Config):
     USER_NAME = 'smpdb'
     PASSWORD = 'lasdl32rwlerldfa,jkljl23r.lwrdf'
 
+    CACHE_TYPE ='simple'
+
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{username}:{password}@{mysql_addr}:{mysql_port}/{db_name}'.\
         format(username=USER_NAME, password=PASSWORD, mysql_addr=MYSQL_ADDR, db_name=DB_NAME, mysql_port=MYQSL_PORT)
 class TestingConfig(Config):
@@ -36,6 +38,11 @@ class ProductionConfig(Config):
     DB_NAME = 'test'
     USER_NAME = 'root'
     PASSWORD = 'ztesoft'
+
+    CACHE_TYPE ='redis'
+    CACHE_REDIS_HOST = '127.0.0.1'
+    CACHE_REDIS_PASSWORD = ''
+    CACHE_REDIS_DB = 0
 
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{username}:{password}@{mysql_addr}/{db_name}'.\
         format(username=USER_NAME, password=PASSWORD, mysql_addr=MYSQL_ADDR, db_name=DB_NAME)
