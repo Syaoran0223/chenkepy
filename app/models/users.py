@@ -22,7 +22,6 @@ class User(db.Model, SessionMixin, UserMixin):
 
 
 
-
     @property
     def password(self):
         return AttributeError('password is not a readable attribute')
