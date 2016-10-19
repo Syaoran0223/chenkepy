@@ -13,11 +13,15 @@
 
     <h1 class="page-heading text-center">思明试卷情报系统</h1>
 
-    <form>
+
+    <form method="POST" action="/login/">
+
+        {$=form.csrf_token}
         <h2 class="form-heading text-center">登录</h2>
         <div class="form-group">
             <input type="text" class="form-control input-lg"
                    id="userName"
+                   name="user_name"
                    placeholder="手机号/用户名"
                    required
                    autofocus>
@@ -25,14 +29,22 @@
         <div class="form-group">
             <input type="password" class="form-control input-lg"
                    id="password"
+                   name="password"
                    placeholder="密码"
                    required>
         </div>
 
         <label for="rememberMe">
-            <input id="rememberMe" type="checkbox" value="remember-me" />
+            <input id="rememberMe" name="remember_me" type="checkbox" value="remember-me" />
             使我保持登录状态
         </label>
+
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {$= message}
+        </div>
+        {% endfor %}
 
         <div class="row">
             <div class="col-md-12">
@@ -62,22 +74,6 @@
     })
 </script>
 
-<script>
-    $("form").on('submit', function (e) {
-        e.preventDefault();
-        $.getJSON("/api/login", {
-            "userName": $("#userName").val(),
-            "password": $("#password").val(),
-            "rememberMe": !!$("#rememberMe:checked").length
-        }, function (json) {
-            if (!json.code) {
-                location.href = "/index";
-            }
-            else {
-                alert(json.msg);
-            }
-        })
-    });
-</script>
+
 </body>
 </html>
