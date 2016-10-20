@@ -1,7 +1,7 @@
 # coding: utf-8
 
 from flask import jsonify
-from app.exceptions import ValidationError
+from app.exceptions import ValidationError, FormValidateError
 from . import api_blueprint
 
 
@@ -27,8 +27,3 @@ def forbidden(message):
 def validation_error(e):
     return bad_request(e.args[0])
 
-@api_blueprint.app_errorhandler(JsonOutputException)
-def json_output(e):
-    response = jsonify({'code': '400', 'msg': str(e)})
-    response.status_code = 200
-    return response

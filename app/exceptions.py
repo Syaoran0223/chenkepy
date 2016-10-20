@@ -6,3 +6,6 @@ class JsonOutputException(ValueError):
 
 class ValidationError(ValueError):
     pass
+
+class FormValidateError(ValueError):
+    pass
