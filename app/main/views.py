@@ -1,5 +1,6 @@
 #coding: utf-8
 
+import json
 from flask import render_template, request, url_for, flash, redirect, session, g
 from flask.ext.login import login_user,logout_user,login_required,current_user
 
@@ -53,7 +54,9 @@ def register_info():
 @login_required
 def index():
     site_url = 'http://192.168.146.130:5000'
-    return render_template('index.html', site_url=site_url)
+    user_info = current_user.to_dict()
+    user_info = json.dumps(user_info)
+    return render_template('index.html', site_url=site_url, user_info=user_info)
 
 @main.route("/logout")
 @login_required

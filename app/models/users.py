@@ -7,6 +7,8 @@ from ._base import SessionMixin
 
 class User(db.Model, SessionMixin, UserMixin):
     __tablename__ = 'user'
+    protected_field = ['password_hash', 'last_login_ip', 'code']
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
     email = db.Column(db.String(128))
@@ -19,8 +21,6 @@ class User(db.Model, SessionMixin, UserMixin):
     state = db.Column(db.Integer)
     phone = db.Column(db.String(16))
     code = db.Column(db.String(12))
-
-
 
     @property
     def password(self):
