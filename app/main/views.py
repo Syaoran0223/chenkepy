@@ -5,21 +5,34 @@ from flask import render_template, request, url_for, flash, redirect, session, g
 from flask.ext.login import login_user,logout_user,login_required,current_user
 
 from . import main
-from .forms import LoginForm,PasswordResetRequestForm,PasswordResetForm
+from .forms import LoginForm, PasswordResetRequestForm,PasswordResetForm
+from app.api.forms import SmsForm
 from app.models import User, Region, School
-from app.exceptions import JsonOutputException
-
+from app.sms import SmsServer
 @main.route('/register/', methods=['GET', 'POST'])
 def register():
-    if request.method == 'POST':
-        phone = request.form.get('phone')
-        if not phone:
-            raise JsonOutputException('请输入正确的手机号')
-        session['phone'] = phone
-        return {'code': 0}
-    if session.get('phone'):
-        return redirect(url_for('main.register_info'))
-    return render_template('register.html')
+    form = SmsForm()
+    phone = form.phone.data
+    if form.validate_on_submit():
+        user = User.query.filter_by(phone=phone)
+        if user is not None:
+            flash('该手机号已经注册过')
+            return render_template('register.html')
+        sms = SmsServer()
+        if sms.check_code(form.valid_code.data, form.phone.data):
+            #邀请码验证
+            return render_template('register_info.html')
+        else:
+            flash('验证码错误')
+            form.valid_code.data = ''
+            return render_template('register.html', form)
+    return render_template('register.html', form)
+
+    session['phone'] = phone
+    return {'code': 0}
+    #if session.get('phone'):
+    #    return redirect(url_for('main.register_info'))
+    #return render_template('register.html')
 
 @main.route('/login/', methods=['GET', 'POST'])
 def login():
@@ -34,7 +47,7 @@ def login():
              login_user(user)
              return redirect(request.args.get('next') or url_for('main.index'))
          flash('用户名或密码错误')
-    return render_template('login.html',form=form)
+    return render_template('login.html', form=form)
 
 @main.route('/register/info/')
 def register_info():
