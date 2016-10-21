@@ -23,12 +23,14 @@
                    autofocus>
         </div>
         <div class="form-group">
+
             <input type="text" class="form-control input-lg valid-code-input col-sm-9"
                    id="valid_code"
                    placeholder="验证码"
                    required>
-            <button type="button" class="btn btn-default valid-code-btn">获取验证码</button>
-        </div>
+            </div>
+            <button type="button" id="getCode" class="btn btn-default valid-code-btn">获取验证码</button>
+
 
         <div class="form-group">
             <input type="text" class="form-control input-lg"
@@ -63,6 +65,46 @@
         lineColor: '#ddd',
         parallax: false
     })
+    $('#getCode').click(function () {
+       if ($("#phone").val() == "")
+       {
+           alert("手机号码不能为空");
+           $("#phone").focus();
+           return false;
+       }
+       if(!$("#phone").val().match(/^(((13[0-9]{1})|159|153)+\d{8})$/) ){
+           alert('手机号不正确');
+           $("#phone").focus();
+           return false;
+       }
+       $.getJSON('/api/sms',{
+           phone:$('#phone').val()
+       },function (obj) {
+           if(obj.code==0){
+               alert('发送成功');
+               $('#getCode').attr('disabled',"true");
+               var i = 60;
+               var r = setInterval(function () {
+                   if(i>0){
+                        i--;
+                        $('#getCode').text(i+"秒后重新发送")
+                   }
+                    else{
+                        enablesms(r);
+                   }
+               },1000);
+               $('#getCode').text('获取验证码');
+           }else{
+               alert(obj.msg);
+           }
+
+       });
+    });
+  function enablesms(code) {
+      clearInterval(code);
+      $('#getCode').attr('disabled',false);
+      $('#getCode').text('获取验证码');
+  }
 </script>
 
 <script>
