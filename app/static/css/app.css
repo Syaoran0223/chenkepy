@@ -41,7 +41,8 @@ body {
 .valid-code-btn {
     margin-top: 5px;
     margin-left: 3px;
+    margin-bottom: 25px;
 }
 .valid-code-input {
-    width: 65%;
+    width: 52%;
 }

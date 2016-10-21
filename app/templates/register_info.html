@@ -6,6 +6,7 @@
     <title>思明试卷情报系统</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="{$=url_for('static', filename='css/bootstrap-3.3.6.min.css')}">
+    <script src="{$=url_for('static', filename="public/static/jquery.min.js")}"></script>
 </head>
 <body>
 <div class="container">
@@ -46,44 +47,38 @@
                   <input type="email" class="form-control" id="email" placeholder="邮箱">
                 </div>
               </div>
-              <div class="form-group">
-                <label for="province" class="col-sm-3 control-label">所在城市</label>
-                <div class="col-sm-8">
-                  <select class="form-control" id="province">
-                      {% for p in provinces %}
-                      <option value="{$=p.id}" {% if p.id==1257 %}selected{% endif %}>{$=p.name}</option>
-                      {% endfor %}
-                  </select>
+              <div class="selectList">
+                <div class="form-group">
+                  <label for="province" class="col-sm-3 control-label">所在城市</label>
+                  <div class="col-sm-8">
+                    <select class="form-control" id="province">
+                      <option>请选择</option>
+                    </select>
+                  </div>
                 </div>
-              </div>
-              <div class="form-group">
-                <label for="province" class="col-sm-3 control-label"></label>
-                <div class="col-sm-8">
-                  <select class="form-control" id="city">
-                      {% for c in cities %}
-                      <option value="{$=c.id}" {% if c.id==1258 %}selected{% endif %}>{$=c.name}</option>
-                      {% endfor %}
-                  </select>
+                <div class="form-group">
+                  <label for="province" class="col-sm-3 control-label"></label>
+                  <div class="col-sm-8">
+                    <select class="form-control" id="city">
+                      <option>请选择</option>
+                    </select>
+                  </div>
                 </div>
-              </div>
-              <div class="form-group">
-                <label for="province" class="col-sm-3 control-label"></label>
-                <div class="col-sm-8">
-                  <select class="form-control" id="area">
-                      {% for a in areas %}
-                      <option value="{$=a.id}" {% if a.id==1260 %}selected{% endif %}>{$=a.name}</option>
-                      {% endfor %}
-                  </select>
+                <div class="form-group">
+                  <label for="province" class="col-sm-3 control-label"></label>
+                  <div class="col-sm-8">
+                    <select class="form-control" id="area">
+                      <option>请选择</option>
+                    </select>
+                  </div>
                 </div>
-              </div>
-              <div class="form-group">
-                <label for="school" class="col-sm-3 control-label">学校</label>
-                <div class="col-sm-8">
-                  <select class="form-control" id="area">
-                      {% for s in schools %}
-                      <option value="{$=s.id}">{$=s.name}</option>
-                      {% endfor %}
-                  </select>
+                <div class="form-group">
+                  <label for="school" class="col-sm-3 control-label">学校</label>
+                  <div class="col-sm-8">
+                    <select class="form-control" id="school">
+                      <option>请选择</option>
+                    </select>
+                  </div>
                 </div>
               </div>
               <div class="form-group">
@@ -106,6 +101,82 @@
         <button class="btn btn-warning"><span class="glyphicon glyphicon-chevron-left"></span> 上一步</button>
         <button class="btn btn-primary">&nbsp;&nbsp;保存&nbsp;&nbsp;</button>
     </div>
+    <script type="text/javascript">
+      $(function(){
+          $(".selectList").each(function(){
+              var temp_html;
+              var oProvince = $(this).find("#province");
+              var oCity = $(this).find("#city");
+              var oArea = $(this).find("#area");
+              var oSchool = $(this).find('#school')
+              //初始化省
+              var province = function(){
+                  var provinces;
+                  var temp_html = '<option>请选择</option>';
+                  $.getJSON('/api/province/', {}, function(data) {
+                      provinces = data.data
+                      $.each(provinces, function(i,province){
+                          temp_html+="<option value='"+province.id+"'>"+province.name+"</option>";
+                      });
+                      oProvince.html(temp_html);
+                  })
+              };
+              //赋值市
+              var city = function(){
+                  var temp_html = '<option>请选择</option>';
+                  var cities;
+                  var pro_id = oProvince.val()
+                  $.getJSON('/api/city/', {pro_id: pro_id}, function(data) {
+                      cities = data.data
+                      $.each(cities, function(i,city){
+                          temp_html+="<option value='"+city.id+"'>"+city.name+"</option>";
+                      });
+                      oCity.html(temp_html);
+                  })
+              };
+              //赋值县
+              var area = function(){
+                  var temp_html = '<option>请选择</option>';
+                  var areas;
+                  var city_id = oCity.val();
+                  $.getJSON('/api/area/', {city_id: city_id}, function(data) {
+                      areas = data.data
+                      $.each(areas, function(i,area){
+                          temp_html+="<option value='"+area.id+"'>"+area.name+"</option>";
+                      });
+                      oArea.html(temp_html);
+                  })
+              };
+
+              //学校
+              var school = function() {
+                var temp_html = '<option>请选择</option>';
+                var schools;
+                var ctid = oArea.val();
+                $.getJSON('/api/school/', {ctid: ctid}, function(data) {
+                    schools = data.data
+                    $.each(schools, function(i,school){
+                        temp_html+="<option value='"+school.id+"'>"+school.name+"</option>";
+                    });
+                    oSchool.html(temp_html);
+                })
+              }
+
+              //选择省改变市
+              oProvince.change(function(){
+                  city();
+              });
+              //选择市改变县
+              oCity.change(function(){
+                  area();
+              });
+              oArea.change(function() {
+                  school();
+              })
+              province();
+          });
+      });
+    </script>
 </div>
 </body>
 </html>

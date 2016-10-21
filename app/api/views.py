@@ -6,13 +6,14 @@ from flask.ext.login import login_required
 from .forms import SmsForm
 
 from . import api_blueprint
-from app.models import Region
+from app.models import Region, School
 from app.sms import SmsServer
 
 @api_blueprint.route('/province/')
 def province():
     provinces = Region.get_province()
     return {
+        'code': 0,
         'data': provinces
     }
 
@@ -23,6 +24,7 @@ def city():
         raise JsonOutputException('need pro_id')
     cities = Region.get_city(pro_id)
     return {
+        'code': 0,
         'data': cities
     }
 
@@ -33,7 +35,19 @@ def area():
         raise JsonOutputException('need city_id')
     areas = Region.get_area(city_id)
     return {
+        'code': 0,
         'data': areas
+    }
+
+@api_blueprint.route('/school/')
+def school():
+    ctid = request.args.get('ctid')
+    if not ctid:
+        raise JsonOutputException('need ctid')
+    schools = School.get_schools_by_ctid(ctid)
+    return {
+        'code': 0,
+        'data': schools
     }
 
 @api_blueprint.route('/sms/')
