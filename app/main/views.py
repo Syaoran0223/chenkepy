@@ -50,14 +50,13 @@ def register_info():
         schools=schools)
 
 @main.route('/')
+@login_required
 def index():
-    if g.user is None or g.user.is_anonymous():
-        return redirect(url_for('main.login'))
     site_url = 'http://192.168.146.130:5000'
     return render_template('index.html', site_url=site_url)
 
-@login_required
 @main.route("/logout")
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('main.index'))

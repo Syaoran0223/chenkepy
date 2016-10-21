@@ -5,6 +5,6 @@ from flask.ext.login import current_user
 from . import main
 
 # 初始化g.user
-@main.before_request
+@main.before_app_request
 def before_request():
     g.user = current_user

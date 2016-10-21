@@ -1,6 +1,6 @@
 import json
 from app.exceptions import JsonOutputException, FormValidateError
-from flask import request
+from flask import request, g
 from .forms import SmsForm
 
 from . import api_blueprint
@@ -9,6 +9,7 @@ from app.sms import SmsServer
 
 @api_blueprint.route('/province/')
 def province():
+    import ipdb;ipdb.set_trace()
     provinces = Region.get_province()
     return {
         'data': provinces
