@@ -5,7 +5,6 @@ from flask.ext.login import login_user,logout_user,login_required,current_user
 
 from . import main
 from .forms import LoginForm,PasswordResetRequestForm,PasswordResetForm
-from app.email import send_email
 from app.models import User, Region, School
 from app.exceptions import JsonOutputException
 
@@ -60,22 +59,19 @@ def logout():
     return redirect(url_for('main.index'))
 
 
-@amin.route('/reset', methods=['GET', 'POST'])
+@main.route('/reset', methods=['GET', 'POST'])
 def password_reset_request():
-    if not current_user.is_anonymous:
-        return redirect(url_for('main.index'))
-    form = PasswordResetRequestForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        if user:
-            token = user.generate_reset_token()
-            send_email(user.email, 'Reset Your Password',
-                       'auth/email/reset_password',
-                       user=user, token=token,
-                       next=request.args.get('next'))
-        flash('已发送密码重置的邮件至您注册时登记的邮箱中')
-        return redirect(url_for('main.login'))
-    return render_template('main/reset_password.html', form=form)
+    passs
+    # if not current_user.is_anonymous:
+    #     return redirect(url_for('main.index'))
+    # form = PasswordResetRequestForm()
+    # if form.validate_on_submit():
+    #     user = User.query.filter_by(email=form.email.data).first()
+    #     if user:
+    #         token = user.generate_reset_token()
+    #     flash('已发送密码重置的邮件至您注册时登记的邮箱中')
+    #     return redirect(url_for('main.login'))
+    # return render_template('main/reset_password.html', form=form)
 
 
 @main.route('/reset/<token>', methods=['GET', 'POST'])
