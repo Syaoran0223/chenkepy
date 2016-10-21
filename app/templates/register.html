@@ -13,11 +13,13 @@
 
     <h1 class="page-heading text-center">思明试卷情报系统</h1>
 
-    <form>
+    <form method="post" action="{$=url_for('main.register')}">
+        {$=form.csrf_token}
         <h2 class="form-heading text-center">注册</h2>
         <div class="form-group">
             <input type="text" class="form-control input-lg"
                    id="phone"
+                   name="phone"
                    placeholder="手机号"
                    required
                    autofocus>
@@ -26,6 +28,7 @@
 
             <input type="text" class="form-control input-lg valid-code-input col-sm-9"
                    id="valid_code"
+                   name="valid_code"
                    placeholder="验证码"
                    required>
             </div>
@@ -35,6 +38,7 @@
         <div class="form-group">
             <input type="text" class="form-control input-lg"
                    id="visit_code"
+                   name="visit_code"
                    placeholder="邀请码"
                    required>
         </div>
@@ -115,7 +119,9 @@
             url: "/register/",
             // contentType: "application/json",
             data: {
-                "phone": $("#phone").val()
+                "phone": $("#phone").val(),
+                'valid_code':$('#visit_code').val(),
+                'visit_code':$('#visit_code').val()
             },
             success: function (json) {
                 if (!json.code) {
