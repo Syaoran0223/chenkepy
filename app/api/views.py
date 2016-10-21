@@ -1,6 +1,8 @@
 import json
 from app.exceptions import JsonOutputException, FormValidateError
-from flask import request
+from app.decorators import api_login_required
+from flask import request, g
+from flask.ext.login import login_required
 from .forms import SmsForm
 
 from . import api_blueprint

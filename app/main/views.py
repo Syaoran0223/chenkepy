@@ -1,7 +1,8 @@
 #coding: utf-8
 
-from flask import render_template, request, url_for, flash, redirect, session
-from flask.ext.login import login_user, logout_user, login_required, current_user
+import json
+from flask import render_template, request, url_for, flash, redirect, session, g
+from flask.ext.login import login_user,logout_user,login_required,current_user
 
 from . import main
 from .forms import LoginForm, PasswordResetRequestForm,PasswordResetForm
@@ -35,6 +36,8 @@ def register():
 
 @main.route('/login/', methods=['GET', 'POST'])
 def login():
+    if g.user is not None and g.user.is_authenticated():
+        return redirect(url_for('main.index'))
     form = LoginForm()
     if form.validate_on_submit():
          user = User.query.filter_by(name=form.user_name.data).first()
@@ -61,12 +64,15 @@ def register_info():
         schools=schools)
 
 @main.route('/')
+@login_required
 def index():
     site_url = 'http://192.168.146.130:5000'
-    return render_template('index.html', site_url=site_url)
+    user_info = current_user.to_dict()
+    user_info = json.dumps(user_info)
+    return render_template('index.html', site_url=site_url, user_info=user_info)
 
-@login_required
 @main.route("/logout")
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('main.index'))

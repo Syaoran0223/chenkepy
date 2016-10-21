@@ -2,13 +2,15 @@
 import datetime
 
 class SessionMixin(object):
-    def to_dict(self):
+    def to_dict(self, filter=None):
         dictionary = self.__dict__.copy()
         res = {}
         for k, v in dictionary.items():
             if k == '_sa_instance_state':
                 continue
             if k in getattr(self, 'protected_field', ()):
+                continue
+            if isinstance(filter, list) and k in filter:
                 continue
             if isinstance(v, datetime.datetime):
                 v = v.strftime('%Y-%m-%d %H:%M:%S')

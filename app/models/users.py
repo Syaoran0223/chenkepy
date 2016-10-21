@@ -7,6 +7,8 @@ from ._base import SessionMixin
 
 class User(db.Model, SessionMixin, UserMixin):
     __tablename__ = 'user'
+    protected_field = ['password_hash', 'last_login_ip', 'code']
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
     email = db.Column(db.String(128))
@@ -20,8 +22,6 @@ class User(db.Model, SessionMixin, UserMixin):
     phone = db.Column(db.String(16))
     code = db.Column(db.String(12))
 
-
-
     @property
     def password(self):
         return AttributeError('password is not a readable attribute')
@@ -32,6 +32,13 @@ class User(db.Model, SessionMixin, UserMixin):
 
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return str(self.id)
+    
 
     def __repr__(self):
         return '<User: %r>' % self.name
