@@ -1,6 +1,6 @@
 #coding: utf-8
 
-from flask import render_template, request, url_for, flash, redirect, session
+from flask import render_template, request, url_for, flash, redirect, session, g
 from flask.ext.login import login_user,logout_user,login_required,current_user
 
 from . import main
@@ -22,6 +22,8 @@ def register():
 
 @main.route('/login/', methods=['GET', 'POST'])
 def login():
+    if g.user is not None and g.user.is_authenticated():
+        return redirect(url_for('main.index'))
     form = LoginForm()
     if form.validate_on_submit():
          user = User.query.filter_by(name=form.user_name.data).first()
@@ -49,6 +51,8 @@ def register_info():
 
 @main.route('/')
 def index():
+    if g.user is None or g.user.is_anonymous():
+        return redirect(url_for('main.login'))
     site_url = 'http://192.168.146.130:5000'
     return render_template('index.html', site_url=site_url)
 

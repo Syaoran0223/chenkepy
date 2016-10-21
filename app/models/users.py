@@ -33,6 +33,13 @@ class User(db.Model, SessionMixin, UserMixin):
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return str(self.id)
+    
+
     def __repr__(self):
         return '<User: %r>' % self.name
 
