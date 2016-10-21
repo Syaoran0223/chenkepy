@@ -1,5 +1,7 @@
-from app.exceptions import JsonOutputException
+import json
+from app.exceptions import JsonOutputException, FormValidateError
 from flask import request
+from .forms import SmsForm
 
 from . import api_blueprint
 from app.models import Region
@@ -34,7 +36,10 @@ def area():
 
 @api_blueprint.route('/sms/')
 def send_msg():
-    phone = request.args.get('phone')
+    form = SmsForm(request.args)
+    if not form.validate():
+        raise FormValidateError(form.errors)
+    phone = form.phone.data
     sms = SmsServer()
     success, code = sms.generate_code(phone)
     if not success:

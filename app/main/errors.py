@@ -1,5 +1,5 @@
 from flask import render_template, request, jsonify
-from app.exceptions import JsonOutputException
+from app.exceptions import JsonOutputException, FormValidateError
 from . import main
 
 @main.app_errorhandler(404)
@@ -23,5 +23,18 @@ def internal_server_error(e):
 @main.app_errorhandler(JsonOutputException)
 def json_output(e):
     response = jsonify({'code': '400', 'msg': str(e)})
+    response.status_code = 200
+    return response
+
+@main.app_errorhandler(FormValidateError)
+def form_validate(e):
+    msg = ''
+    if (len(e.args) > 0):
+        msg_origin = e.args[0]
+        for (key, value) in msg_origin.items():
+            for err in value:
+                msg += err + ' '
+            msg += key
+    response = jsonify({'code': '400', 'msg': msg})
     response.status_code = 200
     return response
