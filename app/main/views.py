@@ -5,13 +5,13 @@ from flask import render_template, request, url_for, flash, redirect, session, g
 from flask.ext.login import login_user,logout_user,login_required,current_user
 
 from . import main
-from .forms import LoginForm, RegisterForm, PasswordResetRequestForm, PasswordResetForm
+
+from .forms import LoginForm, RegisterForm, PasswordResetRequestForm, PasswordResetForm, RegisterInfoForm
 from app.models import User, Region, School, InviteCode
+
 from app.sms import SmsServer
 @main.route('/register/', methods=['GET', 'POST'])
 def register():
-    if session.get('phone'):
-        return redirect(url_for('main.register_info'))
     form = RegisterForm()
     if form.validate_on_submit():
         phone = form.phone.data
@@ -48,11 +48,23 @@ def login():
          flash('用户名或密码错误')
     return render_template('login.html', form=form)
 
-@main.route('/register/info/')
+@main.route('/register/info/', methods=['GET', 'POST'])
 def register_info():
     if not session.get('phone'):
         return redirect('main.register')
-    return render_template('register_info.html')
+    form = RegisterInfoForm()
+    if form.validate_on_submit():
+        user = User(name=form.user_name.data,
+            phone=form.phone.data,
+            email=form.email.data,
+            password=form.password.data,
+            school_id=form.school_id.data,
+            city_id=form.city_id.data,
+            grade_id=form.grade_id.data)
+        user.save()
+        login_user(user)
+        return redirect(url_for('main.index'))
+    return render_template('register_info.html', form=form)
 
 @main.route('/')
 @login_required

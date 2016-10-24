@@ -1,5 +1,6 @@
 
 import datetime
+from app import db
 
 class SessionMixin(object):
     def to_dict(self, filter=None):
