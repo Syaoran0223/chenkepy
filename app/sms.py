@@ -53,4 +53,4 @@ class SmsServer(object):
 
     def check_code(self, code, phone):
         valid_code_key = "code_{}".format(phone)
-        return cache.get(valid_code_key) == code
+        return str(cache.get(valid_code_key)) == code

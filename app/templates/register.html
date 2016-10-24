@@ -42,6 +42,12 @@
                    placeholder="邀请码"
                    required>
         </div>
+        {% for message in get_flashed_messages() %}
+          <div class="alert alert-warning">
+              <button type="button" class="close" data-dismiss="alert">&times;</button>
+              {$= message}
+          </div>
+        {% endfor %}
 
         <div class="row">
             <div class="col-md-12">
@@ -111,29 +117,5 @@
   }
 </script>
 
-<script>
-    $("form").on('submit', function (e) {
-        e.preventDefault();
-        $.ajax({
-            type: 'POST',
-            url: "/register/",
-            // contentType: "application/json",
-            data: {
-                "phone": $("#phone").val(),
-                'valid_code':$('#visit_code').val(),
-                'visit_code':$('#visit_code').val()
-            },
-            success: function (json) {
-                if (!json.code) {
-                    location.href = "/register/info";
-                }
-                else {
-                    alert(json.msg);
-                }
-            },
-            dataType: 'json'
-        });
-    });
-</script>
 </body>
 </html>

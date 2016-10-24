@@ -5,34 +5,28 @@ from flask import render_template, request, url_for, flash, redirect, session, g
 from flask.ext.login import login_user,logout_user,login_required,current_user
 
 from . import main
-from .forms import LoginForm, PasswordResetRequestForm,PasswordResetForm
-from app.api.forms import SmsForm
+from .forms import LoginForm, RegisterForm, PasswordResetRequestForm, PasswordResetForm
 from app.models import User, Region, School
 from app.sms import SmsServer
 @main.route('/register/', methods=['GET', 'POST'])
 def register():
-    form = SmsForm()
-    phone = form.phone.data
+    if session.get('phone'):
+        return redirect(url_for('main.register_info'))
+    form = RegisterForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(phone=phone)
+        phone = form.phone.data
+        user = User.query.filter_by(phone=phone).first()
         if user is not None:
             flash('该手机号已经注册过')
-            return render_template('register.html')
+            return render_template('register.html', form=form)
         sms = SmsServer()
-        if sms.check_code(form.valid_code.data, form.phone.data):
-            #邀请码验证
-            return render_template('register_info.html')
-        else:
+        # 验证码验证
+        if not sms.check_code(form.valid_code.data, phone):
             flash('验证码错误')
-            form.valid_code.data = ''
-            return render_template('register.html', form)
-    return render_template('register.html', form)
-
-    session['phone'] = phone
-    return {'code': 0}
-    #if session.get('phone'):
-    #    return redirect(url_for('main.register_info'))
-    #return render_template('register.html')
+            return render_template('register.html', form=form)
+        session['phone'] = phone
+        return redirect(url_for('main.register_info'))
+    return render_template('register.html', form=form)
 
 @main.route('/login/', methods=['GET', 'POST'])
 def login():

@@ -10,6 +10,12 @@ class LoginForm(Form):
     remember_me = BooleanField('保持登录')
     submit = SubmitField('登录')
 
+class RegisterForm(Form):
+    phone = StringField('Phone', validators=[Required(),
+        Length(11, 11, '手机号不正确')])
+    valid_code = StringField('ValidCode', validators=[Required('请输入验证码')])
+    visit_code = StringField('VisitCode', validators=[Required('请输入邀请码')])
+
 class PasswordResetRequestForm(Form):
     email = StringField('邮箱', validators=[Required(), Length(1, 64),
                                              Email()])
