@@ -11,5 +11,12 @@ class InviteCode(db.Model, SessionMixin):
     state = db.Column(db.Integer)
     add_time = db.Column(db.DateTime, default=datetime.now)
 
+    @staticmethod
+    def get_code(invite_code):
+        res = InviteCode.query.filter_by(state=1, invite_code=invite_code).first()
+        return res is not None
+
     def __repr__(self):
         return '<Invite Code: %r>' % self.name
+
+
