@@ -53,15 +53,7 @@ def login():
 def register_info():
     if not session.get('phone'):
         return redirect('main.register')
-    provinces = Region.get_province()
-    cities = Region.get_city(1257)
-    areas = Region.get_area(1258)
-    schools = School.get_schools_by_ctid(1260)
-    return render_template('register_info.html',
-        provinces=provinces,
-        cities=cities,
-        areas=areas,
-        schools=schools)
+    return render_template('register_info.html')
 
 @main.route('/')
 @login_required
@@ -80,7 +72,7 @@ def logout():
 
 @main.route('/reset', methods=['GET', 'POST'])
 def password_reset_request():
-    passs
+    pass
     # if not current_user.is_anonymous:
     #     return redirect(url_for('main.index'))
     # form = PasswordResetRequestForm()
