@@ -18,7 +18,7 @@ class User(db.Model, SessionMixin, UserMixin):
     city_id = db.Column(db.Integer)
     user_type = db.Column(db.Integer)
     last_login_ip = db.Column(db.String(64))
-    state = db.Column(db.Integer)
+    state = db.Column(db.Integer, default=0)
     phone = db.Column(db.String(16))
     code = db.Column(db.String(12))
 
