@@ -13,7 +13,7 @@ from app.sms import SmsServer
 def register():
     form = SmsForm()
     phone = form.phone.data
-    if form.validate_on_submit():
+    if form.validate():
         user = User.query.filter_by(phone=phone)
         if user is not None:
             flash('该手机号已经注册过')
@@ -25,8 +25,8 @@ def register():
         else:
             flash('验证码错误')
             form.valid_code.data = ''
-            return render_template('register.html', form)
-    return render_template('register.html', form)
+            return render_template('register.html', form=form)
+    return render_template('register.html', form=form)
 
     session['phone'] = phone
     return {'code': 0}
