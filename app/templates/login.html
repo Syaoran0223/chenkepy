@@ -44,6 +44,14 @@
             {$= message}
         </div>
         {% endfor %}
+        {% for index, errors in form.errors.items() %}
+          {% for message in errors %}
+          <div class="alert alert-warning">
+              <button type="button" class="close" data-dismiss="alert">&times;</button>
+              {$=message}
+          </div>
+          {% endfor %}
+        {% endfor %}
 
         <div class="row">
             <div class="col-md-12">

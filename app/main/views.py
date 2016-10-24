@@ -10,8 +10,6 @@ from app.models import User, Region, School
 from app.sms import SmsServer
 @main.route('/register/', methods=['GET', 'POST'])
 def register():
-    if session.get('phone'):
-        return redirect(url_for('main.register_info'))
     form = RegisterForm()
     if form.validate_on_submit():
         phone = form.phone.data

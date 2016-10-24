@@ -5,13 +5,13 @@ from wtforms import ValidationError
 from ..models import User
 
 class LoginForm(Form):
-    user_name = StringField('用户名',validators=[Required(), Length(1,64)])
-    password = PasswordField('密码',validators=[Required()])
+    user_name = StringField('用户名',validators=[Required('请输入用户名'), Length(1,64)])
+    password = PasswordField('密码',validators=[Required('请输入密码')])
     remember_me = BooleanField('保持登录')
     submit = SubmitField('登录')
 
 class RegisterForm(Form):
-    phone = StringField('Phone', validators=[Required(),
+    phone = StringField('Phone', validators=[Required('请输入手机号'),
         Length(11, 11, '手机号不正确')])
     valid_code = StringField('ValidCode', validators=[Required('请输入验证码')])
     visit_code = StringField('VisitCode', validators=[Required('请输入邀请码')])

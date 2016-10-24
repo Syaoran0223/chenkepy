@@ -31,8 +31,8 @@
                    name="valid_code"
                    placeholder="验证码"
                    required>
-            </div>
-            <button type="button" id="getCode" class="btn btn-default valid-code-btn">获取验证码</button>
+        </div>
+        <button type="button" id="getCode" class="btn btn-default valid-code-btn">获取验证码</button>
 
 
         <div class="form-group">
@@ -47,6 +47,14 @@
               <button type="button" class="close" data-dismiss="alert">&times;</button>
               {$= message}
           </div>
+        {% endfor %}
+        {% for index, errors in form.errors.items() %}
+          {% for message in errors %}
+          <div class="alert alert-warning">
+              <button type="button" class="close" data-dismiss="alert">&times;</button>
+              {$=message}
+          </div>
+          {% endfor %}
         {% endfor %}
 
         <div class="row">
