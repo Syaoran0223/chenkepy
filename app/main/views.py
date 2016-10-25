@@ -62,7 +62,7 @@ def register_info():
 @main.route('/')
 @login_required
 def index():
-    site_url = 'http://192.168.146.130:5000'
+    site_url = 'http://127.0.0.1:5000'
     user_info = current_user.to_dict()
     user_info = json.dumps(user_info)
     return render_template('index.html', site_url=site_url, user_info=user_info)
