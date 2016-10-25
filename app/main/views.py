@@ -5,8 +5,10 @@ from flask import render_template, request, url_for, flash, redirect, session, g
 from flask.ext.login import login_user,logout_user,login_required,current_user
 
 from . import main
+
 from .forms import LoginForm, RegisterForm, PasswordResetRequestForm, PasswordResetForm, RegisterInfoForm
-from app.models import User, Region, School
+from app.models import User, Region, School, InviteCode
+
 from app.sms import SmsServer
 @main.route('/register/', methods=['GET', 'POST'])
 def register():
@@ -22,8 +24,13 @@ def register():
         if not sms.check_code(form.valid_code.data, phone):
             flash('验证码错误')
             return render_template('register.html', form=form)
+        if not InviteCode.get_code(form.visit_code.data):
+            flash('邀请码错误')
+            return render_template('register.html', form=form)
         session['phone'] = phone
         return redirect(url_for('main.register_info'))
+    else:
+        flash(form.errors)
     return render_template('register.html', form=form)
 
 @main.route('/login/', methods=['GET', 'POST'])
