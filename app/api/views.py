@@ -5,7 +5,7 @@ from app.models import Attachment
 from app.utils import upload
 from flask import request, g
 from flask.ext.login import login_required
-from .forms import SmsForm
+from .forms import SmsForm, PaperUploadForm
 
 from . import api_blueprint
 from app.models import Region, School
@@ -94,6 +94,14 @@ def upload_attachment():
             'data': [attachment.url]
         }
     raise JsonOutputException('上传失败')
+
+@api_blueprint.route('/paper/upload/', methods=['POST'])
+@api_login_required
+def paper_upload():
+    form = PaperUploadForm(request.form)
+    if not form.validate():
+        raise FormValidateError(form.errors)
+    # todo 插入数据库
 
 
 
