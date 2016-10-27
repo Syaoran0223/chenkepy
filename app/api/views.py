@@ -71,6 +71,7 @@ def send_msg():
         }
     return sms.send_code(code, phone)
 
+
 @api_blueprint.route('/uploads', methods=['POST'])
 @api_login_required
 def upload_attachment():
@@ -93,8 +94,6 @@ def upload_attachment():
             'data': [attachment.url]
         }
     raise JsonOutputException('上传失败')
-
-
 
 
 

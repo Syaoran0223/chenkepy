@@ -44,6 +44,7 @@ def login():
              user = User.query.filter_by(phone=form.user_name.data).first()
          if user is not None and user.verify_password(form.password.data):
              login_user(user)
+             flash('登录成功')
              return redirect(request.args.get('next') or url_for('main.index'))
          flash('用户名或密码错误')
     return render_template('login.html', form=form)
@@ -63,7 +64,9 @@ def register_info():
             grade_id=form.grade_id.data)
         user.save()
         login_user(user)
-        return redirect(url_for('main.index'))
+        flash('注册成功')
+        return render_template('main.index')
+        #return redirect(url_for('main.index'))
     return render_template('register_info.html', form=form)
 
 @main.route('/')
