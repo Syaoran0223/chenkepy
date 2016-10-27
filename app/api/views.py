@@ -1,6 +1,8 @@
 import json
 from app.exceptions import JsonOutputException, FormValidateError
 from app.decorators import api_login_required
+from app.models import Attachment
+from app.utils import upload
 from flask import request, g
 from flask.ext.login import login_required
 from .forms import SmsForm
@@ -65,10 +67,33 @@ def send_msg():
         }
     return sms.send_code(code, phone)
 
-@login_required
-@api_blueprint.route('/picupload/', methods=['POST'])
-def picupload():
-    request.json.
+
+@api_blueprint.route('/uploads', methods=['POST'])
+@api_login_required
+def upload_attachment():
+    file = request.files.get('file')
+    thumb = bool(request.args.get('thumb', False))
+    if not file:
+        raise JsonOutputException('请选择要上传的文件')
+    file_type = request.form.get('type', '')
+    data = upload(file, thumb)
+    if data.get('status') is True:
+        attachment = Attachment(
+            name=data.get('original', ''),
+            url=data.get('url', ''),
+            user_id=g.user.id,
+            file_type=file_type)
+        attachment.save()
+        attachment.id
+        return {
+            'code': 0,
+            'data': [attachment.url]
+        }
+    raise JsonOutputException('上传失败')
+
+
+
+>>>>>>> 5514a66c9d2e4f739977b1300cdd776d4f26a9c1
 
 
 
