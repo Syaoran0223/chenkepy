@@ -13,7 +13,8 @@ from app.sms import SmsServer
 
 @api_blueprint.route('/province/')
 def province():
-    provinces = Region.get_province()
+    title = request.args.get('title', '')
+    provinces = Region.get_province(title)
     return {
         'code': 0,
         'data': provinces
@@ -22,9 +23,10 @@ def province():
 @api_blueprint.route('/city/')
 def city():
     pro_id = request.args.get('pro_id')
+    title = request.args.get('title', '')
     if not pro_id:
         raise JsonOutputException('need pro_id')
-    cities = Region.get_city(pro_id)
+    cities = Region.get_city(pro_id, title)
     return {
         'code': 0,
         'data': cities
@@ -33,9 +35,10 @@ def city():
 @api_blueprint.route('/area/')
 def area():
     city_id = request.args.get('city_id')
+    title = request.args.get('title', '')
     if not city_id:
         raise JsonOutputException('need city_id')
-    areas = Region.get_area(city_id)
+    areas = Region.get_area(city_id, title)
     return {
         'code': 0,
         'data': areas
@@ -44,9 +47,10 @@ def area():
 @api_blueprint.route('/school/')
 def school():
     ctid = request.args.get('ctid')
+    title = request.args.get('title', '')
     if not ctid:
         raise JsonOutputException('need ctid')
-    schools = School.get_schools_by_ctid(ctid)
+    schools = School.get_schools_by_ctid(ctid, title)
     return {
         'code': 0,
         'data': schools

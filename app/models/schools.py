@@ -9,9 +9,19 @@ class School(db.Model, SessionMixin):
     type = db.Column(db.Integer)
     name = db.Column(db.String(30))
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'title': self.name
+        }
+
     @staticmethod
-    def get_schools_by_ctid(ctid):
-        res = School.query.filter_by(ctid=ctid).all()
+    def get_schools_by_ctid(ctid, title=""):
+        query = School.query.filter_by(ctid=ctid)
+        if title:
+            query = query.filter(School.name.like('%{}%'.format(title)))
+        res = query.all()
         res = list(map(lambda x: x.to_dict(), res))
         return res
     

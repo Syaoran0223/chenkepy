@@ -10,21 +10,37 @@ class Region(db.Model, SessionMixin):
     code = db.Column(db.String(6))
     name = db.Column(db.String(30))
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'title': self.name
+        }
+
     @staticmethod
-    def get_province():
-        res = Region.query.filter_by(type=0).all()
+    def get_province(title=''):
+        query = Region.query.filter_by(type=0)
+        if title:
+            query = query.filter(Region.name.like('%{}%'.format(title)))
+        res = query.all()
         res = list(map(lambda x: x.to_dict(), res))
         return res
 
     @staticmethod
-    def get_city(pro_id):
-        res = Region.query.filter_by(type=1, pid=pro_id).all()
+    def get_city(pro_id, title=''):
+        query = Region.query.filter_by(type=1, pid=pro_id)
+        if title:
+            query = query.filter(Region.name.like('%{}%'.format(title)))
+        res = query.all()
         res = list(map(lambda x: x.to_dict(), res))
         return res
 
     @staticmethod
-    def get_area(city_id):
-        res = Region.query.filter_by(type=2, pid=city_id).all()
+    def get_area(city_id, title=''):
+        query = Region.query.filter_by(type=2, pid=city_id)
+        if title:
+            query = query.filter(Region.name.like('%{}%'.format(title)))
+        res = query.all()
         res = list(map(lambda x: x.to_dict(), res))
         return res
     
