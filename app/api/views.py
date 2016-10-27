@@ -65,8 +65,10 @@ def send_msg():
         }
     return sms.send_code(code, phone)
 
-
-
+@login_required
+@api_blueprint.route('/picupload/', methods=['POST'])
+def picupload():
+    request.json.
 
 
 
