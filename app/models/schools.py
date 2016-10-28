@@ -4,6 +4,10 @@ from ._base import SessionMixin
 class School(db.Model, SessionMixin):
     __tablename__ = 'school'
 
+    def __init__(self, *args, **kwargs):
+        School.register()
+        super(School, self).__init__(*args, **kwargs)
+
     id = db.Column(db.Integer, primary_key=True)
     ctid = db.Column(db.Integer)
     type = db.Column(db.Integer)

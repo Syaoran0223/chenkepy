@@ -6,6 +6,7 @@ from app.utils import upload
 from flask import request, g
 from flask.ext.login import login_required
 from .forms import SmsForm, PaperUploadForm
+from werkzeug.datastructures import MultiDict
 
 from . import api_blueprint
 from app.models import Region, School
@@ -98,11 +99,12 @@ def upload_attachment():
 @api_blueprint.route('/paper/upload/', methods=['POST'])
 @api_login_required
 def paper_upload():
-    form = PaperUploadForm(request.form)
+    data = MultiDict(mapping=request.json)
+    form = PaperUploadForm(data)
     if not form.validate():
         raise FormValidateError(form.errors)
-
     # todo 插入数据库
+    attachments = request.json.get('attachments', [])
 
 
 
