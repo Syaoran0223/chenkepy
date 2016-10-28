@@ -13,3 +13,8 @@ class Attachment(db.Model, SessionMixin):
     file_type = db.Column(db.String(128)) # 本地路径
     user_id = db.Column(db.Integer)
     create_time = db.Column(db.DateTime, default=datetime.now)
+   # exam_id = db.Column(db.Integer, db.ForeignKey('exam.id'))
+
+    @staticmethod
+    def get_attachment(att_id):
+        return Attachment.query.get(int(att_id))

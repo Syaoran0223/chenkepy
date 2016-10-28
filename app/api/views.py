@@ -1,7 +1,7 @@
 import json
 from app.exceptions import JsonOutputException, FormValidateError
 from app.decorators import api_login_required
-from app.models import Attachment
+from app.models import Attachment, Exam
 from app.utils import upload
 from flask import request, g
 from flask.ext.login import login_required
@@ -101,6 +101,7 @@ def paper_upload():
     form = PaperUploadForm(request.form)
     if not form.validate():
         raise FormValidateError(form.errors)
+
     # todo 插入数据库
 
 
