@@ -9,6 +9,10 @@ class User(db.Model, SessionMixin, UserMixin):
     __tablename__ = 'user'
     protected_field = ['password_hash', 'last_login_ip', 'code']
 
+    def __init__(self, *args, **kwargs):
+        User.register()
+        super(User, self).__init__(*args, **kwargs)
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
     email = db.Column(db.String(128))

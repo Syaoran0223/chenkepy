@@ -4,6 +4,11 @@ from ._base import SessionMixin
 class Region(db.Model, SessionMixin):
     __tablename__ = 'region'
 
+    def __init__(self, *args, **kwargs):
+        Region.register()
+        super(Region, self).__init__(*args, **kwargs)
+
+
     id = db.Column(db.Integer, primary_key=True)
     pid = db.Column(db.Integer)
     type = db.Column(db.Integer)

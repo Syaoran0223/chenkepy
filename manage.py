@@ -4,9 +4,10 @@ import os
 from flask.ext.script import Manager, Shell
 from flask.ext.migrate import Migrate, MigrateCommand
 from app import create_app, db
-from app.models import User, InviteCode
 
 app = create_app(os.getenv('BLOG_CONFIG') or 'default')
+
+from app.models import User, InviteCode
 
 manager = Manager(app)
 migrate = Migrate(app, db)
