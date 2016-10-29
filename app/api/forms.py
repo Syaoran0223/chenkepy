@@ -18,6 +18,10 @@ class PaperUploadForm(Form):
         validators.AnyOf(list(const.PAPER_TYPE.keys()), '试卷类型不正确')])
     school_id = IntegerField('SchoolId', validators=[
         validators.DataRequired('请选择学校')])
+    province_id = IntegerField('ProvinceId',validators=[validators.DataRequired('请选择省份')])
+    city_id = IntegerField('CityId', validators=[validators.DataRequired('请选择城市')])
+    area_id = IntegerField('AreaId', validators=[validators.DataRequired('请选择地区')])
+
     subject = StringField('Subject', validators=[
         validators.AnyOf(list(const.SUBJECT.keys()), '学科不正确')])
     grade = StringField('Subject', validators=[

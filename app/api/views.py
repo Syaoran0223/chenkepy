@@ -105,6 +105,19 @@ def paper_upload():
         raise FormValidateError(form.errors)
     # todo 插入数据库
     attachments = request.json.get('attachments', [])
+    exam = Exam(name=form.name.data, section=form.section.data, subject=form.subject.data, paper_types=form.paper_types.data, \
+                province_id=form.province_id.data, city_id=form.city_id.data, area_id=form.area_id.data,\
+                school_id=form.school_id.data,
+                year=form.year.data, grade=form.grade.data, state=0, attachments=attachments)
+    result = exam.save()
+    if result.id is not None:
+        return {
+            'code': 0,
+            'data': ''
+        }
+    raise JsonOutputException('添加失败')
+
+
 
 
 

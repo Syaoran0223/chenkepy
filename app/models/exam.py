@@ -24,8 +24,12 @@ class Exam(db.Model, SessionMixin):
     attachments = db.Column(db.JsonBlob(), default=[])
 
     @staticmethod
-    def get_exams(pageindex):
-        return Exam.query.order_by(Exam.add_time.desc()).paginate(pageindex, per_page=Config.PER_PAGE, error_out=False)
+    def get_exams(pageindex=1):
+        return Exam.query.order_by(Exam.created_at.desc(), Exam.state).paginate(pageindex, per_page=int(Config.PER_PAGE), error_out=False)
+
+    @staticmethod
+    def get_exam(exam_id):
+        return Exam.query.get(int(exam_id))
 
     def __repr__(self):
         return '<Exam: %r>' % self.name
