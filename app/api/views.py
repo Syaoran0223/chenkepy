@@ -11,6 +11,7 @@ from werkzeug.datastructures import MultiDict
 from . import api_blueprint
 from app.models import Region, School
 from app.sms import SmsServer
+from utils import pagination
 
 @api_blueprint.route('/province/')
 def province():
@@ -117,6 +118,16 @@ def paper_upload():
         }
     raise JsonOutputException('添加失败')
 
+@api_blueprint.route('/exams', methods=['GET'])
+@api_login_required
+def get_exams():
+    return Exam.get_exams()
+
+@api_blueprint.route('/exam/<int:exam_id>', methods=['GET'])
+@api_login_required
+def get_exam(exam_id):
+    exam = Exam.get_exam(exam_id)
+    return exam
 
 
 
