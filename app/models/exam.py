@@ -1,7 +1,7 @@
 from app import db
 from ._base import SessionMixin
 from config import Config
-from utils import pagination
+from app.utils import pagination
 
 class Exam(db.Model, SessionMixin):
     __tablename__ = 'exam'
@@ -30,8 +30,8 @@ class Exam(db.Model, SessionMixin):
         #a = Exam.query.order_by(Exam.created_at.desc(), Exam.state).paginate(pageindex, per_page=int(Config.PER_PAGE), error_out=False)
 
     @staticmethod
-    def get_exam(exam_id):
-        return Exam.query.get(int(exam_id))
+    def get_exam(id):
+        return Exam.query.get(int(id))
 
     def __repr__(self):
         return '<Exam: %r>' % self.name

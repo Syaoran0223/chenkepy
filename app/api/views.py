@@ -2,7 +2,7 @@ import json
 from app.exceptions import JsonOutputException, FormValidateError
 from app.decorators import api_login_required
 from app.models import Attachment, Exam
-from app.utils import upload
+from app.utils import upload, pagination
 from flask import request, g
 from flask.ext.login import login_required
 from .forms import SmsForm, PaperUploadForm
@@ -11,7 +11,6 @@ from werkzeug.datastructures import MultiDict
 from . import api_blueprint
 from app.models import Region, School
 from app.sms import SmsServer
-from utils import pagination
 
 @api_blueprint.route('/province/')
 def province():
@@ -118,16 +117,20 @@ def paper_upload():
         }
     raise JsonOutputException('添加失败')
 
-@api_blueprint.route('/exams', methods=['GET'])
+@api_blueprint.route('/paper/upload/', methods=['GET'])
 @api_login_required
 def get_exams():
-    return Exam.get_exams()
+    data = Exam.get_exams()
+    return {
+        'code': 0,
+        'data': data
+    }
 
-@api_blueprint.route('/exam/<int:exam_id>', methods=['GET'])
+@api_blueprint.route('/paper/upload/<int:id>/', methods=['GET'])
 @api_login_required
-def get_exam(exam_id):
-    exam = Exam.get_exam(exam_id)
-    return exam
+def get_exam(id):
+    exam = Exam.get_exam(id)
+    return exam.to_dict()
 
 
 
