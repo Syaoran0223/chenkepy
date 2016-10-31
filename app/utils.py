@@ -67,9 +67,9 @@ def check_password_hash(password_hash, password):
     
 
 def pagination(query, ignore=None):
-    page = int(request.args.get('page', 1))
-    per_page = int(request.args.get('per_page', current_app.config['PER_PAGE']))
-    data = query.paginate(page, per_page, error_out=False)
+    page = int(request.args.get('pageIndex', 0))
+    pageSize = int(request.args.get('pageSize', current_app.config['PER_PAGE']))
+    data = query.paginate(page, pageSize, error_out=False)
     items = []
     for item in data.items:
         if ignore and isinstance(ignore, list):
@@ -78,12 +78,10 @@ def pagination(query, ignore=None):
         items.append(item.to_dict())
     res = {
         'items': items,
-        'pagination': {
-            'count': data.total,
-            'page': data.page,
-            'per_page': data.per_page,
-            'total_page': data.pages
-        }
+        'pageIndex': data.page - 1,
+        'pageSize': data.per_page,
+        'totalCount': data.total,
+        'totalPage': data.pages
     }
     return res
 
