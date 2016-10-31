@@ -130,7 +130,11 @@ def get_exams():
 @api_login_required
 def get_exam(id):
     exam = Exam.get_exam(id)
-    return exam.to_dict()
+    data = exam.to_dict()
+    return {
+        'code': 0,
+        'data': data
+    }
 
 
 
