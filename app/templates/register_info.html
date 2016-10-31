@@ -147,7 +147,7 @@
               var province = function(){
                   var provinces;
                   var temp_html = '<option>请选择</option>';
-                  $.getJSON('/api/province/', {}, function(data) {
+                  $.getJSON('/api/province', {}, function(data) {
                       provinces = data.data
                       $.each(provinces, function(i,province){
                           temp_html+="<option value='"+province.id+"'>"+province.name+"</option>";
@@ -160,7 +160,7 @@
                   var temp_html = '<option>请选择</option>';
                   var cities;
                   var pro_id = oProvince.val()
-                  $.getJSON('/api/city/', {pro_id: pro_id}, function(data) {
+                  $.getJSON('/api/city', {pro_id: pro_id}, function(data) {
                       cities = data.data
                       $.each(cities, function(i,city){
                           temp_html+="<option value='"+city.id+"'>"+city.name+"</option>";
@@ -173,7 +173,7 @@
                   var temp_html = '<option>请选择</option>';
                   var areas;
                   var city_id = oCity.val();
-                  $.getJSON('/api/area/', {city_id: city_id}, function(data) {
+                  $.getJSON('/api/area', {city_id: city_id}, function(data) {
                       areas = data.data
                       $.each(areas, function(i,area){
                           temp_html+="<option value='"+area.id+"'>"+area.name+"</option>";
@@ -187,7 +187,7 @@
                 var temp_html = '<option>请选择</option>';
                 var schools;
                 var ctid = oArea.val();
-                $.getJSON('/api/school/', {ctid: ctid}, function(data) {
+                $.getJSON('/api/school', {ctid: ctid}, function(data) {
                     schools = data.data
                     $.each(schools, function(i,school){
                         temp_html+="<option value='"+school.id+"'>"+school.name+"</option>";
