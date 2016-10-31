@@ -12,7 +12,7 @@ from . import api_blueprint
 from app.models import Region, School
 from app.sms import SmsServer
 
-@api_blueprint.route('/province/')
+@api_blueprint.route('/province')
 def province():
     title = request.args.get('title', '')
     provinces = Region.get_province(title)
@@ -21,7 +21,7 @@ def province():
         'data': provinces
     }
 
-@api_blueprint.route('/city/')
+@api_blueprint.route('/city')
 def city():
     pro_id = request.args.get('pro_id')
     title = request.args.get('title', '')
@@ -33,7 +33,7 @@ def city():
         'data': cities
     }
 
-@api_blueprint.route('/area/')
+@api_blueprint.route('/area')
 def area():
     city_id = request.args.get('city_id')
     title = request.args.get('title', '')
@@ -45,7 +45,7 @@ def area():
         'data': areas
     }
 
-@api_blueprint.route('/school/')
+@api_blueprint.route('/school')
 def school():
     ctid = request.args.get('ctid')
     title = request.args.get('title', '')
@@ -57,7 +57,7 @@ def school():
         'data': schools
     }
 
-@api_blueprint.route('/sms/')
+@api_blueprint.route('/sms')
 def send_msg():
     form = SmsForm(request.args)
     if not form.validate():
@@ -96,7 +96,7 @@ def upload_attachment():
         }
     raise JsonOutputException('上传失败')
 
-@api_blueprint.route('/paper/upload/', methods=['POST'])
+@api_blueprint.route('/paper/upload', methods=['POST'])
 @api_login_required
 def paper_upload():
     data = MultiDict(mapping=request.json)
@@ -117,7 +117,7 @@ def paper_upload():
         }
     raise JsonOutputException('添加失败')
 
-@api_blueprint.route('/paper/upload/', methods=['GET'])
+@api_blueprint.route('/paper/upload', methods=['GET'])
 @api_login_required
 def get_exams():
     data = Exam.get_exams()
@@ -126,7 +126,7 @@ def get_exams():
         'data': data
     }
 
-@api_blueprint.route('/paper/upload/<int:id>/', methods=['GET'])
+@api_blueprint.route('/paper/upload/<int:id>', methods=['GET'])
 @api_login_required
 def get_exam(id):
     exam = Exam.get_exam(id)
