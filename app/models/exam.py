@@ -2,6 +2,7 @@ from app import db
 from ._base import SessionMixin
 from config import Config
 from app.utils import pagination
+from app.models import School
 
 class Exam(db.Model, SessionMixin):
     __tablename__ = 'exam'
@@ -26,7 +27,11 @@ class Exam(db.Model, SessionMixin):
 
     @staticmethod
     def get_exams(pageindex=1):
-        return pagination(Exam.query.order_by(Exam.created_at.desc(), Exam.state))
+        res = pagination(Exam.query.order_by(Exam.created_at.desc(), Exam.state))
+        items = res.get('items', [])
+        items = School.bind_auto(items, 'name')
+        return res
+
         #a = Exam.query.order_by(Exam.created_at.desc(), Exam.state).paginate(pageindex, per_page=int(Config.PER_PAGE), error_out=False)
 
     @staticmethod
