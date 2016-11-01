@@ -2,7 +2,7 @@ from app import db
 from ._base import SessionMixin
 from config import Config
 from app.utils import pagination
-
+from . import School
 class Exam(db.Model, SessionMixin):
     __tablename__ = 'exam'
 
@@ -22,12 +22,15 @@ class Exam(db.Model, SessionMixin):
     year = db.Column(db.Integer)
     grade = db.Column(db.Integer)
     state = db.Column(db.Integer)
+    upload_user = db.Column(db.Integer)
     attachments = db.Column(db.JsonBlob(), default=[])
 
     @staticmethod
-    def get_exams(pageindex=1):
-        return pagination(Exam.query.order_by(Exam.created_at.desc(), Exam.state))
-        #a = Exam.query.order_by(Exam.created_at.desc(), Exam.state).paginate(pageindex, per_page=int(Config.PER_PAGE), error_out=False)
+    def get_exams(upload_user):
+        query = db.session.query(Exam, School).filter_by(upload_user=upload_user).order_by(Exam.created_at.desc(), Exam.state)
+        query = query.join(School, Exam.school_id == School.id)
+
+        return pagination(query)
 
     @staticmethod
     def get_exam(id):

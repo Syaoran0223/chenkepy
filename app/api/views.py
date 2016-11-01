@@ -89,7 +89,7 @@ def upload_attachment():
             user_id=g.user.id,
             file_type=file_type)
         attachment.save()
-        attachment.id
+        #attachment.id
         return {
             'code': 0,
             'data': [attachment.url]
@@ -108,7 +108,7 @@ def paper_upload():
     exam = Exam(name=form.name.data, section=form.section.data, subject=form.subject.data, paper_types=form.paper_types.data, \
                 province_id=form.province_id.data, city_id=form.city_id.data, area_id=form.area_id.data,\
                 school_id=form.school_id.data,
-                year=form.year.data, grade=form.grade.data, state=0, attachments=attachments)
+                year=form.year.data, grade=form.grade.data, state=0, attachments=attachments,upload_user=g.user.id)
     result = exam.save()
     if result.id is not None:
         return {
@@ -120,7 +120,8 @@ def paper_upload():
 @api_blueprint.route('/paper/upload', methods=['GET'])
 @api_login_required
 def get_exams():
-    data = Exam.get_exams()
+    #TODO 添加用户查询条件
+    data = Exam.get_exams(g.user.id)
     return {
         'code': 0,
         'data': data
