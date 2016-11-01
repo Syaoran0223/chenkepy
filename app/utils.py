@@ -67,31 +67,19 @@ def check_password_hash(password_hash, password):
     password_hash2 = hashlib.md5()
     password_hash2.update(password.encode('utf-8'))
     return password_hash == password_hash2.hexdigest()
-    
-def paginate(sa_query, page, per_page=20, error_out=True):
-  sa_query.__class__ = BaseQuery
-  return sa_query.paginate(page, per_page, error_out)
 
 def pagination(query, ignore=None):
     page = int(request.args.get('pageIndex', 0))
     pageSize = int(request.args.get('pageSize', current_app.config['PER_PAGE']))
-    data = paginate(query, page+1, pageSize, error_out=False)
+    data = query.paginate(page+1, pageSize, error_out=False)
     items = []
     for item in data.items:
         if ignore and isinstance(ignore, list):
             for field in ignore:
                 item.__dict__.pop(field)
-        if len(item)==1:
-            items.append(item.to_dict())
-        else:
-            newdic = '{"result":['
-            for i in range(len(item._fields)):
-                if i==0:
-                    dictMerged = item[i].to_dict().copy()
-                else:
-                    dictMerged.update(item[i].to_dict())
 
-            items.append(dictMerged)
+        items.append(item.to_dict())
+
     res = {
         'items': items,
         'pageIndex': data.page - 1,

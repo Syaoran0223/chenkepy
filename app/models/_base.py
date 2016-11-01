@@ -46,3 +46,41 @@ class SessionMixin(object):
         db.session.delete(self)
         db.session.commit()
         return self
+
+    @classmethod
+    def bind_auto(cls, items, keys, refer_id='', id='id', prefix=''):
+        res = []
+        if not refer_id:
+            refer_id = cls.__tablename__ + '_id'
+        if not isinstance(keys, list):
+            keys = [keys]
+        if not isinstance(items, list):
+            if not isinstance(items, dict):
+                raise ValueError('need dict')
+            r_id = items.get(refer_id, 0)
+            obj = cls.query.get(r_id)
+            for key in keys:
+                prefix = cls.__tablename__ if not prefix else prefix
+                ref_key = prefix + '_' + key
+                if not obj:
+                    items[ref_key] = ''
+                else:
+                    items[ref_key] = getattr(obj, key)
+            return items
+        r_ids = [data.get(refer_id, 0) for data in items]
+        objs = cls.query.filter(cls.id.in_(r_ids)).all()
+        for item in items:
+            if not isinstance(item, dict):
+                raise ValueError('need dict')
+            obj = list(filter(lambda x: x.id==item.get(refer_id, 0), objs))
+            for key in keys:
+                prefix = cls.__tablename__ if not prefix else prefix
+                ref_key = prefix + '_' + key
+                if len(obj):
+                    item[ref_key] = getattr(obj[0], key)
+                else:
+                    item[ref_key] = ''
+            res.append(item)
+        return res
+            
+

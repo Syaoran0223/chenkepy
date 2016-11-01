@@ -1,8 +1,8 @@
 from app import db
 from ._base import SessionMixin
-from config import Config
 from app.utils import pagination
-from . import School
+from app.models import School, Region
+
 class Exam(db.Model, SessionMixin):
     __tablename__ = 'exam'
 
@@ -27,14 +27,25 @@ class Exam(db.Model, SessionMixin):
 
     @staticmethod
     def get_exams(upload_user):
-        query = db.session.query(Exam, School).filter_by(upload_user=upload_user).order_by(Exam.created_at.desc(), Exam.state)
-        query = query.join(School, Exam.school_id == School.id)
+        res = pagination(Exam.query.filter_by(upload_user=upload_user).order_by(Exam.created_at.desc(), Exam.state))
+        items = res.get('items', [])
+        items = School.bind_auto(items, 'name')
+        return res
 
-        return pagination(query)
 
     @staticmethod
     def get_exam(id):
-        return Exam.query.get(int(id))
+        result = Exam.query.get(int(id))
+        if result is not None:
+            result = result.to_dict()
+        else:
+            return None
+        result = Region.bind_auto(result, 'name', 'city_id', 'id', 'city')
+        result = Region.bind_auto(result, 'name', 'province_id', 'id', 'province')
+        result = Region.bind_auto(result, 'name', 'area_id', 'id', 'area')
+        result = School.bind_auto(result, 'name', 'school_id', 'id', 'school')
+
+        return result
 
     def __repr__(self):
         return '<Exam: %r>' % self.name

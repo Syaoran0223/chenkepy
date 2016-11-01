@@ -120,7 +120,6 @@ def paper_upload():
 @api_blueprint.route('/paper/upload', methods=['GET'])
 @api_login_required
 def get_exams():
-    #TODO 添加用户查询条件
     data = Exam.get_exams(g.user.id)
     return {
         'code': 0,
@@ -130,12 +129,14 @@ def get_exams():
 @api_blueprint.route('/paper/upload/<int:id>', methods=['GET'])
 @api_login_required
 def get_exam(id):
-    exam = Exam.get_exam(id)
-    data = exam.to_dict()
-    return {
-        'code': 0,
-        'data': data
-    }
+    data = Exam.get_exam(id)
+    if data is not None:
+        return {
+            'code': 0,
+            'data': data
+        }
+    else:
+        raise JsonOutputException('没有数据')
 
 
 
