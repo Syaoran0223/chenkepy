@@ -7,7 +7,7 @@ from flask import request, g
 from flask.ext.login import login_required
 from .forms import SmsForm, PaperUploadForm
 from werkzeug.datastructures import MultiDict
-
+from const import EXAM_STATUS
 from . import api_blueprint
 from app.models import Region, School
 from app.sms import SmsServer
@@ -167,6 +167,29 @@ def update_exam(id):
     else:
         raise JsonOutputException('更新失败')
 
+@api_blueprint.route('/paper/upload/<int:id>', methods=['DELETE'])
+@api_login_required
+def delexam(id):
+
+    exam = Exam.query.get(int(id))
+    if exam is None:
+        raise JsonOutputException('删除失败')
+    else:
+        exam.state = -1
+        exam.save()
+        return {
+            'code': 0,
+            'data': ''
+        }
+
+@api_blueprint.route('api/paper/confirm/wait',methods=['GET'])
+@api_login_required
+def listexam():
+    data = Exam.list_exams(EXAM_STATUS['未审核'])
+    return {
+            'code': 0,
+            'data': data
+    }
 
 
 

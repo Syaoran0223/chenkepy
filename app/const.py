@@ -73,3 +73,8 @@ PAPER_TYPE = {
   'PAPER_MIDLE': '中考',
   'PAPER_HIGH': '高考'
 }
+
+EXAM_STATUS = {
+    '未审核': 0,
+    '已审核': 1
+}

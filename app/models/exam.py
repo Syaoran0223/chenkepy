@@ -25,13 +25,20 @@ class Exam(db.Model, SessionMixin):
     upload_user = db.Column(db.Integer)
     attachments = db.Column(db.JsonBlob(), default=[])
 
+
     @staticmethod
     def get_exams(upload_user):
+        #查询上传用户试卷记录
         res = pagination(Exam.query.filter_by(upload_user=upload_user).order_by(Exam.created_at.desc(), Exam.state))
         items = res.get('items', [])
         items = School.bind_auto(items, 'name')
-        return res
+        return items
 
+    def list_exams(state=0):
+        res = pagination(Exam.query.filter_by(state=state).order_by(Exam.created_at.desc(), Exam.state))
+        items = res.get('items', [])
+        items = School.bind_auto(items, 'name')
+        return items
 
     @staticmethod
     def get_exam(id):
