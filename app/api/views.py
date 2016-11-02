@@ -7,7 +7,7 @@ from flask import request, g
 from flask.ext.login import login_required
 from .forms import SmsForm, PaperUploadForm
 from werkzeug.datastructures import MultiDict
-from const import EXAM_STATUS
+from app.const import EXAM_STATUS
 from . import api_blueprint
 from app.models import Region, School
 from app.sms import SmsServer
