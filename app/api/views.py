@@ -182,7 +182,7 @@ def delexam(id):
             'data': ''
         }
 
-@api_blueprint.route('api/paper/confirm/wait',methods=['GET'])
+@api_blueprint.route('/paper/confirm/wait',methods=['GET'])
 @api_login_required
 def listexam():
     data = Exam.list_exams(EXAM_STATUS['未审核'])
