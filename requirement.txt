@@ -26,3 +26,4 @@ gunicorn
 requests
 redis==2.10.5
 Flask-Cache==0.13.1
+tornado==4.4.2
