@@ -138,6 +138,34 @@ def get_exam(id):
     else:
         raise JsonOutputException('没有数据')
 
+@api_blueprint.route('/paper/upload/<int:id>', methods=['PUT'])
+@api_login_required
+def update_exam(id):
+    data = MultiDict(mapping=request.json)
+    form = PaperUploadForm(data)
+    if not form.validate():
+        raise FormValidateError(form.errors)
+    attachments = request.json.get('attachments', [])
+    exam = Exam.get_exam(form.id.data)
+    exam.name = form.name.data
+    exam.section = form.section.data
+    exam.subject = form.subject.data
+    exam.paper_types = form.paper_types.data
+    exam.province_id = form.province_id.data
+    exam.city_id = form.city_id.data
+    exam.area_id = form.area_id.data
+    exam.school_id = form.school_id.data
+    exam.year = form.year.data
+    exam.grade = form.grade.data
+    exam.attachments = attachments
+    exam.save()
+    if data is not None:
+        return {
+            'code': 0,
+            'data': data
+        }
+    else:
+        raise JsonOutputException('更新失败')
 
 
 
