@@ -167,6 +167,20 @@ def update_exam(id):
     else:
         raise JsonOutputException('更新失败')
 
+@api_blueprint.route('/paper/upload/<int:id>', methods=['DELETE'])
+@api_login_required
+def delexam(id):
+
+    exam = Exam.query.get(int(id))
+    if exam is None:
+        raise JsonOutputException('删除失败')
+    else:
+        exam.state = -1
+        exam.save()
+        return {
+            'code': 0,
+            'data': ''
+        }
 
 
 
