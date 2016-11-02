@@ -146,7 +146,7 @@ def update_exam(id):
     if not form.validate():
         raise FormValidateError(form.errors)
     attachments = request.json.get('attachments', [])
-    exam = Exam.get_exam(form.id.data)
+    exam = Exam.query.get(int(id))
     exam.name = form.name.data
     exam.section = form.section.data
     exam.subject = form.subject.data
