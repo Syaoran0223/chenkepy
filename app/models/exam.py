@@ -2,6 +2,7 @@ from app import db
 from ._base import SessionMixin
 from app.utils import pagination
 from app.models import School, Region
+from app.const import EXAM_STATUS
 
 class Exam(db.Model, SessionMixin):
     __tablename__ = 'exam'
@@ -29,13 +30,13 @@ class Exam(db.Model, SessionMixin):
     @staticmethod
     def get_exams(upload_user):
         #查询上传用户试卷记录
-        res = pagination(Exam.query.filter_by(upload_user=upload_user).order_by(Exam.created_at.desc(), Exam.state))
+        res = pagination(Exam.query.filter(Exam.upload_user == upload_user, Exam.state >= EXAM_STATUS['审核不通过']).order_by(Exam.created_at.desc(), Exam.state))
         items = res.get('items', [])
         items = School.bind_auto(items, 'name')
         return items
 
-    def list_exams(state=0):
-        res = pagination(Exam.query.filter_by(state=state).order_by(Exam.created_at.desc()))
+    def list_exams(state= 0):
+        res = pagination(Exam.query.filter(Exam.state >= state).order_by(Exam.created_at.desc()))
         items = res.get('items', [])
         items = School.bind_auto(items, 'name')
         return items

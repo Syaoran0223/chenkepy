@@ -9,9 +9,10 @@ from .forms import SmsForm, PaperUploadForm
 from werkzeug.datastructures import MultiDict
 from app.const import EXAM_STATUS
 from . import api_blueprint
-from app.models import Region, School
+from app.models import Region, School, ExamReviewLog
 from app.sms import SmsServer
 
+import datetime
 @api_blueprint.route('/province')
 def province():
     title = request.args.get('title', '')
@@ -96,6 +97,7 @@ def upload_attachment():
         }
     raise JsonOutputException('上传失败')
 
+#上传试卷
 @api_blueprint.route('/paper/upload', methods=['POST'])
 @api_login_required
 def paper_upload():
@@ -108,7 +110,7 @@ def paper_upload():
     exam = Exam(name=form.name.data, section=form.section.data, subject=form.subject.data, paper_types=form.paper_types.data, \
                 province_id=form.province_id.data, city_id=form.city_id.data, area_id=form.area_id.data,\
                 school_id=form.school_id.data,
-                year=form.year.data, grade=form.grade.data, state=0, attachments=attachments,upload_user=g.user.id)
+                year=form.year.data, grade=form.grade.data, state=0, attachments=attachments, upload_user=g.user.id)
     result = exam.save()
     if result.id is not None:
         return {
@@ -117,6 +119,7 @@ def paper_upload():
         }
     raise JsonOutputException('添加失败')
 
+#试卷列表
 @api_blueprint.route('/paper/upload', methods=['GET'])
 @api_login_required
 def get_exams():
@@ -126,6 +129,7 @@ def get_exams():
         'data': data
     }
 
+#试卷明细查看
 @api_blueprint.route('/paper/upload/<int:id>', methods=['GET'])
 @api_login_required
 def get_exam(id):
@@ -138,6 +142,7 @@ def get_exam(id):
     else:
         raise JsonOutputException('没有数据')
 
+#试卷更新
 @api_blueprint.route('/paper/upload/<int:id>', methods=['PUT'])
 @api_login_required
 def update_exam(id):
@@ -167,21 +172,22 @@ def update_exam(id):
     else:
         raise JsonOutputException('更新失败')
 
+#试卷删除
 @api_blueprint.route('/paper/upload/<int:id>', methods=['DELETE'])
 @api_login_required
 def delexam(id):
 
     exam = Exam.query.get(int(id))
-    if exam is None:
+    if exam is None or exam.state > EXAM_STATUS['未审核']:
         raise JsonOutputException('删除失败')
     else:
-        exam.state = -1
+        exam.state = EXAM_STATUS['已删除']
         exam.save()
         return {
             'code': 0,
             'data': ''
         }
-
+#试卷未审核列表
 @api_blueprint.route('/paper/confirm/wait',methods=['GET'])
 @api_login_required
 def listexam():
@@ -191,7 +197,30 @@ def listexam():
             'data': data
     }
 
+#试卷审核
+@api_blueprint.route('/paper/confirm/review/<int:id>', methods=['GET'])
+@api_login_required
+def review_exam(id):
+    data = Exam.get_exam(id)
+    #更新审核
+    exam = Exam.query.get(int(id))
+    examReviewLog = ExamReviewLog.query.filter(ExamReviewLog.exam_id == exam.id, ExamReviewLog.review_state == EXAM_STATUS['正在审核'] ).order_by(ExamReviewLog.created_at.desc())
+    examReviewLog = examReviewLog.all()
 
+    if exam.state == EXAM_STATUS['正在审核']:
+        if examReviewLog is not None and examReviewLog[0].review_id != g.user.id:
+            raise JsonOutputException('任务已被领取')
+
+    exam.state = EXAM_STATUS['正在审核']
+    exam.updated_at = datetime.datetime.now()
+    exam.save()
+    examReview = ExamReviewLog(exam_id = exam.id, review_id = g.user.id, review_state = EXAM_STATUS['正在审核'])
+    examReview.save()
+
+    return {
+            'code': 0,
+            'data': data
+    }
 
 
 
