@@ -36,7 +36,7 @@ class Exam(db.Model, SessionMixin):
         return items
 
     def list_exams(state= 0):
-        res = pagination(Exam.query.filter(Exam.state >= state).order_by(Exam.created_at.desc()))
+        res = pagination(Exam.query.filter(Exam.state == state).order_by(Exam.created_at.desc()))
         items = res.get('items', [])
         items = School.bind_auto(items, 'name')
         return items

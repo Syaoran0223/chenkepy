@@ -207,6 +207,7 @@ def review_exam(id):
     examReviewLog = ExamReviewLog.query.filter(ExamReviewLog.exam_id == exam.id, ExamReviewLog.review_state == EXAM_STATUS['正在审核'] ).order_by(ExamReviewLog.created_at.desc())
     examReviewLog = examReviewLog.all()
 
+    #如果为本人操作
     if exam.state == EXAM_STATUS['正在审核']:
         if examReviewLog is not None and examReviewLog[0].review_id != g.user.id:
             raise JsonOutputException('任务已被领取')
@@ -214,8 +215,10 @@ def review_exam(id):
     exam.state = EXAM_STATUS['正在审核']
     exam.updated_at = datetime.datetime.now()
     exam.save()
-    examReview = ExamReviewLog(exam_id = exam.id, review_id = g.user.id, review_state = EXAM_STATUS['正在审核'])
-    examReview.save()
+
+    if examReviewLog is None:
+        examReview = ExamReviewLog(exam_id = exam.id, review_id = g.user.id, review_state = EXAM_STATUS['正在审核'])
+        examReview.save()
 
     return {
             'code': 0,
