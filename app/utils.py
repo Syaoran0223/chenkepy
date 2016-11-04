@@ -68,6 +68,12 @@ def check_password_hash(password_hash, password):
     password_hash2.update(password.encode('utf-8'))
     return password_hash == password_hash2.hexdigest()
 
+
+def paginate(sa_query, page, per_page=20, error_out=True):
+    sa_query.__class__ = BaseQuery
+    # We can now use BaseQuery methods like .paginate on our SA query
+    return sa_query.paginate(page, per_page, error_out)
+
 def pagination(query, ignore=None):
     page = int(request.args.get('pageIndex', 0))
     pageSize = int(request.args.get('pageSize', current_app.config['PER_PAGE']))

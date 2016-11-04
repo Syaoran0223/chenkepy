@@ -202,6 +202,8 @@ def listexam():
 @api_login_required
 def review_exam(id):
     data = Exam.get_exam(id)
+    #审核倒计时 30分钟 （秒）
+    data['countdown'] = 1800
     #更新审核
     exam = Exam.query.get(int(id))
     examReviewLog = ExamReviewLog.query.filter(ExamReviewLog.exam_id == exam.id, ExamReviewLog.review_state == EXAM_STATUS['正在审核'] ).order_by(ExamReviewLog.created_at.desc())
@@ -209,15 +211,19 @@ def review_exam(id):
 
     #如果为本人操作
     if exam.state == EXAM_STATUS['正在审核']:
-        if examReviewLog is not None and examReviewLog[0].review_id != g.user.id:
-            raise JsonOutputException('任务已被领取')
+        #并且不为本人操作
+        if len(examReviewLog) > 0:
+            if examReviewLog[0].reviewer_id != g.user.id:
+                raise JsonOutputException('任务已被领取')
+            else:
+                data['countdown'] = (datetime.datetime.now() - examReviewLog[0].updated_at).seconds;
 
     exam.state = EXAM_STATUS['正在审核']
     exam.updated_at = datetime.datetime.now()
     exam.save()
 
-    if examReviewLog is None:
-        examReview = ExamReviewLog(exam_id = exam.id, review_id = g.user.id, review_state = EXAM_STATUS['正在审核'])
+    if len(examReviewLog) == 0:
+        examReview = ExamReviewLog(exam_id = exam.id, reviewer_id = g.user.id, review_state = EXAM_STATUS['正在审核'],review_memo='')
         examReview.save()
 
     return {
@@ -225,6 +231,39 @@ def review_exam(id):
             'data': data
     }
 
+#试卷审核
+@api_blueprint.route('/paper/confirm/review/<int:id>', methods=['POST'])
+@api_login_required
+def review_exam_update(id):
+    data = MultiDict(mapping=request.json)
+    if data['state'] is None or data['state']=='':
+        raise JsonOutputException('缺少审核结果,审核失败')
+    examReviewLog = ExamReviewLog.query.filter(ExamReviewLog.reviewer_id == g.user.id, ExamReviewLog.exam_id == id,\
+                                               ExamReviewLog.review_state == EXAM_STATUS['正在审核']).all()
+    if len(examReviewLog) == 0:
+        raise JsonOutputException('已审核过，不能重复审核')
+    if (datetime.datetime.now() - examReviewLog.updated_at).seconds > 1800:
+        raise JsonOutputException('超过审核时间')
 
+    examReviewLog.updated_at = datetime.datetime.now()
+    examReviewLog.review_memo = data['memo']
+    examReviewLog.reviewer_id = g.user.id
+    examReviewLog.review_state = data['state']
+    examReviewLog.save()
 
+    exam = Exam.query.get(int(data['id']))
+    exam.state = data['state']
+    exam.updated_at = datetime.datetime.now()
+    exam.save()
+
+    return {
+        'code': 0,
+        'data': ''
+    }
+
+#登录用户审核记录
+@api_blueprint.route('/examreview/list', methods=['GET'])
+@api_login_required
+def list_examreview_log():
+    return ExamReviewLog.list_log(g.user.id)
 
