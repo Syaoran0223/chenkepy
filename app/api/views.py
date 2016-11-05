@@ -232,7 +232,7 @@ def review_exam(id):
     }
 
 #试卷审核
-@api_blueprint.route('/paper/confirm/review/<int:id>', methods=['POST'])
+@api_blueprint.route('/paper/confirm/review/<int:id>', methods=['PUT'])
 @api_login_required
 def review_exam_update(id):
     data = MultiDict(mapping=request.json)
