@@ -197,7 +197,7 @@ def listexam():
             'data': data
     }
 
-#试卷审核
+#试卷审核 读取
 @api_blueprint.route('/paper/confirm/review/<int:id>', methods=['GET'])
 @api_login_required
 def review_exam(id):
@@ -209,7 +209,7 @@ def review_exam(id):
     examReviewLog = ExamReviewLog.query.filter(ExamReviewLog.exam_id == exam.id, ExamReviewLog.review_state == EXAM_STATUS['正在审核'] ).order_by(ExamReviewLog.created_at.desc())
     examReviewLog = examReviewLog.all()
 
-    #如果为本人操作
+    #正在审核状态
     if exam.state == EXAM_STATUS['正在审核']:
         #并且不为本人操作
         if len(examReviewLog) > 0:
@@ -219,7 +219,7 @@ def review_exam(id):
                 data['countdown'] = (datetime.datetime.now() - examReviewLog[0].updated_at).seconds;
 
     exam.state = EXAM_STATUS['正在审核']
-    exam.updated_at = datetime.datetime.now()
+    exam.review_date = datetime.datetime.now()
     exam.save()
 
     if len(examReviewLog) == 0:
@@ -231,7 +231,7 @@ def review_exam(id):
             'data': data
     }
 
-#试卷审核
+#试卷审核 提交、写入
 @api_blueprint.route('/paper/confirm/review/<int:id>', methods=['PUT'])
 @api_login_required
 def review_exam_update(id):
@@ -242,18 +242,19 @@ def review_exam_update(id):
                                                ExamReviewLog.review_state == EXAM_STATUS['正在审核']).all()
     if len(examReviewLog) == 0:
         raise JsonOutputException('已审核过，不能重复审核')
-    if (datetime.datetime.now() - examReviewLog.updated_at).seconds > 1800:
+    if (datetime.datetime.now() - examReviewLog[0].review_date).seconds > 1800:
         raise JsonOutputException('超过审核时间')
 
-    examReviewLog.updated_at = datetime.datetime.now()
+    examReviewLog = examReviewLog[0]
+    examReviewLog.review_date = datetime.datetime.now()
     examReviewLog.review_memo = data['memo']
     examReviewLog.reviewer_id = g.user.id
     examReviewLog.review_state = data['state']
     examReviewLog.save()
 
-    exam = Exam.query.get(int(data['id']))
+    exam = Exam.query.get(int(id))
     exam.state = data['state']
-    exam.updated_at = datetime.datetime.now()
+    exam.review_date = datetime.datetime.now()
     exam.save()
 
     return {

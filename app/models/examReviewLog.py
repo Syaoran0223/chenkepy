@@ -3,7 +3,7 @@ from ._base import SessionMixin
 from app.utils import paginate
 from app.const import EXAM_STATUS
 from app.models import Exam
-
+import datetime
 class ExamReviewLog(db.Model, SessionMixin):
     __tablename__ = 'exam_review_log'
 
@@ -16,6 +16,7 @@ class ExamReviewLog(db.Model, SessionMixin):
     reviewer_id = db.Column(db.Integer)
     review_state = db.Column(db.Integer)
     review_memo = db.Column(db.String(100))
+    review_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now())
 
     @staticmethod
     def list_log(reviewer_id, pageIndex=1, pageSize = 20):
