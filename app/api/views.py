@@ -216,7 +216,7 @@ def review_exam(id):
             if examReviewLog[0].reviewer_id != g.user.id:
                 raise JsonOutputException('任务已被领取')
             else:
-                data['countdown'] = (datetime.datetime.now() - examReviewLog[0].updated_at).seconds;
+                data['countdown'] = 1800 - (datetime.datetime.now() - examReviewLog[0].review_date).seconds;
 
     exam.state = EXAM_STATUS['正在审核']
     exam.review_date = datetime.datetime.now()
