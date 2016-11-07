@@ -25,5 +25,12 @@ class ExamReviewLog(db.Model, SessionMixin):
         result = paginate(result, pageIndex, pageSize, error_out=False)
         #result = pagination(ExamReviewLog.query.filter(ExamReviewLog.reviewer_id == reviewer_id, ExamReviewLog.review_state >= EXAM_STATUS['审核不通过']).order_by(ExamReviewLog.updated_at.desc()))
         items = result.items
-
+        res = {
+            'items': items,
+            'pageIndex': data.page - 1,
+            'pageSize': data.per_page,
+            'totalCount': data.total,
+            'totalPage': data.pages
+        }
+        return res
         return items
