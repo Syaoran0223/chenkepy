@@ -3,7 +3,7 @@ from ._base import SessionMixin
 from app.utils import pagination
 from app.models import School, Region
 from app.const import EXAM_STATUS
-
+import datetime
 class Exam(db.Model, SessionMixin):
     __tablename__ = 'exam'
 
@@ -25,7 +25,7 @@ class Exam(db.Model, SessionMixin):
     state = db.Column(db.Integer)
     upload_user = db.Column(db.Integer)
     attachments = db.Column(db.JsonBlob(), default=[])
-
+    review_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now())
 
     @staticmethod
     def get_exams(upload_user):
@@ -33,13 +33,15 @@ class Exam(db.Model, SessionMixin):
         res = pagination(Exam.query.filter(Exam.upload_user == upload_user, Exam.state >= EXAM_STATUS['审核不通过']).order_by(Exam.created_at.desc(), Exam.state))
         items = res.get('items', [])
         items = School.bind_auto(items, 'name')
-        return items
+        res['items'] = items
+        return res
 
     def list_exams(state= 0):
         res = pagination(Exam.query.filter(Exam.state == state).order_by(Exam.created_at.desc()))
         items = res.get('items', [])
         items = School.bind_auto(items, 'name')
-        return items
+        res['items'] = items
+        return res
 
     @staticmethod
     def get_exam(id):
