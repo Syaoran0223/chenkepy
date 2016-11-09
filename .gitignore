@@ -62,3 +62,4 @@ app/static/public/*
 .idea/
 run.sh
 app/static/uploads
+.vscode/

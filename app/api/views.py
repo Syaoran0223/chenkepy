@@ -11,6 +11,7 @@ from app.const import EXAM_STATUS
 from . import api_blueprint
 from app.models import Region, School, ExamReviewLog
 from app.sms import SmsServer
+from app.utils import render_api
 
 import datetime
 @api_blueprint.route('/province')
@@ -273,4 +274,15 @@ def review_exam_update(id):
 @api_login_required
 def list_examreview_log():
     return ExamReviewLog.list_log(g.user.id)
+
+#获取用户个人信息
+@api_blueprint.route('/user/info', methods=['GET'])
+@api_login_required
+def user_info():
+    data = g.user.to_dict()
+    data = School.bind_auto(data, 'name')
+    data = Region.bind_auto(data, 'name', 'city_id', 'id', 'city')
+    data = Region.bind_auto(data, 'name', 'province_id', 'id', 'province')
+    data = Region.bind_auto(data, 'name', 'area_id', 'id', 'area')
+    return render_api(data)
 
