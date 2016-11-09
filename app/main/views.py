@@ -55,18 +55,27 @@ def register_info():
         return redirect('main.register')
     form = RegisterInfoForm()
     if form.validate_on_submit():
+        user = User.query.filter_by(phone=form.phone.data).first()
+        if user is not None:
+            flash('该手机号已经注册过')
+            return render_template('register.html', form=form)
+        user = User.query.filter_by(name=form.user_name.data).first()
+        if user is not None:
+            flash('该用户名已被使用')
+            return render_template('register.html', form=form)
         user = User(name=form.user_name.data,
             phone=form.phone.data,
             email=form.email.data,
             password=form.password.data,
             school_id=form.school_id.data,
             city_id=form.city_id.data,
-            grade_id=form.grade_id.data)
+            grade_id=form.grade_id.data,
+            province_id=form.province_id.data,
+            area_id=form.area_id.data)
         user.save()
         login_user(user)
         flash('注册成功')
-        return render_template('main.index')
-        #return redirect(url_for('main.index'))
+        return redirect(url_for('main.index'))
     return render_template('register_info.html', form=form)
 
 @main.route('/')

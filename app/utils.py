@@ -116,3 +116,9 @@ def add_month_interval (dt,inter):
 
 def add_year_interval (dt,inter):
     return add_month_interval(dt,inter*12)
+
+def render_api(data):
+    return {
+        'code': 0,
+        'data': data
+    }
