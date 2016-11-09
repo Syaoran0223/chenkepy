@@ -273,7 +273,7 @@ def review_exam_update(id):
 @api_blueprint.route('/examreview/list', methods=['GET'])
 @api_login_required
 def list_examreview_log():
-    return ExamReviewLog.list_log(g.user.id)
+    return render_api(ExamReviewLog.list_log(g.user.id))
 
 #获取用户个人信息
 @api_blueprint.route('/user/info', methods=['GET'])
