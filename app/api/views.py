@@ -218,11 +218,14 @@ def review_exam(id):
             else:
                 data['countdown'] = 1800 - (datetime.datetime.now() - examReviewLog[0].review_date).seconds;
 
-    exam.state = EXAM_STATUS['正在审核']
-    exam.review_date = datetime.datetime.now()
-    exam.save()
+    if exam.state == EXAM_STATUS['已审核']: #试卷已审核通过
+        raise JsonOutputException('该试卷已经通过审核，不能重复审核')
 
     if len(examReviewLog) == 0:
+        exam.state = EXAM_STATUS['正在审核']
+        exam.review_date = datetime.datetime.now()
+        exam.save()
+
         examReview = ExamReviewLog(exam_id = exam.id, reviewer_id = g.user.id, review_state = EXAM_STATUS['正在审核'],review_memo='')
         examReview.save()
 
@@ -236,6 +239,9 @@ def review_exam(id):
 @api_login_required
 def review_exam_update(id):
     data = MultiDict(mapping=request.json)
+
+    #查询是否已审核
+    exam = Exam.query.get(i)
     if data['state'] is None or data['state']=='':
         raise JsonOutputException('缺少审核结果,审核失败')
     examReviewLog = ExamReviewLog.query.filter(ExamReviewLog.reviewer_id == g.user.id, ExamReviewLog.exam_id == id,\
