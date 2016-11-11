@@ -1,7 +1,7 @@
 import json
 from app.exceptions import JsonOutputException, FormValidateError
 from app.decorators import api_login_required
-from app.models import Attachment, Exam, User
+from app.models import Attachment, Exam, User, Message
 from app.utils import upload, pagination
 from flask import request, g
 from flask.ext.login import login_required
@@ -331,4 +331,11 @@ def user_score():
     data = pagination(g.user.scores)
     return render_api(data)
     
-
+# 消息记录
+@api_blueprint.route('/user/message')
+@api_login_required
+def user_message():
+    data = pagination(g.user.messages)
+    message_ids = [str(item['id']) for item in data['items']]
+    Message.set_is_read(message_ids)
+    return render_api(data)
