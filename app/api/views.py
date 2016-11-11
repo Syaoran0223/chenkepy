@@ -339,3 +339,13 @@ def user_message():
     message_ids = [str(item['id']) for item in data['items']]
     Message.set_is_read(message_ids)
     return render_api(data)
+
+#试卷待处理列表
+@api_blueprint.route('/paper/deal/wait',methods=['GET'])
+@api_login_required
+def list_deal_wait():
+    data = Exam.list_exams(EXAM_STATUS['已审核'])
+    return {
+            'code': 0,
+            'data': data
+    }
