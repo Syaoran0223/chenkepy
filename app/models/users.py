@@ -27,6 +27,8 @@ class User(db.Model, SessionMixin, UserMixin):
     state = db.Column(db.Integer, default=0)
     phone = db.Column(db.String(16))
     code = db.Column(db.String(12))
+    scores = db.relationship('Score', backref='user',
+                                lazy='dynamic')
 
     @property
     def password(self):

@@ -1,7 +1,7 @@
 import json
 from app.exceptions import JsonOutputException, FormValidateError
 from app.decorators import api_login_required
-from app.models import Attachment, Exam
+from app.models import Attachment, Exam, User
 from app.utils import upload, pagination
 from flask import request, g
 from flask.ext.login import login_required
@@ -285,4 +285,50 @@ def user_info():
     data = Region.bind_auto(data, 'name', 'province_id', 'id', 'province')
     data = Region.bind_auto(data, 'name', 'area_id', 'id', 'area')
     return render_api(data)
+
+#更新用户信息
+@api_blueprint.route('/user/info', methods=['PUT'])
+@api_login_required
+def user_info_update():
+    password = request.json.get('password')
+    repassword = request.json.get('rePassword')
+    valid_code = request.json.get('validCode')
+    phone = request.json.get('phone')
+    email = request.json.get('email')
+    province_id = request.json.get('province_id', 0)
+    city_id = request.json.get('city_id', 0)
+    area_id = request.json.get('area_id', 0)
+    school_id = request.json.get('school_id', 0)
+    grade_id = request.json.get('grade_id', 0)
+
+    user = User.query.filter_by(phone=phone).first()
+    if user is not None and user.id != g.user.id:
+        raise JsonOutputException('该手机号已被使用')
+    if not valid_code:
+        raise JsonOutputException('请输入验证码')
+    sms = SmsServer()
+    # 验证码验证
+    if not sms.check_code(valid_code, phone):
+        raise JsonOutputException('验证码错误')
+    if password:
+        if password != repassword:
+            raise JsonOutputException('两次输入密码不一致')
+        g.user.password = password
+    g.user.phone = phone
+    g.user.email = email
+    g.user.province_id = province_id
+    g.user.city_id = city_id
+    g.user.area_id = area_id
+    g.user.school_id = school_id
+    g.user.grade_id = grade_id
+    g.user.save()
+    return render_api({})
+
+# 积分记录
+@api_blueprint.route('/user/score')
+@api_login_required
+def user_score():
+    data = pagination(g.user.scores)
+    return render_api(data)
+    
 

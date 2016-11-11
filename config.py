@@ -23,6 +23,8 @@ class DevelopmentConfig(Config):
     PASSWORD = 'lasdl32rwlerldfa,jkljl23r.lwrdf'
 
     CACHE_TYPE ='simple'
+    SQLALCHEMY_POOL_SIZE = 20
+    SQLALCHEMY_POOL_TIMEOUT = 3600
 
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{username}:{password}@{mysql_addr}:{mysql_port}/{db_name}'.\
         format(username=USER_NAME, password=PASSWORD, mysql_addr=MYSQL_ADDR, db_name=DB_NAME, mysql_port=MYQSL_PORT)
