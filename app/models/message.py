@@ -25,4 +25,11 @@ class Message(db.Model, SessionMixin):
         message_ids = ','.join(message_ids)
         sql = text('update message set is_read=1 where id in ({})'.format(message_ids))
         db.engine.execute(sql)
+
+    @staticmethod
+    def send(user_id, title, types):
+        msg = Message(title=title,
+            type=types,
+            user_id=user_id)
+        msg.save()
         

@@ -15,5 +15,27 @@ class Score(db.Model, SessionMixin):
     type = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
+    @staticmethod
+    def add(user_id, title, info, score):
+        score = Score(
+            title = title,
+            info = info,
+            score = score,
+            type = 1,
+            user_id = user_id
+        )
+        score.save()
+
+    @staticmethod
+    def reduce(user_id, title, info, score):
+        score = Score(
+            title = title,
+            info = info,
+            score = score,
+            type = -1,
+            user_id = user_id
+        )
+        score.save()
+
     def __repr__(self):
         return '<Score: %r>' % self.title
