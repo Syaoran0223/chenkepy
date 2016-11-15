@@ -84,7 +84,10 @@ def index():
     site_url = 'http://127.0.0.1:5000'
     user_info = current_user.to_dict()
     user_info = json.dumps(user_info)
-    return render_template('index.html', site_url=site_url, user_info=user_info)
+    menus = g.user.get_menus()
+    menus = json.dumps(menus)
+    return render_template('index.html',
+        site_url=site_url, user_info=user_info, menus=menus)
 
 @main.route("/logout")
 @login_required

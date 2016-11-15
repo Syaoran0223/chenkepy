@@ -3,6 +3,7 @@ from datetime import datetime
 
 from flask.ext.login import UserMixin, AnonymousUserMixin
 from app import db, login_manager
+from app.models.permissions import Permission
 from ._base import SessionMixin
 
 class User(db.Model, SessionMixin, UserMixin):
@@ -27,6 +28,7 @@ class User(db.Model, SessionMixin, UserMixin):
     state = db.Column(db.Integer, default=0)
     phone = db.Column(db.String(16))
     code = db.Column(db.String(12))
+    permissions = db.Column(db.JsonBlob(), default=[])
     scores = db.relationship('Score', backref='user',
                                 lazy='dynamic')
     messages = db.relationship('Message', backref='user',
@@ -48,6 +50,14 @@ class User(db.Model, SessionMixin, UserMixin):
 
     def get_id(self):
         return str(self.id)
+
+    def get_menus(self):
+        permissions = self.permissions
+        menus = []
+        for p in permissions:
+            menus += Permission.__dict__.get(p, [])
+        return [{'identity': m} for m in menus]
+
     
 
     def __repr__(self):

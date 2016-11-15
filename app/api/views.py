@@ -1,6 +1,6 @@
 import json
 from app.exceptions import JsonOutputException, FormValidateError
-from app.decorators import api_login_required
+from app.decorators import api_login_required, permission_required
 from app.models import Attachment, Exam, User, Message
 from app.utils import upload, pagination
 from flask import request, g
@@ -77,6 +77,7 @@ def send_msg():
 
 @api_blueprint.route('/uploads', methods=['POST'])
 @api_login_required
+@permission_required('UPLOAD_PERMISSION')
 def upload_attachment():
     file = request.files.get('file')
     thumb = bool(request.args.get('thumb', False))
@@ -101,6 +102,7 @@ def upload_attachment():
 #上传试卷
 @api_blueprint.route('/paper/upload', methods=['POST'])
 @api_login_required
+@permission_required('UPLOAD_PERMISSION')
 def paper_upload():
     data = MultiDict(mapping=request.json)
     form = PaperUploadForm(data)
@@ -123,6 +125,7 @@ def paper_upload():
 #试卷列表
 @api_blueprint.route('/paper/upload', methods=['GET'])
 @api_login_required
+@permission_required('UPLOAD_PERMISSION')
 def get_exams():
     data = Exam.get_exams(g.user.id)
     return {
@@ -133,6 +136,7 @@ def get_exams():
 #试卷明细查看
 @api_blueprint.route('/paper/upload/<int:id>', methods=['GET'])
 @api_login_required
+@permission_required('UPLOAD_PERMISSION')
 def get_exam(id):
     data = Exam.get_exam(id)
     if data is not None:
@@ -146,6 +150,7 @@ def get_exam(id):
 #试卷更新
 @api_blueprint.route('/paper/upload/<int:id>', methods=['PUT'])
 @api_login_required
+@permission_required('UPLOAD_PERMISSION')
 def update_exam(id):
     data = MultiDict(mapping=request.json)
     form = PaperUploadForm(data)
@@ -176,6 +181,7 @@ def update_exam(id):
 #试卷删除
 @api_blueprint.route('/paper/upload/<int:id>', methods=['DELETE'])
 @api_login_required
+@permission_required('UPLOAD_PERMISSION')
 def delexam(id):
 
     exam = Exam.query.get(int(id))
@@ -191,6 +197,7 @@ def delexam(id):
 #试卷未审核列表
 @api_blueprint.route('/paper/confirm/wait',methods=['GET'])
 @api_login_required
+@permission_required('CONFIRM_PERMISSION')
 def listexam():
     data = Exam.list_exams(EXAM_STATUS['未审核'])
     return {
@@ -201,6 +208,7 @@ def listexam():
 #试卷审核 读取
 @api_blueprint.route('/paper/confirm/review/<int:id>', methods=['GET'])
 @api_login_required
+@permission_required('CONFIRM_PERMISSION')
 def review_exam(id):
     data = Exam.get_exam(id)
     #审核倒计时 30分钟 （秒）
@@ -238,6 +246,7 @@ def review_exam(id):
 #试卷审核 提交、写入
 @api_blueprint.route('/paper/confirm/review/<int:id>', methods=['PUT'])
 @api_login_required
+@permission_required('CONFIRM_PERMISSION')
 def review_exam_update(id):
     data = MultiDict(mapping=request.json)
 
@@ -272,6 +281,7 @@ def review_exam_update(id):
 #登录用户审核记录
 @api_blueprint.route('/examreview/list', methods=['GET'])
 @api_login_required
+@permission_required('CONFIRM_PERMISSION')
 def list_examreview_log():
     return render_api(ExamReviewLog.list_log(g.user.id))
 
