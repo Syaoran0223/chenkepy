@@ -372,15 +372,12 @@ def list_exam_file_pre_process():
     }
 
 @api_blueprint.route('/paper/preprocess/view/<int:id>',methods=['GET'])
-def view_exam_file_pre_process():
-    data = MultiDict(mapping=request.json)
+def view_exam_file_pre_process(id):
     exam = Exam.get_exam(id)
     examReviewLog = ExamReviewLog.query.filter(ExamReviewLog.reviewer_id == g.user.id, ExamReviewLog.exam_id == id, \
                                                ExamReviewLog.review_state == EXAM_STATUS['预处理']).all()
     if len(examReviewLog) == 0:
-        raise JsonOutputException('已审核过，不能重复审核')
-    if (datetime.datetime.now() - examReviewLog[0].review_date).seconds > 1800:
-        raise JsonOutputException('操作超时')
+        raise JsonOutputException('已处理过')
 
     examReviewLog = examReviewLog[0]
     examReviewLog.review_date = datetime.datetime.now()
@@ -390,7 +387,7 @@ def view_exam_file_pre_process():
     examReviewLog.save()
 
     exam = Exam.query.get(int(id))
-    exam.state = data['state']
+    exam.state = EXAM_STATUS['预处理']
     exam.review_date = datetime.datetime.now()
     exam.save()
 
