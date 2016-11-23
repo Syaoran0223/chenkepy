@@ -7,9 +7,9 @@ from flask import request, g
 from flask.ext.login import login_required
 from .forms import SmsForm, PaperUploadForm
 from werkzeug.datastructures import MultiDict
-from app.const import EXAM_STATUS
+from app.const import EXAM_STATUS,QUEST_IMAGE_STATUS
 from . import api_blueprint
-from app.models import Region, School, ExamReviewLog
+from app.models import Region, School, ExamReviewLog, QuestImage
 from app.sms import SmsServer
 from app.utils import render_api
 
@@ -350,6 +350,8 @@ def user_message():
     Message.set_is_read(message_ids)
     return render_api(data)
 
+
+
 #试卷待处理列表
 @api_blueprint.route('/paper/deal/wait',methods=['GET'])
 @api_login_required
@@ -359,3 +361,69 @@ def list_deal_wait():
             'code': 0,
             'data': data
     }
+
+
+@api_blueprint.route('/paper/preprocess/list',methods=['GET'])
+def list_exam_file_pre_process():
+    data = Exam.list_exams(EXAM_STATUS['审核结束'])
+    return {
+        'code': 0,
+        'data': data
+    }
+
+@api_blueprint.route('/paper/preprocess/view/<int:id>',methods=['GET'])
+def view_exam_file_pre_process():
+    data = MultiDict(mapping=request.json)
+    exam = Exam.get_exam(id)
+    examReviewLog = ExamReviewLog.query.filter(ExamReviewLog.reviewer_id == g.user.id, ExamReviewLog.exam_id == id, \
+                                               ExamReviewLog.review_state == EXAM_STATUS['预处理']).all()
+    if len(examReviewLog) == 0:
+        raise JsonOutputException('已审核过，不能重复审核')
+    if (datetime.datetime.now() - examReviewLog[0].review_date).seconds > 1800:
+        raise JsonOutputException('操作超时')
+
+    examReviewLog = examReviewLog[0]
+    examReviewLog.review_date = datetime.datetime.now()
+    examReviewLog.review_memo = EXAM_STATUS['预处理']
+    examReviewLog.reviewer_id = g.user.id
+    examReviewLog.review_state = EXAM_STATUS['预处理']
+    examReviewLog.save()
+
+    exam = Exam.query.get(int(id))
+    exam.state = data['state']
+    exam.review_date = datetime.datetime.now()
+    exam.save()
+
+    data = Exam.get_exam(id)
+    
+    return {
+        'code': 0,
+        'data': data
+    }
+
+
+#预处理结束生成图片,题目图片列表
+@api_blueprint.route('/paper/image/list', methods=['GET'])
+def list_quest_image():
+    data = QuestImage.list_image(QUEST_IMAGE_STATUS['未处理'])
+    return {
+        'code': 0,
+        'data': data
+    }
+
+
+
+#查看图片
+@api_blueprint.route('/paper/image/view/<int:id>', methods=['GET'])
+def view_quest_image(id):
+
+    data = QuestImage.view_quest_image_detail(id)
+    return {
+        'code': 0,
+        'data': data
+    }
+
+#
+#def add_quest_image():
+#    quest_no = request.json.get('quset_no')
+
