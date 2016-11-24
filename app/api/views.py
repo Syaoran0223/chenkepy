@@ -371,31 +371,41 @@ def list_exam_file_pre_process():
         'data': data
     }
 
-@api_blueprint.route('/paper/preprocess/view/<int:id>',methods=['GET'])
-def view_exam_file_pre_process():
-    data = MultiDict(mapping=request.json)
-    exam = Exam.get_exam(id)
+def list_user_preprocess_file():
+    res = pagination(Exam.query.filter(Exam.state == EXAM_STATUS['预处理'] or Exam.state == EXAM_STATUS['预处理完成']).order_by(Exam.created_at.desc()))
+    items = res.get('items', [])
+    items = School.bind_auto(items, 'name')
+    res['items'] = items
+    return {
+        'code': 0,
+        'data': res
+    }
+
+
+@api_blueprint.route('/paper/preprocess/view/<int:id>', methods=['GET'])
+def view_exam_file_pre_process(id):
+    #data = MultiDict(mapping=request.json)
+    data = Exam.get_exam(id)
+    exam = Exam.query.get(int(id))
     examReviewLog = ExamReviewLog.query.filter(ExamReviewLog.reviewer_id == g.user.id, ExamReviewLog.exam_id == id, \
                                                ExamReviewLog.review_state == EXAM_STATUS['预处理']).all()
+    if exam.state == EXAM_STATUS['预处理']:
+        if len(examReviewLog) > 0:
+            if examReviewLog[0].reviewer_id != g.user.id:
+                raise JsonOutputException('任务已被领取')
+
+
+    if exam.state == EXAM_STATUS['预处理完成']:
+        raise JsonOutputException('预处理已完成,不能重')
+
     if len(examReviewLog) == 0:
-        raise JsonOutputException('已审核过，不能重复审核')
-    if (datetime.datetime.now() - examReviewLog[0].review_date).seconds > 1800:
-        raise JsonOutputException('操作超时')
+        exam.state = EXAM_STATUS['预处理']
+        exam.review_date = datetime.datetime.now()
+        exam.save()
 
-    examReviewLog = examReviewLog[0]
-    examReviewLog.review_date = datetime.datetime.now()
-    examReviewLog.review_memo = EXAM_STATUS['预处理']
-    examReviewLog.reviewer_id = g.user.id
-    examReviewLog.review_state = EXAM_STATUS['预处理']
-    examReviewLog.save()
+        examReview = ExamReviewLog(exam_id=exam.id, reviewer_id=g.user.id, review_state=EXAM_STATUS['预处理'], review_memo='')
+        examReview.save()
 
-    exam = Exam.query.get(int(id))
-    exam.state = data['state']
-    exam.review_date = datetime.datetime.now()
-    exam.save()
-
-    data = Exam.get_exam(id)
-    
     return {
         'code': 0,
         'data': data
