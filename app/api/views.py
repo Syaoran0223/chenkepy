@@ -371,6 +371,7 @@ def list_exam_file_pre_process():
         'data': data
     }
 
+<<<<<<< HEAD
 def list_user_preprocess_file():
     res = pagination(Exam.query.filter(Exam.state == EXAM_STATUS['预处理'] or Exam.state == EXAM_STATUS['预处理完成']).order_by(Exam.created_at.desc()))
     items = res.get('items', [])

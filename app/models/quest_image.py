@@ -1,7 +1,7 @@
 from app import db
 from ._base import SessionMixin
 from app.utils import pagination
-from const import QUEST_IMAGE_STATUS
+from app.const import QUEST_IMAGE_STATUS
 import datetime
 class QuestImage(db.Model, SessionMixin):
     __tablename__ = 'quest_image'
