@@ -9,7 +9,7 @@ from .forms import SmsForm, PaperUploadForm
 from werkzeug.datastructures import MultiDict
 from app.const import EXAM_STATUS,QUEST_IMAGE_STATUS
 from . import api_blueprint
-from app.models import Region, School, ExamReviewLog, QuestImage
+from app.models import Region, School, ExamReviewLog, Question
 from app.sms import SmsServer
 from app.utils import render_api
 
@@ -415,25 +415,33 @@ def view_exam_file_pre_process(id):
 #预处理结束生成图片,题目图片列表
 @api_blueprint.route('/paper/image/list', methods=['GET'])
 def list_quest_image():
-    data = QuestImage.list_image(QUEST_IMAGE_STATUS['未处理'])
+    data = Question.list_image(EXAM_STATUS['预处理结束'])
     return {
         'code': 0,
         'data': data
     }
-
-
 
 #查看图片
 @api_blueprint.route('/paper/image/view/<int:id>', methods=['GET'])
 def view_quest_image(id):
 
-    data = QuestImage.view_quest_image_detail(id)
+    data = Question.view_quest_image_detail(id)
     return {
         'code': 0,
         'data': data
     }
 
-#
-#def add_quest_image():
-#    quest_no = request.json.get('quset_no')
+@api_blueprint.route('/paper/preprocess/view',methods=['POST'])
+def add_pre_review_quest_image():
+    quest_no = request.json.get('quset_no')
+    exam_id = request.json.get('exam_id')
+    quest_type_id = request.json.get('quest_type_id')
+    option_count = request.json.get('option_count')
+    quest_image = request.json.get('quest_image')
+    review_memo = request.json.get('review_memo')
+    answer_image = request.json.get('answer_image')
+
+    res = Question.add_pre_process_image(exam_id, quest_no, quest_type_id, option_count, quest_image, 22, review_memo, answer_image)
+    return render_api(res)
+
 

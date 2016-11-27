@@ -26,17 +26,17 @@ class ExamReviewLog(db.Model, SessionMixin):
         items = []
         for item in result.items:
             obj = {
-                'id':item.ExamReviewLog.id,
-                'name':item.Exam.name,
-                'school_name':item.School.name,
-                'section':item.Exam.section,
-                'year':item.Exam.year,
-                'grade':item.Exam.grade,
-                'subject':item.Exam.subject,
-                'reviewer':item.User.name,
-                'review_state':item.ExamReviewLog.review_state,
-                'review_date':item.ExamReviewLog.review_date.strftime("%Y-%m-%d %H:%M:%S"),
-                'review_memo':item.ExamReviewLog.review_memo
+                'id': item.ExamReviewLog.id,
+                'name': item.Exam.name,
+                'school_name': item.School.name,
+                'section': item.Exam.section,
+                'year': item.Exam.year,
+                'grade': item.Exam.grade,
+                'subject': item.Exam.subject,
+                'reviewer': item.User.name,
+                'review_state': item.ExamReviewLog.review_state,
+                'review_date': item.ExamReviewLog.review_date.strftime("%Y-%m-%d %H:%M:%S"),
+                'review_memo': item.ExamReviewLog.review_memo
             }
             items.append(obj)
 

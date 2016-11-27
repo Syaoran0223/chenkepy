@@ -8,4 +8,4 @@ from .examReviewLog import ExamReviewLog
 from .score import Score
 from .message import Message
 from .question import Question
-from .quest_image import QuestImage
+from .quest_review_log import QuestReviewLog
