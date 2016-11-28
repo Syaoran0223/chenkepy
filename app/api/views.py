@@ -471,10 +471,52 @@ def update_question():
     correct_answer = request.json.get('correct_answer')
     knowledge_point = request.json.get('knowledge_point')
     state = request.json.get('state')
-    quest = Question.query.get('id')
+    quest = Question.query.get(id)
+
+    exam = Exam.query.get(int(exam_id))
+    examReviewLog = ExamReviewLog.query.filter(ExamReviewLog.exam_id == exam_id).order_by(ExamReviewLog.id.desc()).all()
+
+    if exam.state == EXAM_STATUS['预处理']:
+        if len(examReviewLog) > 0:
+            if examReviewLog[0].reviewer_id != g.user.id:
+                raise JsonOutputException('任务已被领取')
+    else:
+        raise JsonOutputException('该试卷已处理过')
+
     if quest is None:
         raise JsonOutputException('未找到题目')
-    return render_api('')
+    if has_sub is not None:
+        quest.has_sub = has_sub
+    if quest_type_id is not None:
+        quest.quest_type_id = quest_type_id
+    if quest_image is not None:
+        quest.quest_image = quest_image
+    if answer_image is not None:
+        quest.answer_image = answer_image
+    if quest_no is not None:
+        quest.quest_no = quest_no
+    if quest_content is not None:
+        quest.quest_content = quest_content
+    if quest_content_html is not None:
+        quest.quest_content_html = quest_content_html
+    if option_count is not None:
+        quest.option_count = option_count
+    if qrows is not None:
+        quest.qrows = qrows
+    if qcols is not None:
+        quest.qcols = qcols
+    if kaodian is not None:
+        quest.kaodian= kaodian
+    if fenxi is not None:
+        quest.fenxi = fenxi
+    if correct_answer is not None:
+        quest.correct_answer = correct_answer
+    if knowledge_point is not None:
+        quest.knowledge_point= knowledge_point
+    if state is not None:
+        quest.state = state
+    quest.save()
+    return render_api(quest)
 
 #试卷预处理完成
 @api_blueprint.route('/paper/preprocess/finish',methods=['POST'])
