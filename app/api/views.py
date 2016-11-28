@@ -516,7 +516,7 @@ def update_question():
     if state is not None:
         quest.state = state
     quest.save()
-    return render_api(quest)
+    return render_api(quest.to_dict())
 
 #试卷预处理完成
 @api_blueprint.route('/paper/preprocess/finish',methods=['POST'])
