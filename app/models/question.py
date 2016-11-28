@@ -48,5 +48,5 @@ class Question(db.Model, SessionMixin):
         quest.save()
         quest_review_log = QuestReviewLog(exam_id=exam_id, quest_no=quest_no, reviewer_id=user_id, review_state=EXAM_STATUS['预处理完成'], review_memo=review_memo)
         quest_review_log.save()
-        res = quest.to_dict()
-        return res
+        res = Question.query.get(quest.id)
+        return res.to_dict()
