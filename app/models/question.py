@@ -12,7 +12,7 @@ class Question(db.Model, SessionMixin):
         super(Question, self).__init__(*args, **kwargs)
 
     id = db.Column(db.Integer, primary_key=True)
-    has_sub = db.Column(db.Boolean, default=False)
+    has_sub = db.Column(db.Integer, default=0)
     exam_id = db.Column(db.Integer)
     quest_type_id = db.Column(db.Integer)
     quest_image =  db.Column(db.JsonBlob(), default=[])
