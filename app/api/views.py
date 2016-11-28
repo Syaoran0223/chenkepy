@@ -372,7 +372,7 @@ def list_exam_file_pre_process():
     }
 
 def list_user_preprocess_file():
-    res = pagination(Exam.query.filter_by(Exam.state == EXAM_STATUS['预处理'] or Exam.state == EXAM_STATUS['预处理完成']).order_by(Exam.created_at.desc()))
+    res = pagination(Exam.query.filter(Exam.state == EXAM_STATUS['预处理'] or Exam.state == EXAM_STATUS['预处理完成']).order_by(Exam.created_at.desc()))
     items = res.get('items', [])
     items = School.bind_auto(items, 'name')
     res['items'] = items
@@ -388,7 +388,7 @@ def view_exam_file_pre_process(id):
 
     data = Exam.get_exam(id)
     exam = Exam.query.get(int(id))
-    examReviewLog = ExamReviewLog.query.filter_by(ExamReviewLog.exam_id == id).order_by(ExamReviewLog.id.desc()).all()
+    examReviewLog = ExamReviewLog.query.filter(ExamReviewLog.exam_id == id).order_by(ExamReviewLog.id.desc()).all()
 
     if exam.state == EXAM_STATUS['预处理']:
         if len(examReviewLog) > 0:
