@@ -516,6 +516,7 @@ def update_question():
     if state is not None:
         quest.state = state
     quest.save()
+    quest = Question.query.get(id)
     return render_api(quest.to_dict())
 
 #试卷预处理完成
