@@ -540,4 +540,5 @@ def finish_exam_pre_process():
 
     exam.state = EXAM_STATUS['预处理完成']
     exam.save()
-    return render_api('')
+    exam = Exam.query.get(id)
+    return render_api(exam.to_dict())
