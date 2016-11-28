@@ -408,7 +408,9 @@ def view_exam_file_pre_process(id):
         examReview = ExamReviewLog(exam_id=exam.id, reviewer_id=g.user.id, review_state=EXAM_STATUS['预处理'], review_memo='')
         examReview.save()
     questList = Question.query.filter_by(exam_id=exam.id).all()
-    data['quest_list'] = questList
+    questDict = []
+
+    data['quest_list'] = [item.to_dict() for item in questList]
     return {
         'code': 0,
         'data': data
@@ -437,7 +439,7 @@ def view_quest_image(id):
 #添加上题目图片
 @api_blueprint.route('/paper/preprocess/view',methods=['POST'])
 def add_pre_review_quest_image():
-    quest_no = request.json.get('quset_no')
+    quest_no = request.json.get('quest_no')
     exam_id = request.json.get('exam_id')
     has_sub = request.json.get('has_sub')
     quest_type_id = request.json.get('quest_type_id')
