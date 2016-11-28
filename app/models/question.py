@@ -43,8 +43,8 @@ class Question(db.Model, SessionMixin):
         return Question.query.filter(Question.quest_no==quest_no)
 
     @staticmethod
-    def add_pre_process_image(exam_id, quest_no, quest_type_id, option_count, quest_image, user_id, review_memo, answer_image):
-        quest = Question(exam_id=exam_id, quest_no=quest_no, quest_type_id=quest_type_id, option_count=option_count, quest_image=quest_image,answer_image=answer_image, state=EXAM_STATUS['预处理完成'])
+    def add_pre_process_image(exam_id, quest_no,has_sub, quest_type_id, option_count, quest_image, user_id, review_memo, answer_image):
+        quest = Question(exam_id=exam_id, quest_no=quest_no,has_sub=has_sub, quest_type_id=quest_type_id, option_count=option_count, quest_image=quest_image,answer_image=answer_image, state=EXAM_STATUS['预处理完成'])
         quest.save()
         quest_review_log = QuestReviewLog(exam_id=exam_id, quest_no=quest_no, reviewer_id=user_id, review_state=EXAM_STATUS['预处理完成'], review_memo=review_memo)
         quest_review_log.save()

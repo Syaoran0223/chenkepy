@@ -372,7 +372,7 @@ def list_exam_file_pre_process():
     }
 
 def list_user_preprocess_file():
-    res = pagination(Exam.query.filter(Exam.state == EXAM_STATUS['预处理'] or Exam.state == EXAM_STATUS['预处理完成']).order_by(Exam.created_at.desc()))
+    res = pagination(Exam.query.filter_by(Exam.state == EXAM_STATUS['预处理'] or Exam.state == EXAM_STATUS['预处理完成']).order_by(Exam.created_at.desc()))
     items = res.get('items', [])
     items = School.bind_auto(items, 'name')
     res['items'] = items
@@ -381,22 +381,24 @@ def list_user_preprocess_file():
         'data': res
     }
 
-
+#预处理试卷列表
 @api_blueprint.route('/paper/preprocess/view/<int:id>', methods=['GET'])
 def view_exam_file_pre_process(id):
     #data = MultiDict(mapping=request.json)
+
     data = Exam.get_exam(id)
     exam = Exam.query.get(int(id))
-    examReviewLog = ExamReviewLog.query.filter(ExamReviewLog.reviewer_id == g.user.id, ExamReviewLog.exam_id == id, \
-                                               ExamReviewLog.review_state == EXAM_STATUS['预处理']).all()
+    examReviewLog = ExamReviewLog.query.filter_by(ExamReviewLog.exam_id == id).order_by(ExamReviewLog.id.desc()).all()
+
     if exam.state == EXAM_STATUS['预处理']:
         if len(examReviewLog) > 0:
             if examReviewLog[0].reviewer_id != g.user.id:
                 raise JsonOutputException('任务已被领取')
+    else:
+        raise JsonOutputException('该试卷已处理过')
 
-
-    if exam.state == EXAM_STATUS['预处理完成']:
-        raise JsonOutputException('预处理已完成,不能重')
+    if exam.state != EXAM_STATUS['预处理']:
+        raise JsonOutputException('该试卷已处理完成,不能重复处理')
 
     if len(examReviewLog) == 0:
         exam.state = EXAM_STATUS['预处理']
@@ -405,7 +407,8 @@ def view_exam_file_pre_process(id):
 
         examReview = ExamReviewLog(exam_id=exam.id, reviewer_id=g.user.id, review_state=EXAM_STATUS['预处理'], review_memo='')
         examReview.save()
-
+    questList = Question.query.filter_by(exam_id=exam.id).all()
+    data['quest_list'] = questList
     return {
         'code': 0,
         'data': data
@@ -431,17 +434,65 @@ def view_quest_image(id):
         'data': data
     }
 
+#添加上题目图片
 @api_blueprint.route('/paper/preprocess/view',methods=['POST'])
 def add_pre_review_quest_image():
     quest_no = request.json.get('quset_no')
     exam_id = request.json.get('exam_id')
+    has_sub = request.json.get('has_sub')
     quest_type_id = request.json.get('quest_type_id')
     option_count = request.json.get('option_count')
     quest_image = request.json.get('quest_image')
     review_memo = request.json.get('review_memo')
     answer_image = request.json.get('answer_image')
 
-    res = Question.add_pre_process_image(exam_id, quest_no, quest_type_id, option_count, quest_image, 22, review_memo, answer_image)
+    res = Question.add_pre_process_image(exam_id, quest_no,has_sub, quest_type_id, option_count, quest_image, 22, review_memo, answer_image)
     return render_api(res)
 
+#修改题目
+@api_blueprint.route('/paper/preprocess/view',methods=['PUT'])
+def update_question():
+    id = request.json.get('id')
+    exam_id = request.json.get('exam_id')
+    has_sub = request.json.get('has_sub')
+    quest_type_id = request.json.get('quest_type_id')
+    quest_image = request.json.get('quest_image')
+    answer_image = request.json.get('answer_image')
+    quest_no= request.json.get('quest_no')
+    quest_content = request.json.get('quest_content')
+    quest_content_html =request.json.get('quest_content_html')
+    option_count = request.json.get('option_count')
+    qrows = request.json.get('qrows')
+    qcols = request.json.get('qcols')
+    kaodian = request.json.get('kaodian')
+    fenxi = request.json.get('fenxi')
+    correct_answer = request.json.get('correct_answer')
+    knowledge_point = request.json.get('knowledge_point')
+    state = request.json.get('state')
+    quest = Question.query.get('id')
+    if quest is None:
+        raise JsonOutputException('未找到题目')
+    return render_api('')
 
+#试卷预处理完成
+@api_blueprint.route('/paper/preprocess/finish',methods=['POST'])
+def finish_exam_pre_process():
+    id = request.json.get("id")
+    exam = Exam.query.get(id)
+    review_memo = request.json.get('review_memo')
+    examReviewLog = ExamReviewLog.query.filter_by(exam_id=id).order_by(ExamReviewLog.id.desc()).all()
+
+    user_id = g.user.id
+    if exam.state == EXAM_STATUS['预处理']:
+        if len(examReviewLog)>0:
+            if examReviewLog[0].reviewer_id != user_id:
+                raise JsonOutputException('非本人处理试卷,没有权限操作')
+    else:
+        raise JsonOutputException('该试卷已处理过')
+
+    examReviewLog = ExamReviewLog(exam_id=id, reviewer_id=user_id, review_state=EXAM_STATUS['预处理完成'], review_memo=review_memo)
+    examReviewLog.save()
+
+    exam.state = EXAM_STATUS['预处理完成']
+    exam.save()
+    return render_api('')
