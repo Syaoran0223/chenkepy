@@ -9,7 +9,7 @@ from .forms import SmsForm, PaperUploadForm
 from werkzeug.datastructures import MultiDict
 from app.const import EXAM_STATUS,QUEST_IMAGE_STATUS
 from . import api_blueprint
-from app.models import Region, School, ExamReviewLog, Question
+from app.models import Region, School, ExamReviewLog, Question, QuestReviewLog
 from app.sms import SmsServer
 from app.utils import render_api
 
@@ -519,6 +519,27 @@ def update_question():
     quest = Question.query.get(id)
     return render_api(quest.to_dict())
 
+@api_blueprint.route('/paper/preprocess/view/<int:id>',methods=['DELETE'])
+def del_quest(id):
+    quest = Question.query.get(id)
+    exam = Exam.query.get(quest.exam_id)
+    examReviewLog = ExamReviewLog.query.filter(ExamReviewLog.exam_id == exam.exam_id).order_by(ExamReviewLog.id.desc()).all()
+
+    if exam.state == EXAM_STATUS['预处理']:
+        if len(examReviewLog) > 0:
+            if examReviewLog[0].reviewer_id != g.user.id:
+                raise JsonOutputException('任务已被领取')
+    else:
+        raise JsonOutputException('该试卷已处理过')
+
+    quest.delete()
+
+    # questReviewLog = QuestReviewLog.query.filter(QuestReviewLog.id == id).all()
+    # if questReviewLog is None:
+    #     questReviewLog = QuestReviewLog
+
+    return render_api('')
+
 #试卷预处理完成
 @api_blueprint.route('/paper/preprocess/finish',methods=['POST'])
 def finish_exam_pre_process():
@@ -540,4 +561,5 @@ def finish_exam_pre_process():
 
     exam.state = EXAM_STATUS['预处理完成']
     exam.save()
-    return render_api('')
+    exam = Exam.query.get(id)
+    return render_api(exam.to_dict())
