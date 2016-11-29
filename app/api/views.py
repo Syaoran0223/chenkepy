@@ -3,7 +3,7 @@ from app.exceptions import JsonOutputException, FormValidateError
 from app.decorators import api_login_required, permission_required
 from app.models import Attachment, Exam, User, Message
 from app.utils import upload, pagination
-from flask import request, g
+from flask import request, g, current_app
 from flask.ext.login import login_required
 from .forms import SmsForm, PaperUploadForm
 from werkzeug.datastructures import MultiDict
@@ -430,10 +430,16 @@ def list_quest_image():
 @api_blueprint.route('/paper/image/view/<int:id>', methods=['GET'])
 def view_quest_image(id):
 
-    data = Question.view_quest_image_detail(id)
+    quest = Question.view_quest_detail(id)
+
+    if quest is None:
+        raise JsonOutputException('未找到数据')
+
+    #exam = Exam.query.get(quest.exam_id)
+
     return {
         'code': 0,
-        'data': data
+        'data': quest.to_dict()
     }
 
 #添加上题目图片
@@ -522,7 +528,11 @@ def update_question():
 @api_blueprint.route('/paper/preprocess/view/<int:id>',methods=['DELETE'])
 def del_quest(id):
     quest = Question.query.get(id)
+    if quest is None:
+        raise JsonOutputException('未找到该试题')
     exam = Exam.query.get(quest.exam_id)
+    if exam is None:
+        raise JsonOutputException('未找到该试卷')
     examReviewLog = ExamReviewLog.query.filter(ExamReviewLog.exam_id == exam.exam_id).order_by(ExamReviewLog.id.desc()).all()
 
     if exam.state == EXAM_STATUS['预处理']:
@@ -533,12 +543,17 @@ def del_quest(id):
         raise JsonOutputException('该试卷已处理过')
 
     quest.delete()
-
-    # questReviewLog = QuestReviewLog.query.filter(QuestReviewLog.id == id).all()
-    # if questReviewLog is None:
-    #     questReviewLog = QuestReviewLog
+    questReviewLog = QuestReviewLog(exam_id=exam.id,quest_no=quest.quest_no,review_id=g.user.id, review_state=EXAM_STATUS['已删除'], review_memo='')
+    questReviewLog.save()
 
     return render_api('')
+
+#查看审核记录
+@api_blueprint.route('/paper/preprocess/log', methods=['GET'])
+def list_quest_review_log():
+    pageIndex = int(request.args.get('pageIndex', 0))
+    pageSize = int(request.args.get('pageSize', current_app.config['PER_PAGE']))
+    return QuestReviewLog.list_log(g.user.id, pageIndex, pageSize)
 
 #试卷预处理完成
 @api_blueprint.route('/paper/preprocess/finish',methods=['POST'])

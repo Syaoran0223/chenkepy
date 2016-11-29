@@ -39,8 +39,8 @@ class Question(db.Model, SessionMixin):
     #     return res
 
     @staticmethod
-    def view_quest_detail(quest_no=0):
-        return Question.query.filter(Question.quest_no==quest_no)
+    def view_quest_detail(id=0):
+        return Question.query.filter(Question.id==id).all()
 
     @staticmethod
     def add_pre_process_image(exam_id, quest_no,has_sub, quest_type_id, option_count, quest_image, user_id, review_memo, answer_image):
