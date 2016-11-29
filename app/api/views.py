@@ -560,7 +560,7 @@ def list_quest_review_log():
 def finish_exam_pre_process():
     id = request.json.get("id")
     exam = Exam.query.get(id)
-    review_memo = request.json.get('review_memo')
+    review_memo = request.json.get('review_memo', '')
     examReviewLog = ExamReviewLog.query.filter_by(exam_id=id).order_by(ExamReviewLog.id.desc()).all()
 
     user_id = g.user.id
