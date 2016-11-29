@@ -370,7 +370,7 @@ def list_exam_file_pre_process():
         'code': 0,
         'data': data
     }
-
+@api_blueprint('')
 def list_user_preprocess_file():
     res = pagination(Exam.query.filter(Exam.state == EXAM_STATUS['预处理'] or Exam.state == EXAM_STATUS['预处理完成']).order_by(Exam.created_at.desc()))
     items = res.get('items', [])
@@ -404,9 +404,9 @@ def view_exam_file_pre_process(id):
         exam.state = EXAM_STATUS['预处理']
         exam.review_date = datetime.datetime.now()
         exam.save()
-
         examReview = ExamReviewLog(exam_id=exam.id, reviewer_id=g.user.id, review_state=EXAM_STATUS['预处理'], review_memo='')
         examReview.save()
+
     questList = Question.query.filter_by(exam_id=exam.id).all()
     questDict = []
 
