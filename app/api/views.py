@@ -429,7 +429,6 @@ def list_quest_image():
 #查看图片
 @api_blueprint.route('/paper/image/view/<int:id>', methods=['GET'])
 def view_quest_image(id):
-
     quest = Question.view_quest_detail(id)
 
     if quest is None:

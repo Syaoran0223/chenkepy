@@ -40,7 +40,7 @@ class Question(db.Model, SessionMixin):
 
     @staticmethod
     def view_quest_detail(id=0):
-        return Question.query.filter(Question.id==id).all()
+        return Question.query.get(id)
 
     @staticmethod
     def add_pre_process_image(exam_id, quest_no,has_sub, quest_type_id, option_count, quest_image, user_id, review_memo, answer_image):
