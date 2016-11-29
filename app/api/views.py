@@ -550,7 +550,7 @@ def del_quest(id):
 #查看审核记录
 @api_blueprint.route('/paper/preprocess/log', methods=['GET'])
 def list_quest_review_log():
-    pageIndex = int(request.args.get('pageIndex', 0))
+    pageIndex = int(request.args.get('pageIndex', 1))
     pageSize = int(request.args.get('pageSize', current_app.config['PER_PAGE']))
     return QuestReviewLog.list_log(g.user.id, pageIndex, pageSize)
 
