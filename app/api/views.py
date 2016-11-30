@@ -116,6 +116,8 @@ def paper_upload():
                 school_id=form.school_id.data,
                 year=form.year.data, grade=form.grade.data, state=0, attachments=attachments, upload_user=g.user.id)
     result = exam.save()
+    exam_log = ExamReviewLog(exam_id = exam.id, reviewer_id = g.user.id, review_state = EXAM_STATUS['未审核'],review_memo='')
+    exam_log.save()
     if result.id is not None:
         return {
             'code': 0,
@@ -424,22 +426,16 @@ def list_exam_file_pre_process():
 #预处理试卷列表
 @api_blueprint.route('/paper/preprocess/view/<int:id>', methods=['GET'])
 def view_exam_file_pre_process(id):
-    #data = MultiDict(mapping=request.json)
-
     data = Exam.get_exam(id)
     exam = Exam.query.get(int(id))
     examReviewLog = ExamReviewLog.query.filter(ExamReviewLog.exam_id == id).order_by(ExamReviewLog.id.desc()).all()
-
     if exam.state == EXAM_STATUS['预处理']:
         if len(examReviewLog) > 0:
             if examReviewLog[0].reviewer_id != g.user.id:
                 raise JsonOutputException('任务已被领取')
     else:
-        raise JsonOutputException('该试卷已处理过')
-
-    if exam.state != EXAM_STATUS['预处理']:
-        raise JsonOutputException('该试卷已处理完成,不能重复处理')
-
+        if exam.state != EXAM_STATUS['已审核']:
+            raise JsonOutputException('该试卷无法进行预处理')
     if len(examReviewLog) == 0:
         exam.state = EXAM_STATUS['预处理']
         exam.review_date = datetime.datetime.now()
