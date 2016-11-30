@@ -27,6 +27,7 @@ class ExamReviewLog(db.Model, SessionMixin):
         for item in result.items:
             obj = {
                 'id': item.ExamReviewLog.id,
+                'exam_id': item.Exam.id,
                 'name': item.Exam.name,
                 'school_name': item.School.name,
                 'section': item.Exam.section,

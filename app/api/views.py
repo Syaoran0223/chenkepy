@@ -389,7 +389,10 @@ def list_exam_file_pre_process():
 def view_exam_file_pre_process(id):
     data = Exam.get_exam(id)
     exam = Exam.query.get(int(id))
-    examReviewLog = ExamReviewLog.query.filter(ExamReviewLog.exam_id == id).order_by(ExamReviewLog.id.desc()).all()
+    examReviewLog = ExamReviewLog.query.\
+        filter(ExamReviewLog.exam_id == id).\
+        filter(ExamReviewLog.review_state == EXAM_STATUS['预处理']).\
+        order_by(ExamReviewLog.id.desc()).all()
     if exam.state == EXAM_STATUS['预处理']:
         if len(examReviewLog) > 0:
             if examReviewLog[0].reviewer_id != g.user.id:
