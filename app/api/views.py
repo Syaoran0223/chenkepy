@@ -371,16 +371,16 @@ def list_exam_file_pre_process():
         'code': 0,
         'data': data
     }
-@api_blueprint('')
-def list_user_preprocess_file():
-    res = pagination(Exam.query.filter(Exam.state == EXAM_STATUS['预处理'] or Exam.state == EXAM_STATUS['预处理完成']).order_by(Exam.created_at.desc()))
-    items = res.get('items', [])
-    items = School.bind_auto(items, 'name')
-    res['items'] = items
-    return {
-        'code': 0,
-        'data': res
-    }
+#@api_blueprint('/paper/preprocess/')
+# def list_user_preprocess_file():
+#     res = pagination(Exam.query.filter(Exam.state == EXAM_STATUS['预处理'] or Exam.state == EXAM_STATUS['预处理完成']).order_by(Exam.created_at.desc()))
+#     items = res.get('items', [])
+#     items = School.bind_auto(items, 'name')
+#     res['items'] = items
+#     return {
+#         'code': 0,
+#         'data': res
+#     }
 
 #预处理试卷列表
 @api_blueprint.route('/paper/preprocess/view/<int:id>', methods=['GET'])
