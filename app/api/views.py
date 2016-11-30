@@ -13,7 +13,7 @@ from app.models import Region, School, ExamReviewLog, Question, QuestReviewLog
 from app.sms import SmsServer
 from app.utils import render_api,paginate
 from app import db
-
+from sqlalchemy import or_
 import datetime
 @api_blueprint.route('/province')
 def province():
@@ -200,7 +200,11 @@ def delexam(id):
 @api_login_required
 @permission_required('CONFIRM_PERMISSION')
 def listexam():
-    data = Exam.list_exams(EXAM_STATUS['未审核'])
+    res = pagination(Exam.query.filter(Exam.state == EXAM_STATUS['未审核'],Exam.upload_user!=g.user.id).order_by(Exam.created_at.desc()))
+    items = res.get('items', [])
+    items = School.bind_auto(items, 'name')
+    res['items'] = items
+    data=Exam.list_exams(EXAM_STATUS['未审核'])
     return {
             'code': 0,
             'data': data
@@ -252,7 +256,7 @@ def review_exam_update(id):
     data = MultiDict(mapping=request.json)
 
     #查询是否已审核
-    exam = Exam.query.get(i)
+    exam = Exam.query.get(id)
     if data['state'] is None or data['state']=='':
         raise JsonOutputException('缺少审核结果,审核失败')
     examReviewLog = ExamReviewLog.query.filter(ExamReviewLog.reviewer_id == g.user.id, ExamReviewLog.exam_id == id,\
@@ -284,7 +288,42 @@ def review_exam_update(id):
 @api_login_required
 @permission_required('CONFIRM_PERMISSION')
 def list_examreview_log():
-    return render_api(ExamReviewLog.list_log(g.user.id))
+    pageIndex = int(request.args.get('pageIndex', 1))
+    if pageIndex ==0:
+        pageIndex = 1
+    pageSize = int(request.args.get('pageSize', current_app.config['PER_PAGE']))
+
+    result = db.session.query(Exam, ExamReviewLog, School, User).filter(Exam.id == ExamReviewLog.exam_id,
+                                                                        ExamReviewLog.reviewer_id == g.user.id,or_(ExamReviewLog.review_state==EXAM_STATUS['审核不通过'], \
+                                                                         ExamReviewLog.review_state==EXAM_STATUS['正在审核'], \
+                                                                         ExamReviewLog.review_state==EXAM_STATUS['已审核']), Exam.school_id == School.id , ExamReviewLog.reviewer_id == User.id).order_by(
+        ExamReviewLog.review_date.desc())
+    result = paginate(result, pageIndex, pageSize, error_out=False)
+    items = []
+    for item in result.items:
+        obj = {
+            'id': item.ExamReviewLog.id,
+            'name': item.Exam.name,
+            'school_name': item.School.name,
+            'section': item.Exam.section,
+            'year': item.Exam.year,
+            'grade': item.Exam.grade,
+            'subject': item.Exam.subject,
+            'reviewer': item.User.name,
+            'review_state': item.ExamReviewLog.review_state,
+            'review_date': item.ExamReviewLog.review_date.strftime("%Y-%m-%d %H:%M:%S"),
+            'review_memo': item.ExamReviewLog.review_memo
+        }
+        items.append(obj)
+
+    res = {
+        'items': items,
+        'pageIndex': result.page - 1,
+        'pageSize': result.per_page,
+        'totalCount': result.total,
+        'totalPage': result.pages
+    }
+    return render_api(res)
 
 #获取用户个人信息
 @api_blueprint.route('/user/info', methods=['GET'])
@@ -366,7 +405,7 @@ def list_deal_wait():
 
 @api_blueprint.route('/paper/preprocess/list',methods=['GET'])
 def list_exam_file_pre_process():
-    data = Exam.list_exams(EXAM_STATUS['审核结束'])
+    data = Exam.list_exams(EXAM_STATUS['已审核'])
     return {
         'code': 0,
         'data': data
