@@ -9,3 +9,5 @@ from .score import Score
 from .message import Message
 from .question import Question
 from .quest_review_log import QuestReviewLog
+from .review import Review
+from .examLog import ExamLog

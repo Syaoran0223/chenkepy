@@ -27,6 +27,30 @@ class Exam(db.Model, SessionMixin):
     attachments = db.Column(db.JsonBlob(), default=[])
     review_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now())
 
+    def get_dtl(self):
+        result = {
+            'id': self.id,
+            'name': self.name,
+            'sections': self.section,
+            'subject': self.subject,
+            'paper_types': self.paper_types,
+            'province_id': self.province_id,
+            'city_id': self.city_id,
+            'area_id': self.area_id,
+            'school_id': self.school_id,
+            'year': self.year,
+            'grade': self.grade,
+            'state': self.state,
+            'upload_user': self.upload_user,
+            'attachments': self.attachments,
+            'review_date': self.review_date.strftime('%Y-%m-%d %H:%M:%S')
+        }
+        result = Region.bind_auto(result, 'name', 'city_id', 'id', 'city')
+        result = Region.bind_auto(result, 'name', 'province_id', 'id', 'province')
+        result = Region.bind_auto(result, 'name', 'area_id', 'id', 'area')
+        result = School.bind_auto(result, 'name', 'school_id', 'id', 'school')
+        return result
+
     @staticmethod
     def get_exams(upload_user):
         #查询上传用户试卷记录

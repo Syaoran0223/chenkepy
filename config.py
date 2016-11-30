@@ -16,11 +16,11 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     #mysql数据库IP地址
-    MYSQL_ADDR = '117.27.143.66'
-    MYQSL_PORT = 8333
+    MYSQL_ADDR = '115.28.18.59'
+    MYQSL_PORT = 3306
     DB_NAME = 'pdb'
-    USER_NAME = 'smpdb'
-    PASSWORD = 'lasdl32rwlerldfa,jkljl23r.lwrdf'
+    USER_NAME = 'chenke91'
+    PASSWORD = 'chenke91.com'
 
     CACHE_TYPE ='simple'
     SQLALCHEMY_POOL_SIZE = 20

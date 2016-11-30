@@ -9,7 +9,7 @@ from .forms import SmsForm, PaperUploadForm
 from werkzeug.datastructures import MultiDict
 from app.const import EXAM_STATUS,QUEST_IMAGE_STATUS
 from . import api_blueprint
-from app.models import Region, School, ExamReviewLog, Question, QuestReviewLog
+from app.models import Region, School, ExamReviewLog, Question, QuestReviewLog, ExamLog
 from app.sms import SmsServer
 from app.utils import render_api,paginate
 from app import db
@@ -116,13 +116,9 @@ def paper_upload():
                 school_id=form.school_id.data,
                 year=form.year.data, grade=form.grade.data, state=0, attachments=attachments, upload_user=g.user.id)
     result = exam.save()
-    exam_log = ExamReviewLog(exam_id = exam.id, reviewer_id = g.user.id, review_state = EXAM_STATUS['未审核'],review_memo='')
-    exam_log.save()
+    ExamLog.log(exam.id, g.user.id, EXAM_STATUS['未审核'], 'UPLOAD')
     if result.id is not None:
-        return {
-            'code': 0,
-            'data': ''
-        }
+        return render_api({})
     raise JsonOutputException('添加失败')
 
 #试卷列表
@@ -197,135 +193,6 @@ def delexam(id):
             'code': 0,
             'data': ''
         }
-#试卷未审核列表
-@api_blueprint.route('/paper/confirm/wait',methods=['GET'])
-@api_login_required
-@permission_required('CONFIRM_PERMISSION')
-def listexam():
-    res = pagination(Exam.query.filter(Exam.state == EXAM_STATUS['未审核'],Exam.upload_user!=g.user.id).order_by(Exam.created_at.desc()))
-    items = res.get('items', [])
-    items = School.bind_auto(items, 'name')
-    res['items'] = items
-    data=Exam.list_exams(EXAM_STATUS['未审核'])
-    return {
-            'code': 0,
-            'data': data
-    }
-
-#试卷审核 读取
-@api_blueprint.route('/paper/confirm/review/<int:id>', methods=['GET'])
-@api_login_required
-@permission_required('CONFIRM_PERMISSION')
-def review_exam(id):
-    data = Exam.get_exam(id)
-    #审核倒计时 30分钟 （秒）
-    data['countdown'] = 1800
-    #更新审核
-    exam = Exam.query.get(int(id))
-    examReviewLog = ExamReviewLog.query.filter(ExamReviewLog.exam_id == exam.id, ExamReviewLog.review_state == EXAM_STATUS['正在审核'] ).order_by(ExamReviewLog.created_at.desc())
-    examReviewLog = examReviewLog.all()
-
-    #正在审核状态
-    if exam.state == EXAM_STATUS['正在审核']:
-        #并且不为本人操作
-        if len(examReviewLog) > 0:
-            if examReviewLog[0].reviewer_id != g.user.id:
-                raise JsonOutputException('任务已被领取')
-            else:
-                data['countdown'] = 1800 - (datetime.datetime.now() - examReviewLog[0].review_date).seconds;
-
-    if exam.state == EXAM_STATUS['已审核']: #试卷已审核通过
-        raise JsonOutputException('该试卷已经通过审核，不能重复审核')
-
-    if len(examReviewLog) == 0:
-        exam.state = EXAM_STATUS['正在审核']
-        exam.review_date = datetime.datetime.now()
-        exam.save()
-
-        examReview = ExamReviewLog(exam_id = exam.id, reviewer_id = g.user.id, review_state = EXAM_STATUS['正在审核'],review_memo='')
-        examReview.save()
-
-    return {
-            'code': 0,
-            'data': data
-    }
-
-#试卷审核 提交、写入
-@api_blueprint.route('/paper/confirm/review/<int:id>', methods=['PUT'])
-@api_login_required
-@permission_required('CONFIRM_PERMISSION')
-def review_exam_update(id):
-    data = MultiDict(mapping=request.json)
-
-    #查询是否已审核
-    exam = Exam.query.get(id)
-    if data['state'] is None or data['state']=='':
-        raise JsonOutputException('缺少审核结果,审核失败')
-    examReviewLog = ExamReviewLog.query.filter(ExamReviewLog.reviewer_id == g.user.id, ExamReviewLog.exam_id == id,\
-                                               ExamReviewLog.review_state == EXAM_STATUS['正在审核']).all()
-    if len(examReviewLog) == 0:
-        raise JsonOutputException('已审核过，不能重复审核')
-    if (datetime.datetime.now() - examReviewLog[0].review_date).seconds > 1800:
-        raise JsonOutputException('超过审核时间')
-
-    examReviewLog = examReviewLog[0]
-    examReviewLog.review_date = datetime.datetime.now()
-    examReviewLog.review_memo = data['memo']
-    examReviewLog.reviewer_id = g.user.id
-    examReviewLog.review_state = data['state']
-    examReviewLog.save()
-
-    exam = Exam.query.get(int(id))
-    exam.state = data['state']
-    exam.review_date = datetime.datetime.now()
-    exam.save()
-
-    return {
-        'code': 0,
-        'data': ''
-    }
-
-#登录用户审核记录
-@api_blueprint.route('/examreview/list', methods=['GET'])
-@api_login_required
-@permission_required('CONFIRM_PERMISSION')
-def list_examreview_log():
-    pageIndex = int(request.args.get('pageIndex', 1))
-    if pageIndex ==0:
-        pageIndex = 1
-    pageSize = int(request.args.get('pageSize', current_app.config['PER_PAGE']))
-
-    result = db.session.query(Exam, ExamReviewLog, School, User).filter(Exam.id == ExamReviewLog.exam_id,
-                                                                        ExamReviewLog.reviewer_id == g.user.id,or_(ExamReviewLog.review_state==EXAM_STATUS['审核不通过'], \
-                                                                         ExamReviewLog.review_state==EXAM_STATUS['正在审核'], \
-                                                                         ExamReviewLog.review_state==EXAM_STATUS['已审核']), Exam.school_id == School.id , ExamReviewLog.reviewer_id == User.id).order_by(
-        ExamReviewLog.review_date.desc())
-    result = paginate(result, pageIndex, pageSize, error_out=False)
-    items = []
-    for item in result.items:
-        obj = {
-            'id': item.ExamReviewLog.id,
-            'name': item.Exam.name,
-            'school_name': item.School.name,
-            'section': item.Exam.section,
-            'year': item.Exam.year,
-            'grade': item.Exam.grade,
-            'subject': item.Exam.subject,
-            'reviewer': item.User.name,
-            'review_state': item.ExamReviewLog.review_state,
-            'review_date': item.ExamReviewLog.review_date.strftime("%Y-%m-%d %H:%M:%S"),
-            'review_memo': item.ExamReviewLog.review_memo
-        }
-        items.append(obj)
-
-    res = {
-        'items': items,
-        'pageIndex': result.page - 1,
-        'pageSize': result.per_page,
-        'totalCount': result.total,
-        'totalPage': result.pages
-    }
-    return render_api(res)
 
 #获取用户个人信息
 @api_blueprint.route('/user/info', methods=['GET'])
