@@ -7,7 +7,7 @@ from flask import request, g, current_app
 from flask.ext.login import login_required
 from .forms import SmsForm, PaperUploadForm
 from werkzeug.datastructures import MultiDict
-from app.const import EXAM_STATUS,QUEST_IMAGE_STATUS
+from app.const import EXAM_STATUS,QUEST_STATUS
 from . import api_blueprint
 from app.models import Region, School, ExamReviewLog, Question, QuestReviewLog, ExamLog, Review
 from app.sms import SmsServer

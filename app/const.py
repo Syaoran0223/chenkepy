@@ -86,8 +86,8 @@ EXAM_STATUS = {
 
 }
 
-QUEST_IMAGE_STATUS = {
-    '已删除': -1,
+QUEST_STATUS = {
+    '已删除': -99,
     '未处理': 0,
     '正在打字': 1,
     '审核不通过': 2,
