@@ -1,5 +1,5 @@
 import json
-from app.exceptions import JsonOutputException, FormValidateError
+from app.exceptions import JsonOutputException
 from app.decorators import api_login_required, permission_required
 from app.models import Exam, User, Review, Question, QuestReviewLog, QuestLog, ExamLog, School, Preprocess
 from app.utils import pagination
@@ -17,6 +17,7 @@ import datetime
 #试卷待处理列表
 @api_blueprint.route('/paper/deal/wait',methods=['GET'])
 @api_login_required
+@permission_required('DEAL_PERMISSION')
 def list_deal_wait():
     data = Exam.list_exams(EXAM_STATUS['已审核'])
     return render_api(data)
@@ -24,6 +25,7 @@ def list_deal_wait():
 #进行处理
 @api_blueprint.route('/paper/preprocess/view/<int:id>', methods=['GET'])
 @api_login_required
+@permission_required('DEAL_PERMISSION')
 def view_exam_file_pre_process(id):
     exam = Exam.query.get(int(id))
     if not exam:
@@ -51,6 +53,8 @@ def view_exam_file_pre_process(id):
 
 #添加上题目图片
 @api_blueprint.route('/paper/preprocess/view',methods=['POST'])
+@api_login_required
+@permission_required('DEAL_PERMISSION')
 def add_pre_review_quest_image():
     quest_no = request.json.get('quest_no')
     exam_id = request.json.get('exam_id')
@@ -73,6 +77,8 @@ def add_pre_review_quest_image():
 
 #修改题目
 @api_blueprint.route('/paper/preprocess/view',methods=['PUT'])
+@api_login_required
+@permission_required('DEAL_PERMISSION')
 def update_question():
     id = request.json.get('id')
     has_sub = request.json.get('has_sub')
@@ -109,6 +115,7 @@ def update_question():
 
 @api_blueprint.route('/paper/preprocess/view/<int:id>',methods=['DELETE'])
 @api_login_required
+@permission_required('DEAL_PERMISSION')
 def del_quest(id):
     quest = Question.query.get(id)
     if quest is None:
@@ -128,6 +135,7 @@ def del_quest(id):
 #查看预处理记录
 @api_blueprint.route('/paper/preprocess/list', methods=['GET'])
 @api_login_required
+@permission_required('DEAL_PERMISSION')
 def list_quest_review_log():
 
     query = Preprocess.query.filter_by(operator_id=g.user.id)
@@ -140,6 +148,8 @@ def list_quest_review_log():
 
 #试卷预处理完成
 @api_blueprint.route('/paper/preprocess/finish',methods=['POST'])
+@api_login_required
+@permission_required('DEAL_PERMISSION')
 def finish_exam_pre_process():
     id = request.json.get("id")
     exam = Exam.query.get(id)

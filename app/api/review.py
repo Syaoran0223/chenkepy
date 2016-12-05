@@ -1,19 +1,12 @@
 import json
-from app.exceptions import JsonOutputException, FormValidateError
+from app.exceptions import JsonOutputException
 from app.decorators import api_login_required, permission_required
-from app.models import Attachment, Exam, User, Message
 from app.utils import upload, pagination
-from flask import request, g, current_app
-from flask.ext.login import login_required
-from .forms import SmsForm, PaperUploadForm
-from werkzeug.datastructures import MultiDict
-from app.const import EXAM_STATUS,QUEST_STATUS
+from flask import request, g
+from app.const import EXAM_STATUS
 from . import api_blueprint
-from app.models import Region, School, ExamReviewLog, Question, QuestReviewLog, ExamLog, Review
-from app.sms import SmsServer
-from app.utils import render_api,paginate
-from app import db
-from sqlalchemy import or_
+from app.models import Exam, School, ExamLog, Review
+from app.utils import render_api
 import datetime
 
 #试卷未审核列表
@@ -40,7 +33,7 @@ def review_exam(id):
     timeout = 1800
     if not exam:
         raise JsonOutputException('试卷不存在')
-    if not exam.status in (EXAM_STATUS['正在审核'], EXAM_STATUS['未审核']):
+    if not exam.state in (EXAM_STATUS['正在审核'], EXAM_STATUS['未审核']):
         raise JsonOutputException('试卷状态错误')
     review_data = Review.query.filter_by(exam_id=exam.id).\
         filter_by(review_state=EXAM_STATUS['正在审核']).\
@@ -76,7 +69,6 @@ def review_exam(id):
 @api_login_required
 @permission_required('CONFIRM_PERMISSION')
 def review_exam_update(id):
-    data = MultiDict(mapping=request.json)
     state = request.json.get('state')
     memo = request.json.get('memo')
     if not state or state not in [-1, 2]:
