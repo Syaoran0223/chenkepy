@@ -13,3 +13,4 @@ from .questLog import QuestLog
 from .quest_review_log import QuestReviewLog
 from .review import Review
 from .examLog import ExamLog
+from .preprocess import Preprocess

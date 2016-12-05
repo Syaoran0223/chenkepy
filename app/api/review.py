@@ -40,6 +40,8 @@ def review_exam(id):
     timeout = 1800
     if not exam:
         raise JsonOutputException('试卷不存在')
+    if not exam.status in (EXAM_STATUS['正在审核'], EXAM_STATUS['未审核']):
+        raise JsonOutputException('试卷状态错误')
     review_data = Review.query.filter_by(exam_id=exam.id).\
         filter_by(review_state=EXAM_STATUS['正在审核']).\
         first()
@@ -86,11 +88,10 @@ def review_exam_update(id):
         raise JsonOutputException('试卷不存在')
     review_data = Review.query.filter_by(exam_id=exam.id).\
         filter_by(review_state=EXAM_STATUS['正在审核']).\
+        filter_by(reviewer_id=g.user.id).\
         first()
     if not review_data:
         raise JsonOutputException('审核记录不存在')
-    if review_data.reviewer_id != g.user.id:
-        raise JsonOutputException('改试卷已被他人审核')
     countdown = 1800 - (datetime.datetime.now() - review_data.review_date).seconds
     if countdown <= 0:
         review_data.review_state = EXAM_STATUS['审核超时']

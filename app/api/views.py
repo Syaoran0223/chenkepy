@@ -259,66 +259,6 @@ def user_message():
     Message.set_is_read(message_ids)
     return render_api(data)
 
-
-
-#试卷待处理列表
-@api_blueprint.route('/paper/deal/wait',methods=['GET'])
-@api_login_required
-def list_deal_wait():
-    data = Exam.list_exams(EXAM_STATUS['已审核'])
-    return {
-            'code': 0,
-            'data': data
-    }
-
-
-@api_blueprint.route('/paper/preprocess/list',methods=['GET'])
-def list_exam_file_pre_process():
-    data = Exam.list_exams(EXAM_STATUS['已审核'])
-    pageIndex = int(request.args.get('pageIndex', 1))
-    if pageIndex == 0:
-        pageIndex = 1
-    pageSize = int(request.args.get('pageSize', current_app.config['PER_PAGE']))
-
-    result = db.session.query(Exam, ExamReviewLog, School, User).filter(Exam.id == ExamReviewLog.exam_id,
-                                                                        ExamReviewLog.reviewer_id == g.user.id, or_(
-            ExamReviewLog.review_state == EXAM_STATUS['预处理'], \
-            ExamReviewLog.review_state == EXAM_STATUS['正在审核'], \
-            ExamReviewLog.review_state == EXAM_STATUS['已审核']), Exam.school_id == School.id,
-                                                                        ExamReviewLog.reviewer_id == User.id).order_by(
-        ExamReviewLog.review_date.desc())
-    result = paginate(result, pageIndex, pageSize, error_out=False)
-    items = []
-    for item in result.items:
-        obj = {
-            'id': item.ExamReviewLog.id,
-            'name': item.Exam.name,
-            'school_name': item.School.name,
-            'section': item.Exam.section,
-            'year': item.Exam.year,
-            'grade': item.Exam.grade,
-            'subject': item.Exam.subject,
-            'reviewer': item.User.name,
-            'review_state': item.ExamReviewLog.review_state,
-            'review_date': item.ExamReviewLog.review_date.strftime("%Y-%m-%d %H:%M:%S"),
-            'review_memo': item.ExamReviewLog.review_memo
-        }
-        items.append(obj)
-
-    res = {
-        'items': items,
-        'pageIndex': result.page - 1,
-        'pageSize': result.per_page,
-        'totalCount': result.total,
-        'totalPage': result.pages
-    }
-    return {
-        'code': 0,
-        'data': data
-    }
-    data = Exam.xlist_exams(EXAM_STATUS['已审核'], g.user.id)
-    return render_api(data)
-
 #预处理结束生成图片,题目图片列表
 @api_blueprint.route('/paper/image/list', methods=['GET'])
 def list_quest_image():
