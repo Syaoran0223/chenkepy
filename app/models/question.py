@@ -4,6 +4,9 @@ from app.utils import pagination
 from ._base import SessionMixin
 from .quest_review_log import QuestReviewLog
 from .questLog import QuestLog
+from .exam import Exam
+from .schools import School
+
 class Question(db.Model, SessionMixin):
     __tablename__ = 'quest'
 
@@ -54,3 +57,14 @@ class Question(db.Model, SessionMixin):
 
         res = Question.query.get(quest.id)
         return res.to_dict()
+
+    @staticmethod
+    def get_quest_by_state(state):
+        query = Question.query.filter_by(state=state).\
+            order_by(Question.created_at.desc())
+        res = pagination(query)
+        items = res.get('items',[])
+        items = Exam.bind_auto(items,['name', 'year', 'school_id', 'section', 'subject', 'grade'])
+        items = School.bind_auto(items, 'name', 'exam_school_id')
+        res['items'] = items
+        return res

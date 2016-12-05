@@ -3,18 +3,15 @@ from app.exceptions import JsonOutputException, FormValidateError
 from app.decorators import api_login_required, permission_required
 from app.models import Attachment, Exam, User, Message
 from app.utils import upload, pagination
-from flask import request, g, current_app
-from flask.ext.login import login_required
+from flask import request, g
 from .forms import SmsForm, PaperUploadForm
 from werkzeug.datastructures import MultiDict
 from app.const import EXAM_STATUS
 from . import api_blueprint
-from app.models import Region, School, ExamReviewLog, Question, QuestReviewLog, ExamLog, Review
+from app.models import Region, School, ExamLog
 from app.sms import SmsServer
-from app.utils import render_api,paginate
-from app import db
-from sqlalchemy import or_
-import datetime
+from app.utils import render_api
+
 @api_blueprint.route('/province')
 def province():
     title = request.args.get('title', '')
@@ -127,10 +124,7 @@ def paper_upload():
 @permission_required('UPLOAD_PERMISSION')
 def get_exams():
     data = Exam.get_exams(g.user.id)
-    return {
-        'code': 0,
-        'data': data
-    }
+    return render_api(data)
 
 #试卷明细查看
 @api_blueprint.route('/paper/upload/<int:id>', methods=['GET'])

@@ -20,8 +20,7 @@ def listexam():
     items = res.get('items', [])
     items = School.bind_auto(items, 'name')
     res['items'] = items
-    data=Exam.list_exams(EXAM_STATUS['未审核'])
-    return render_api(data)
+    return render_api(res)
 
 #试卷审核 读取
 @api_blueprint.route('/paper/confirm/<int:id>')

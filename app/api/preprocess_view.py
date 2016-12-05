@@ -1,17 +1,12 @@
 import json
 from app.exceptions import JsonOutputException
 from app.decorators import api_login_required, permission_required
-from app.models import Exam, User, Review, Question, QuestReviewLog, QuestLog, ExamLog, School, Preprocess
+from app.models import Exam, Question, QuestLog, ExamLog, School, Preprocess
 from app.utils import pagination
-from flask import request, g, current_app
-from werkzeug.datastructures import MultiDict
-from app.const import EXAM_STATUS,QUEST_STATUS
+from flask import request, g
+from app.const import EXAM_STATUS, QUEST_STATUS
 from . import api_blueprint
-from app.models import ExamReviewLog, Question, QuestTyping
-from app.utils import render_api,paginate
-from app import db
-from sqlalchemy import or_
-import datetime
+from app.utils import render_api
 
 
 #试卷待处理列表
