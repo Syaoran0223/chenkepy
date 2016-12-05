@@ -258,27 +258,3 @@ def user_message():
     message_ids = [str(item['id']) for item in data['items']]
     Message.set_is_read(message_ids)
     return render_api(data)
-
-#预处理结束生成图片,题目图片列表
-@api_blueprint.route('/paper/image/list', methods=['GET'])
-def list_quest_image():
-    data = Question.list_image(EXAM_STATUS['预处理结束'])
-    return {
-        'code': 0,
-        'data': data
-    }
-
-#查看图片
-@api_blueprint.route('/paper/image/view/<int:id>', methods=['GET'])
-def view_quest_image(id):
-    quest = Question.view_quest_detail(id)
-
-    if quest is None:
-        raise JsonOutputException('未找到数据')
-
-    #exam = Exam.query.get(quest.exam_id)
-
-    return {
-        'code': 0,
-        'data': quest.to_dict()
-    }
