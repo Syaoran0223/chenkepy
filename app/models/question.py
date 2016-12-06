@@ -37,11 +37,6 @@ class Question(db.Model, SessionMixin):
     def __repr__(self):
         return '<Question: %r>' % self.id
 
-    # @staticmethod
-    # def list_image(state=EXAM_STATUS['未处理']):
-    #     res = pagination(Question.query.filter(Question.review_state == state).order_by(Question.id,Question.quest_no))
-    #     return res
-
     @staticmethod
     def view_quest_detail(id=0):
         return Question.query.get(id)

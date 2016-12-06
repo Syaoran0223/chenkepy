@@ -74,7 +74,7 @@ def paginate(sa_query, page, per_page=20, error_out=True):
     # We can now use BaseQuery methods like .paginate on our SA query
     return sa_query.paginate(page, per_page, error_out)
 
-def pagination(query, ignore=None):
+def pagination(query, ignore=None, to_dict=True):
     page = int(request.args.get('pageIndex', 0))
     pageSize = int(request.args.get('pageSize', current_app.config['PER_PAGE']))
     data = query.paginate(page+1, pageSize, error_out=False)
@@ -84,7 +84,10 @@ def pagination(query, ignore=None):
             for field in ignore:
                 item.__dict__.pop(field)
 
-        items.append(item.to_dict())
+        if not to_dict:
+            items.append(item)
+        else:
+            items.append(item.to_dict())
 
     res = {
         'items': items,

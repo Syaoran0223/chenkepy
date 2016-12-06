@@ -1,4 +1,3 @@
-import json
 from app.exceptions import JsonOutputException
 from app.decorators import api_login_required, permission_required
 from app.models import Exam, Question, QuestLog, ExamLog, School, Preprocess
