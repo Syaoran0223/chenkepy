@@ -96,7 +96,7 @@ def upgrade():
     sa.Column('jieda', sa.String(length=255), nullable=True),
     sa.Column('correct_answer', sa.String(length=255), nullable=True),
     sa.Column('knowledge_point', sa.String(length=255), nullable=True),
-    sa.Column('state', sa.String(length=255), nullable=True),
+    sa.Column('state', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('quest_review_log',

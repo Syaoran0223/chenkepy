@@ -1,19 +1,12 @@
 import json
-from app.exceptions import JsonOutputException, FormValidateError
+from app.exceptions import JsonOutputException
 from app.decorators import api_login_required, permission_required
-from app.models import Attachment, Exam, User, Message
 from app.utils import upload, pagination
-from flask import request, g, current_app
-from flask.ext.login import login_required
-from .forms import SmsForm, PaperUploadForm
-from werkzeug.datastructures import MultiDict
-from app.const import EXAM_STATUS,QUEST_STATUS
+from flask import request, g
+from app.const import EXAM_STATUS
 from . import api_blueprint
-from app.models import Region, School, ExamReviewLog, Question, QuestReviewLog, ExamLog, Review
-from app.sms import SmsServer
-from app.utils import render_api,paginate
-from app import db
-from sqlalchemy import or_
+from app.models import Exam, School, ExamLog, Review
+from app.utils import render_api
 import datetime
 
 #试卷未审核列表
@@ -27,8 +20,7 @@ def listexam():
     items = res.get('items', [])
     items = School.bind_auto(items, 'name')
     res['items'] = items
-    data=Exam.list_exams(EXAM_STATUS['未审核'])
-    return render_api(data)
+    return render_api(res)
 
 #试卷审核 读取
 @api_blueprint.route('/paper/confirm/<int:id>')
@@ -40,6 +32,8 @@ def review_exam(id):
     timeout = 1800
     if not exam:
         raise JsonOutputException('试卷不存在')
+    if not exam.state in (EXAM_STATUS['正在审核'], EXAM_STATUS['未审核']):
+        raise JsonOutputException('试卷状态错误')
     review_data = Review.query.filter_by(exam_id=exam.id).\
         filter_by(review_state=EXAM_STATUS['正在审核']).\
         first()
@@ -74,7 +68,6 @@ def review_exam(id):
 @api_login_required
 @permission_required('CONFIRM_PERMISSION')
 def review_exam_update(id):
-    data = MultiDict(mapping=request.json)
     state = request.json.get('state')
     memo = request.json.get('memo')
     if not state or state not in [-1, 2]:
@@ -86,11 +79,10 @@ def review_exam_update(id):
         raise JsonOutputException('试卷不存在')
     review_data = Review.query.filter_by(exam_id=exam.id).\
         filter_by(review_state=EXAM_STATUS['正在审核']).\
+        filter_by(reviewer_id=g.user.id).\
         first()
     if not review_data:
         raise JsonOutputException('审核记录不存在')
-    if review_data.reviewer_id != g.user.id:
-        raise JsonOutputException('改试卷已被他人审核')
     countdown = 1800 - (datetime.datetime.now() - review_data.review_date).seconds
     if countdown <= 0:
         review_data.review_state = EXAM_STATUS['审核超时']

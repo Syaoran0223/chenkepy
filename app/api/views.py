@@ -3,18 +3,15 @@ from app.exceptions import JsonOutputException, FormValidateError
 from app.decorators import api_login_required, permission_required
 from app.models import Attachment, Exam, User, Message
 from app.utils import upload, pagination
-from flask import request, g, current_app
-from flask.ext.login import login_required
+from flask import request, g
 from .forms import SmsForm, PaperUploadForm
 from werkzeug.datastructures import MultiDict
 from app.const import EXAM_STATUS
 from . import api_blueprint
-from app.models import Region, School, ExamReviewLog, Question, QuestReviewLog, ExamLog, Review
+from app.models import Region, School, ExamLog
 from app.sms import SmsServer
-from app.utils import render_api,paginate
-from app import db
-from sqlalchemy import or_
-import datetime
+from app.utils import render_api
+
 @api_blueprint.route('/province')
 def province():
     title = request.args.get('title', '')
@@ -127,10 +124,7 @@ def paper_upload():
 @permission_required('UPLOAD_PERMISSION')
 def get_exams():
     data = Exam.get_exams(g.user.id)
-    return {
-        'code': 0,
-        'data': data
-    }
+    return render_api(data)
 
 #试卷明细查看
 @api_blueprint.route('/paper/upload/<int:id>', methods=['GET'])
@@ -258,87 +252,3 @@ def user_message():
     message_ids = [str(item['id']) for item in data['items']]
     Message.set_is_read(message_ids)
     return render_api(data)
-
-
-
-#试卷待处理列表
-@api_blueprint.route('/paper/deal/wait',methods=['GET'])
-@api_login_required
-def list_deal_wait():
-    data = Exam.list_exams(EXAM_STATUS['已审核'])
-    return {
-            'code': 0,
-            'data': data
-    }
-
-
-@api_blueprint.route('/paper/preprocess/list',methods=['GET'])
-def list_exam_file_pre_process():
-    data = Exam.list_exams(EXAM_STATUS['已审核'])
-    pageIndex = int(request.args.get('pageIndex', 1))
-    if pageIndex == 0:
-        pageIndex = 1
-    pageSize = int(request.args.get('pageSize', current_app.config['PER_PAGE']))
-
-    result = db.session.query(Exam, ExamReviewLog, School, User).filter(Exam.id == ExamReviewLog.exam_id,
-                                                                        ExamReviewLog.reviewer_id == g.user.id, or_(
-            ExamReviewLog.review_state == EXAM_STATUS['预处理'], \
-            ExamReviewLog.review_state == EXAM_STATUS['正在审核'], \
-            ExamReviewLog.review_state == EXAM_STATUS['已审核']), Exam.school_id == School.id,
-                                                                        ExamReviewLog.reviewer_id == User.id).order_by(
-        ExamReviewLog.review_date.desc())
-    result = paginate(result, pageIndex, pageSize, error_out=False)
-    items = []
-    for item in result.items:
-        obj = {
-            'id': item.ExamReviewLog.id,
-            'name': item.Exam.name,
-            'school_name': item.School.name,
-            'section': item.Exam.section,
-            'year': item.Exam.year,
-            'grade': item.Exam.grade,
-            'subject': item.Exam.subject,
-            'reviewer': item.User.name,
-            'review_state': item.ExamReviewLog.review_state,
-            'review_date': item.ExamReviewLog.review_date.strftime("%Y-%m-%d %H:%M:%S"),
-            'review_memo': item.ExamReviewLog.review_memo
-        }
-        items.append(obj)
-
-    res = {
-        'items': items,
-        'pageIndex': result.page - 1,
-        'pageSize': result.per_page,
-        'totalCount': result.total,
-        'totalPage': result.pages
-    }
-    return {
-        'code': 0,
-        'data': data
-    }
-    data = Exam.xlist_exams(EXAM_STATUS['已审核'], g.user.id)
-    return render_api(data)
-
-#预处理结束生成图片,题目图片列表
-@api_blueprint.route('/paper/image/list', methods=['GET'])
-def list_quest_image():
-    data = Question.list_image(EXAM_STATUS['预处理结束'])
-    return {
-        'code': 0,
-        'data': data
-    }
-
-#查看图片
-@api_blueprint.route('/paper/image/view/<int:id>', methods=['GET'])
-def view_quest_image(id):
-    quest = Question.view_quest_detail(id)
-
-    if quest is None:
-        raise JsonOutputException('未找到数据')
-
-    #exam = Exam.query.get(quest.exam_id)
-
-    return {
-        'code': 0,
-        'data': quest.to_dict()
-    }

@@ -25,17 +25,25 @@ class SessionMixin(object):
 
     def to_dict(self, filter=None):
         dictionary = self.__dict__.copy()
+        attrs = dir(self)
+        remove_fileds = ['_decl_class_registry',
+            '_sa_class_manager', '_sa_instance_state',
+            'metadata', 'query', 'protected_field']
+        remove_fileds += getattr(self, 'protected_field', [])
         res = {}
-        for k, v in dictionary.items():
-            if k == '_sa_instance_state':
+        for attr in attrs:
+            if isinstance(getattr(self, attr), BaseQuery):
                 continue
-            if k in getattr(self, 'protected_field', ()):
+            if attr.startswith('__'):
                 continue
-            if isinstance(filter, list) and k in filter:
+            if callable(getattr(self, attr)):
                 continue
-            if isinstance(v, datetime.datetime):
-                v = v.strftime('%Y-%m-%d %H:%M:%S')
-            res[k] = v
+            if attr in remove_fileds:
+                continue
+            value = getattr(self, attr)
+            if isinstance(value, datetime.datetime):
+                value = value.strftime('%Y-%m-%d %H:%M:%S')
+            res[attr] = value
         return res
 
     def save(self):

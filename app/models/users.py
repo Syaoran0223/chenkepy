@@ -8,7 +8,7 @@ from ._base import SessionMixin
 
 class User(db.Model, SessionMixin, UserMixin):
     __tablename__ = 'user'
-    protected_field = ['password_hash', 'last_login_ip', 'code']
+    protected_field = ['password','password_hash', 'last_login_ip', 'code']
 
     def __init__(self, *args, **kwargs):
         User.register()

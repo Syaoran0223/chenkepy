@@ -60,13 +60,7 @@ class Exam(db.Model, SessionMixin):
         res['items'] = items
         return res
 
-    def xlist_exams(state= 0,userid=0):
-        res = pagination(Exam.query.filter(Exam.state == state ,Exam.upload_user!=userid).order_by(Exam.created_at.desc()))
-        items = res.get('items', [])
-        items = School.bind_auto(items, 'name')
-        res['items'] = items
-        return res
-
+    @staticmethod
     def list_exams(state=EXAM_STATUS['已审核'] ):
         res = pagination(Exam.query.filter(Exam.state == state).order_by(Exam.created_at.desc()))
         items = res.get('items',[])
