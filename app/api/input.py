@@ -27,7 +27,11 @@ def get_input_task(id):
         raise JsonOutputException('题目不存在')
     if question.state != QUEST_STATUS['未处理'] and question.state != QUEST_STATUS['正在录题']:
         raise JsonOutputException('暂时无法处理该题目')
-    quest_typing_data = QuestTyping.query.filter_by(state=QUEST_STATUS['正在录题']).first()
+    quest_typing_data = QuestTyping.query.\
+        filter_by(state=QUEST_STATUS['正在录题']).\
+        filter_by(quest_id=id).\
+        order_by(QuestTyping.created_at.desc()).\
+        first()
     if not quest_typing_data:
         quest_typing_data = QuestTyping(
             quest_id=id,
@@ -55,4 +59,3 @@ def input_list():
     items = [item.get_question_dtl() for item in res['items']]
     res['items'] = items
     return render_api(res)
-        

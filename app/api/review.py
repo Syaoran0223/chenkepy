@@ -34,8 +34,10 @@ def review_exam(id):
         raise JsonOutputException('试卷不存在')
     if not exam.state in (EXAM_STATUS['正在审核'], EXAM_STATUS['未审核']):
         raise JsonOutputException('试卷状态错误')
-    review_data = Review.query.filter_by(exam_id=exam.id).\
+    review_data = Review.query.\
+        filter_by(exam_id=exam.id).\
         filter_by(review_state=EXAM_STATUS['正在审核']).\
+        order_by(Review.created_at.desc()).\
         first()
     #新增
     if not review_data:
