@@ -252,3 +252,31 @@ def user_message():
     message_ids = [str(item['id']) for item in data['items']]
     Message.set_is_read(message_ids)
     return render_api(data)
+
+
+@api_blueprint.route('/paper/search/<q>', methods=['GET'])
+def q_search(q):
+    import http.client, urllib.parse
+    import json
+    httpClient = None
+
+    connection = http.client.HTTPConnection('search.i3ke.com', 80, timeout=10)
+    headers = {'Content-type': 'application/json'}
+    param = {"mlt": {"fields": "qtxt", "like": "%"+q}, "allFields": ["qtxt"], "highlightedFields": ["qtxt"],
+          "from": 0, "size": 15, "sort": {"_score": "desc"}}
+    params = json.dumps(param)
+
+    connection.request('POST', '/sq-apps/api/_search', params, headers)
+
+    response = connection.getresponse()
+    jsonStr = response.read().decode()
+    jsonResult = json.loads(jsonStr)
+
+    res = {
+        'items': jsonResult['datas'],
+        'pageIndex': 1,
+        'pageSize': jsonResult['size'],
+        'totalCount': jsonResult['total'],
+        'totalPage': jsonResult['total']/jsonResult['size']+1
+    }
+    return res

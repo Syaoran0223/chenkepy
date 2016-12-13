@@ -7,14 +7,14 @@ from app import create_app, db
 
 app = create_app(os.getenv('BLOG_CONFIG') or 'default')
 
-from app.models import User, InviteCode, Exam, Question, QuestReviewLog
+from app.models import User, InviteCode, Exam, Question, QuestReviewLog,QType
 from app.const import EXAM_STATUS
 
 manager = Manager(app)
 migrate = Migrate(app, db)
 
 def make_shell_context():
-    return dict(app=app, db=db, User=User, InviteCode=InviteCode, Exam=Exam, EXAM_STATUS = EXAM_STATUS,Question=Question, QuestReviewLog=QuestReviewLog)
+    return dict(app=app, db=db, User=User, InviteCode=InviteCode, Exam=Exam, EXAM_STATUS = EXAM_STATUS,Question=Question, QuestReviewLog=QuestReviewLog,QType=QType)
 
 manager.add_command('shell', Shell(make_context=make_shell_context))
 manager.add_command('db', MigrateCommand)
