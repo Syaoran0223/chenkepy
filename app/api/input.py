@@ -45,7 +45,7 @@ def get_input_task(id):
         raise JsonOutputException('该题目已被他人领取')
     question.state = QUEST_STATUS['正在录题']
     question.save()
-    res = question.to_dict()
+    res = question.get_dtl()
     return render_api(res)
 
 # 录题记录
