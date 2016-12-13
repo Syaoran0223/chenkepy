@@ -26,7 +26,10 @@ def view_exam_file_pre_process(id):
         raise JsonOutputException('试卷不存在')
     if not exam.state in (EXAM_STATUS['已审核'], EXAM_STATUS['预处理']):
         raise JsonOutputException('试卷状态错误')
-    process_data = Preprocess.query.filter_by(exam_id=id, state=EXAM_STATUS['预处理']).first()
+    process_data = Preprocess.query.\
+        filter_by(exam_id=id, state=EXAM_STATUS['预处理']).\
+        order_by(Preprocess.created_at.desc()).\
+        first()
     if process_data and not process_data.operator_id == g.user.id:
         raise JsonOutputException('任务已被领取')
     if not process_data:

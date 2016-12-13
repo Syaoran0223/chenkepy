@@ -37,9 +37,13 @@ class Question(db.Model, SessionMixin):
     def __repr__(self):
         return '<Question: %r>' % self.id
 
-    @staticmethod
-    def view_quest_detail(id=0):
-        return Question.query.get(id)
+    def get_dtl(self):
+        exam = Exam.query.get(self.exam_id)
+        exam_dict = exam.to_dict() if exam else {}
+        exam_dict = School.bind_auto(exam_dict, 'name')
+        res = self.to_dict()
+        res['exam'] = exam_dict
+        return res
 
     @staticmethod
     def add_pre_process_quest(exam_id, quest_no,has_sub, quest_type_id, option_count, quest_image, user_id, review_memo, answer_image):
