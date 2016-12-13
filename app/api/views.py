@@ -259,9 +259,9 @@ def q_search(q):
     import http.client, urllib.parse
     import json
     httpClient = None
-    pageIndex = request.get_data("pageIndex")
-    if pageIndex is None or pageIndex == '':
-        pageIndex = 1
+    pageIndex = request.args.get("pageIndex","1")
+    q = request.args.get("q","")
+
     connection = http.client.HTTPConnection('search.i3ke.com', 80, timeout=10)
     headers = {'Content-type': 'application/json'}
     param = {"mlt": {"fields": "qtxt", "like": "%"+q}, "allFields": ["qtxt"], "highlightedFields": ["qtxt"],
