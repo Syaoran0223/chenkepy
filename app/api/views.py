@@ -254,8 +254,8 @@ def user_message():
     return render_api(data)
 
 
-@api_blueprint.route('/paper/search/<q>', methods=['GET'])
-def q_search(q):
+@api_blueprint.route('/paper/search', methods=['GET'])
+def q_search():
     import http.client, urllib.parse
     import json
     httpClient = None
@@ -281,4 +281,4 @@ def q_search(q):
         'totalCount': jsonResult['total'],
         'totalPage': jsonResult['total']/jsonResult['size']+1
     }
-    return res
+    return render_api(res)
