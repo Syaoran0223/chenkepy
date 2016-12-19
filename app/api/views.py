@@ -1,4 +1,4 @@
-import json
+import json, math
 from app.exceptions import JsonOutputException, FormValidateError
 from app.decorators import api_login_required, permission_required
 from app.models import Attachment, Exam, User, Message
@@ -261,11 +261,15 @@ def q_search():
     httpClient = None
     pageIndex = request.args.get("pageIndex","1")
     q = request.args.get("q","")
+    pageIndex = request.args.get('pageIndex', 0)
+
+    size = 15
+    _from = int(pageIndex) * size
 
     connection = http.client.HTTPConnection('search.i3ke.com', 80, timeout=10)
     headers = {'Content-type': 'application/json'}
     param = {"mlt": {"fields": "qtxt", "like": "%"+q}, "allFields": ["qtxt"], "highlightedFields": ["qtxt"],
-          "from": 0, "size": 15, "sort": {"_score": "desc"}}
+          "from": _from, "size": size, "sort": {"_score": "desc"}}
     params = json.dumps(param)
 
     connection.request('POST', '/sq-apps/api/_search', params, headers)
@@ -279,6 +283,6 @@ def q_search():
         'pageIndex': pageIndex,
         'pageSize': jsonResult['size'],
         'totalCount': jsonResult['total'],
-        'totalPage': jsonResult['total']/jsonResult['size']+1
+        'totalPage': math.ceil(jsonResult['total']/jsonResult['size'])
     }
     return render_api(res)
