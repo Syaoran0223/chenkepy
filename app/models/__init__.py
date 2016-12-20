@@ -14,3 +14,4 @@ from .review import Review
 from .examLog import ExamLog
 from .preprocess import Preprocess
 from .qtype import QType
+from .qoption import QOption
