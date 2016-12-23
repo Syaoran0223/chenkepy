@@ -14,21 +14,19 @@ class SubQuestion(db.Model, SessionMixin):
     quest_content_html = db.Column(db.String(1000))
 
     quest_option_html = db.Column(db.String(1000))
-    kaodian = db.Column(db.String(255))
+    zhuanti = db.Column(db.String(255))
+    kaodian = db.Column(db.String(1000))
     fenxi = db.Column(db.String(1000))
     jieda = db.Column(db.String(1000))
     dianpin = db.Column(db.String(1000))
     correct_answer = db.Column(db.String(255))
-    quest_image = db.Column(db.JsonBlob(), default=[])
-    answer_image = db.Column(db.JsonBlob(), default=[])
     quest_no = db.Column(db.Integer)
     qtype = db.Column(db.String(200))
-    quest_type_id = db.Column(db.Integer)
-    option_count = db.Column(db.Integer)
-    qrows = db.Column(db.Integer)
-    qcols = db.Column(db.Integer)
-    state = db.Column(db.Integer)
-    insert_user_id = db.Column(db.Integer)
+    qtype_id = db.Column(db.Integer)
+    option_count = db.Column(db.Integer, default=0)
+    qrows = db.Column(db.Integer, default=0)
+    qcols = db.Column(db.Integer, default=0)
+    qoptjson = db.Column(db.String(1000))
 
     def __repr__(self):
         return '<SubQuestion: %r>' % self.id

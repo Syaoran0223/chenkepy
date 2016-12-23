@@ -34,6 +34,7 @@ class Question(db.Model, SessionMixin):
     knowledge_point = db.Column(db.Text)
     state = db.Column(db.Integer)
     insert_user_id = db.Column(db.Integer)
+    refer_quest_id = db.Column(db.Integer, default=0)
     
     def __repr__(self):
         return '<Question: %r>' % self.id

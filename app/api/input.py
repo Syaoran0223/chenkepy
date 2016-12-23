@@ -6,7 +6,7 @@ from app.utils import upload, pagination
 from flask import request, g
 from app.const import QUEST_STATUS
 from . import api_blueprint
-from app.models import Question, QuestTyping, QOption
+from app.models import Question, QuestTyping, QOption, SubQuestion
 from app.utils import render_api
 import datetime
 
@@ -54,10 +54,9 @@ def get_input_task(id):
 @api_login_required
 @permission_required('INPUT_PERMISSION')
 def input_quest(id):
+    selected_id = request.json.get('selected_id', 0)
     quest_content_html = request.json.get('quest_content_html')
     quest_content = request.json.get('quest_content')
-    if not quest_content_html:
-        raise JsonOutputException('请输入题目')
     question = Question.query.get(id)
     if not question:
         raise JsonOutputException('题目不存在')
@@ -70,6 +69,16 @@ def input_quest(id):
         first()
     if quest_typing_data.operator_id != g.user.id:
         raise JsonOutputException('该题目已被他人领取')
+    if not quest_content_html:
+        raise JsonOutputException('请输入题目')
+    if selected_id:
+        question.refer_quest_id = selected_id
+        quest_typing_data.state = QUEST_STATUS['完成入题']
+        question.state = QUEST_STATUS['完成入题']
+        db.session.add(quest_typing_data)
+        db.session.add(question)
+        db.session.commit()
+        return render_api({})
     # 题目类型
     quest_type_id = request.json.get('quest_type_id')
     jieda = request.json.get('jieda', '')
@@ -113,15 +122,42 @@ def input_quest(id):
             )
             db.session.add(option)
     # 填空
-    if quest_type_id == '2':
+    elif quest_type_id == '2':
         correct_answer = request.json.get('correct_answer', [])
         correct_answer = json.dumps(correct_answer)
         question.correct_answer = correct_answer
         
     # 解答
-    if quest_type_id == '3':
+    elif quest_type_id == '3':
         correct_answer = request.json.get('quest_answer', '')
         question.correct_answer = correct_answer
+    # 大小题
+    elif quest_type_id == '4':
+        question.has_sub = True
+        sub_items = request.json.get('sub_items', [])
+        for item in sub_items:
+            item_quest_type_id = item.get('quest_type_id', 0)
+            sub_quest = SubQuestion(parent_id=question.id,
+                quest_content=item.get('quest_content', ''),
+                quest_content_html=item.get('quest_content_html', ''),
+                correct_answer=item.get('correct_answer', ''),
+                quest_no=item.get('sort', 0),
+                qtype_id=item_quest_type_id)
+            if item_quest_type_id == '1':
+                options = item.get('options', [])
+                option_count = len(options)
+                # 插入选项
+                sub_quest.qoptjson = json.dumps(options)
+                sub_quest.option_count = option_count
+            elif item_quest_type_id == '2':
+                correct_answer = item.get('correct_answer', [])
+                correct_answer = json.dumps(correct_answer)
+                sub_quest.correct_answer = correct_answer
+            elif item_quest_type_id == '3':
+                pass
+            else:
+                raise JsonOutputException('子题题型错误')
+            db.session.add(sub_quest)
     else:
         raise JsonOutputException('题型错误')
     quest_typing_data.state = QUEST_STATUS['完成入题']

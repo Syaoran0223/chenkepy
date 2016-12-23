@@ -15,3 +15,4 @@ from .examLog import ExamLog
 from .preprocess import Preprocess
 from .qtype import QType
 from .qoption import QOption
+from .sub_quest import SubQuestion
