@@ -69,16 +69,16 @@ def input_quest(id):
         first()
     if quest_typing_data.operator_id != g.user.id:
         raise JsonOutputException('该题目已被他人领取')
-    if not quest_content_html:
-        raise JsonOutputException('请输入题目')
     if selected_id:
         question.refer_quest_id = selected_id
-        quest_typing_data.state = QUEST_STATUS['完成入题']
-        question.state = QUEST_STATUS['完成入题']
+        quest_typing_data.state = QUEST_STATUS['完成录题']
+        question.state = QUEST_STATUS['完成录题']
         db.session.add(quest_typing_data)
         db.session.add(question)
         db.session.commit()
         return render_api({})
+    if not quest_content_html:
+        raise JsonOutputException('请输入题目')
     # 题目类型
     quest_type_id = request.json.get('quest_type_id')
     jieda = request.json.get('jieda', '')
@@ -93,6 +93,7 @@ def input_quest(id):
     question.dianpin = dianpin
     question.kaodian = kaodian
     question.has_sub = False
+    state = QUEST_STATUS['完成录题']
     # 选择题
     if quest_type_id == '1':
         options = request.json.get('options', [])
@@ -112,6 +113,8 @@ def input_quest(id):
         question.qrows = qrows
         question.qcols = qcols
         question.correct_answer = correct_answer
+        if not question.correct_answer:
+            state = QUEST_STATUS['待解答']
         # 插入选项
         for option in options:
             option = QOption(
@@ -124,6 +127,8 @@ def input_quest(id):
     # 填空
     elif quest_type_id == '2':
         correct_answer = request.json.get('correct_answer', [])
+        if len(correct_answer) == 0:
+            state = QUEST_STATUS['待解答']
         correct_answer = json.dumps(correct_answer)
         question.correct_answer = correct_answer
         
@@ -131,16 +136,21 @@ def input_quest(id):
     elif quest_type_id == '3':
         correct_answer = request.json.get('quest_answer', '')
         question.correct_answer = correct_answer
+        if question.correct_answer == '':
+            state = QUEST_STATUS['待解答']
     # 大小题
     elif quest_type_id == '4':
         question.has_sub = True
         sub_items = request.json.get('sub_items', [])
         for item in sub_items:
             item_quest_type_id = item.get('quest_type_id', 0)
+            correct_answer = item.get('correct_answer', '')
+            if correct_answer == '':
+                state = QUEST_STATUS['待解答']
             sub_quest = SubQuestion(parent_id=question.id,
                 quest_content=item.get('quest_content', ''),
                 quest_content_html=item.get('quest_content_html', ''),
-                correct_answer=item.get('correct_answer', ''),
+                correct_answer=correct_answer,
                 quest_no=item.get('sort', 0),
                 qtype_id=item_quest_type_id)
             if item_quest_type_id == '1':
@@ -151,6 +161,8 @@ def input_quest(id):
                 sub_quest.option_count = option_count
             elif item_quest_type_id == '2':
                 correct_answer = item.get('correct_answer', [])
+                if len(correct_answer) == 0:
+                    state = QUEST_STATUS['待解答']
                 correct_answer = json.dumps(correct_answer)
                 sub_quest.correct_answer = correct_answer
             elif item_quest_type_id == '3':
@@ -160,8 +172,8 @@ def input_quest(id):
             db.session.add(sub_quest)
     else:
         raise JsonOutputException('题型错误')
-    quest_typing_data.state = QUEST_STATUS['完成入题']
-    question.state = QUEST_STATUS['完成入题']
+    quest_typing_data.state = QUEST_STATUS['完成录题']
+    question.state = state
     db.session.add(quest_typing_data)
     db.session.add(question)
     db.session.commit()
