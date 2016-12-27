@@ -112,3 +112,8 @@ def list_examreview_log():
     items = School.bind_auto(items, 'name', 'exam_school_id', 'id', 'school')
     res['items'] = items
     return render_api(res)
+
+@api_blueprint.route('/courier/history',methods=['GET'])
+def list_upload_log():
+    data = Exam.get_exams(1)##(g.user.id)
+    return render_api(data)
