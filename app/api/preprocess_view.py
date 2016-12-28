@@ -55,12 +55,14 @@ def view_exam_file_pre_process(id):
 def add_pre_review_quest_image():
     quest_no = request.json.get('quest_no')
     exam_id = request.json.get('exam_id')
-    has_sub = request.json.get('has_sub')
     quest_type_id = request.json.get('quest_type_id')
     option_count = request.json.get('option_count')
     quest_image = request.json.get('quest_image')
     review_memo = request.json.get('review_memo')
     answer_image = request.json.get('answer_image')
+    has_sub = 0
+    if quest_type_id == '3':
+        has_sub = 1
 
     #添加题目数据
     res = Question.add_pre_process_quest(exam_id, quest_no,
@@ -78,7 +80,6 @@ def add_pre_review_quest_image():
 @permission_required('DEAL_PERMISSION')
 def update_question():
     id = request.json.get('id')
-    has_sub = request.json.get('has_sub')
     quest_type_id = request.json.get('quest_type_id')
     quest_image = request.json.get('quest_image')
     answer_image = request.json.get('answer_image')
@@ -94,8 +95,6 @@ def update_question():
     elif quest.insert_user_id != g.user.id: #非本人操作无法修改
         raise JsonOutputException("您无权修改该题目")
 
-    if has_sub is not None:
-        quest.has_sub = has_sub
     if quest_type_id is not None:
         quest.quest_type_id = quest_type_id
     if quest_image is not None:
@@ -106,6 +105,8 @@ def update_question():
         quest.quest_no = quest_no
     if option_count is not None:
         quest.option_count = option_count
+    if quest.quest_type_id == '3':
+        quest.has_sub = 1
     quest.save()
     quest = Question.query.get(id)
     return render_api(quest.to_dict())

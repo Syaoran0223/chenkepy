@@ -1,3 +1,4 @@
+import json
 from app import db
 from app.const import EXAM_STATUS,QUEST_STATUS
 from app.utils import pagination
@@ -6,6 +7,8 @@ from .quest_review_log import QuestReviewLog
 from .questLog import QuestLog
 from .exam import Exam
 from .schools import School
+from .qoption import QOption
+from .sub_quest import SubQuestion
 
 class Question(db.Model, SessionMixin):
     __tablename__ = 'quest'
@@ -45,6 +48,25 @@ class Question(db.Model, SessionMixin):
         exam_dict = School.bind_auto(exam_dict, 'name')
         res = self.to_dict()
         res['exam'] = exam_dict
+        return res
+
+    def get_answer_dtl(self):
+        exam = Exam.query.get(self.exam_id)
+        exam_dict = exam.to_dict() if exam else {}
+        exam_dict = School.bind_auto(exam_dict, 'name')
+        res = self.to_dict()
+        res['exam'] = exam_dict
+        # 选择题
+        if self.quest_type_id == '1':
+            options = QOption.query.filter_by(qid=self.id).all()
+            res['options'] = [option.to_dict() for option in options]
+        # 填空题
+        elif self.quest_type_id == '2':
+            res['correct_answer'] = json.loads(self.correct_answer)
+        # 大小题
+        elif self.quest_type_id == '4':
+            sub_items = SubQuestion.query.filter_by(parent_id=self.id).all()
+            res['sub_items'] = [item.to_dict() for item in sub_items]
         return res
 
     @staticmethod
