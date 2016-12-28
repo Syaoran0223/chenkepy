@@ -1,3 +1,4 @@
+import json
 from app import db
 from ._base import SessionMixin
 
@@ -30,3 +31,11 @@ class SubQuestion(db.Model, SessionMixin):
 
     def __repr__(self):
         return '<SubQuestion: %r>' % self.id
+
+    def to_dict(self):
+        res = super(SubQuestion, self).to_dict()
+        if self.qtype_id == 1:
+            res['options'] = json.loads(self.qoptjson)
+        if self.qtype_id == 2:
+            res['answer_list'] = json.loads(self.correct_answer)
+        return res
