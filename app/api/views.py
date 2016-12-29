@@ -162,14 +162,9 @@ def update_exam(id):
     exam.year = form.year.data
     exam.grade = form.grade.data
     exam.attachments = attachments
+    exam.state = EXAM_STATUS['未审核']
     exam.save()
-    if data is not None:
-        return {
-            'code': 0,
-            'data': data
-        }
-    else:
-        raise JsonOutputException('更新失败')
+    return render_api({})
 
 #试卷删除
 @api_blueprint.route('/paper/upload/<int:id>', methods=['DELETE'])

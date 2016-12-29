@@ -15,7 +15,7 @@ import datetime
 @api_login_required
 @permission_required('ANSWER_PERMISSION')
 def answer_wait():
-    data = Question.get_quest_by_state(QUEST_STATUS['待解答'])
+    data = Question.get_quest_by_state(QUEST_STATUS['完成录题'])
     return render_api(data)
 
 # 领取录题任务
@@ -26,7 +26,7 @@ def get_answer_task(id):
     question = Question.query.get(id)
     if not question:
         raise JsonOutputException('题目不存在')
-    if question.state != QUEST_STATUS['待解答'] and question.state != QUEST_STATUS['正在解答']:
+    if question.state != QUEST_STATUS['完成录题'] and question.state != QUEST_STATUS['正在解答']:
         raise JsonOutputException('暂时无法处理该题目')
     quest_answer_data = QuestAnswer.query.\
         filter_by(state=QUEST_STATUS['正在解答']).\

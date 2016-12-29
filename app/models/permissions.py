@@ -4,5 +4,5 @@ class Permission():
     DEAL_PERMISSION = ['WaitDeal', 'PaperDeal', 'DealList']
     INPUT_PERMISSION = ['WaitInput', 'PaperInput', 'InputList']
     ANSWER_PERMISSION = ['WaitAnswer', 'PaperAnswer', 'AnswerList']
+    CHECK_PERMISSION = ['WaitCheck', 'QuestCheck', 'CheckList']
     JUDGE_PERMISSION = []
-    CHECK_PERMISSION = []
