@@ -66,7 +66,7 @@ class Question(db.Model, SessionMixin):
             res['correct_answer'] = json.loads(self.correct_answer)
         # 大小题
         elif self.quest_type_id == '4':
-            sub_items = SubQuestion.query.filter_by(parent_id=self.id).all()
+            sub_items = SubQuestion.query.filter_by(parent_id=self.id, group=1).all()
             res['sub_items'] = [item.to_dict() for item in sub_items]
         return res
 

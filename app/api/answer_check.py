@@ -61,89 +61,115 @@ def check_list():
     res['items'] = items
     return render_api(res)
 
-# # 题目解答
-# @api_blueprint.route('/paper/answer/<int:id>', methods=['PUT'])
-# @api_login_required
-# @permission_required('CHECK_PERMISSION')
-# def answer_quest(id):
-#     question = Question.query.get(id)
-#     if not question:
-#         raise JsonOutputException('题目不存在')
-#     if question.state != QUEST_STATUS['正在解答']:
-#         raise JsonOutputException('暂时无法处理该题目')
-#     quest_answer_data = QuestAnswer.query.\
-#         filter_by(state=QUEST_STATUS['正在解答']).\
-#         filter_by(quest_id=id).\
-#         order_by(QuestAnswer.created_at.desc()).\
-#         first()
-#     if quest_answer_data.operator_id != g.user.id:
-#         raise JsonOutputException('该题目已被他人领取')
+# 答案正确
+@api_blueprint.route('/paper/answer/check/right/<int:id>', methods=['PUT'])
+@api_login_required
+@permission_required('CHECK_PERMISSION')
+def check_right(id):
+    question = Question.query.get(id)
+    if not question:
+        raise JsonOutputException('题目不存在')
+    if question.state != QUEST_STATUS['正在检查']:
+        raise JsonOutputException('暂时无法处理该题目')
+    quest_check_data = QuestCheck.query.\
+        filter_by(state=QUEST_STATUS['正在检查']).\
+        filter_by(quest_id=id).\
+        order_by(QuestCheck.created_at.desc()).\
+        first()
+    if quest_check_data.operator_id != g.user.id:
+        raise JsonOutputException('该题目已被他人领取')
+    state = QUEST_STATUS['待校对']
+    quest_check_data.state = state
+    question.state = state
+    db.session.add(quest_check_data)
+    db.session.add(question)
+    db.session.commit()
+    return render_api({})
 
-#     # 题目类型
-#     jieda = request.json.get('jieda', '')
-#     fenxi = request.json.get('fenxi', '')
-#     dianpin = request.json.get('dianpin', '')
-#     kaodian = request.json.get('kaodian', '')
-#     question.jieda = jieda
-#     question.fenxi = fenxi
-#     question.dianpin = dianpin
-#     question.kaodian = kaodian
-#     question.has_sub = False
-#     state = QUEST_STATUS['完成解答']
-#     quest_type_id = request.json.get('quest_type_id')
-#     # 选择题
-#     if quest_type_id == '1':
-#         options = request.json.get('options', [])
-#         correct_answer = request.json.get('correct_answer', '')
-#         if not correct_answer:
-#             raise JsonOutputException('请输入正确答案')
-#         question.correct_answer = correct_answer
-#         # 修改选项选中状态
-#         for data in options:
-#             option = QOption.query.get(data.get('id', 0))
-#             if option:
-#                 option.qok = data['_selected']
-#                 db.session.add(option)
-#     # 填空
-#     elif quest_type_id == '2':
-#         correct_answer = request.json.get('correct_answer', [])
-#         if len(correct_answer) == 0:
-#             raise JsonOutputException('请输入正确答案')
-#         correct_answer = json.dumps(correct_answer)
-#         question.correct_answer = correct_answer
+# 重新输入答案
+@api_blueprint.route('/paper/answer/check/<int:id>', methods=['PUT'])
+@api_login_required
+@permission_required('CHECK_PERMISSION')
+def check_quest(id):
+    question = Question.query.get(id)
+    if not question:
+        raise JsonOutputException('题目不存在')
+    if question.state != QUEST_STATUS['正在检查']:
+        raise JsonOutputException('暂时无法处理该题目')
+    quest_check_data = QuestCheck.query.\
+        filter_by(state=QUEST_STATUS['正在检查']).\
+        filter_by(quest_id=id).\
+        order_by(QuestCheck.created_at.desc()).\
+        first()
+    if quest_check_data.operator_id != g.user.id:
+        raise JsonOutputException('该题目已被他人领取')
+
+    # 题目类型
+    jieda = request.json.get('jieda', '')
+    fenxi = request.json.get('fenxi', '')
+    dianpin = request.json.get('dianpin', '')
+    kaodian = request.json.get('kaodian', '')
+    question.jieda = jieda
+    question.fenxi = fenxi
+    question.dianpin = dianpin
+    question.kaodian = kaodian
+    question.has_sub = False
+    state = QUEST_STATUS['待裁定']
+    quest_type_id = request.json.get('quest_type_id')
+    # 填空
+    if quest_type_id == '2':
+        correct_answer2 = request.json.get('correct_answer2', [])
+        if len(correct_answer2) == 0:
+            raise JsonOutputException('请输入正确答案')
+        correct_answer2 = json.dumps(correct_answer2)
+        question.correct_answer2 = correct_answer2
         
-#     # 解答
-#     elif quest_type_id == '3':
-#         correct_answer = request.json.get('quest_answer', '')
-#         question.correct_answer = correct_answer
-#         if question.correct_answer == '':
-#             raise JsonOutputException('请输入正确答案')
-#     # 大小题
-#     elif quest_type_id == '4':
-#         sub_items = request.json.get('sub_items', [])
-#         if len(sub_items) == 0:
-#             raise JsonOutputException('请输入子题信息')
-#         for item in sub_items:
-#             sub_quest = SubQuestion.query.get(item.get('id', 0))
-#             if not sub_quest:
-#                 continue
-            
-#             correct_answer = item.get('correct_answer', '')
-#             if correct_answer == '':
-#                 raise JsonOutputException('子题({})请输入正确答案'.format(sub_quest.quest_no))
-#             sub_quest.correct_answer = correct_answer
-#             if sub_quest.qtype_id == 2:
-#                 correct_answer = item.get('correct_answer', [])
-#                 if len(correct_answer) == 0:
-#                     raise JsonOutputException('子题({})请输入正确答案'.format(sub_quest.quest_no))
-#                 correct_answer = json.dumps(correct_answer)
-#                 sub_quest.correct_answer = correct_answer
-#             db.session.add(sub_quest)
-#     else:
-#         raise JsonOutputException('题型错误')
-#     quest_answer_data.state = state
-#     question.state = state
-#     db.session.add(quest_answer_data)
-#     db.session.add(question)
-#     db.session.commit()
-#     return render_api({})
+    # 解答/选择题
+    elif quest_type_id == '3' or quest_type_id == '1':
+        correct_answer2 = request.json.get('correct_answer2', '')
+        question.correct_answer2 = correct_answer2
+        if not question.correct_answer2:
+            raise JsonOutputException('请输入正确答案')
+    # 大小题
+    elif quest_type_id == '4':
+        sub_items = request.json.get('sub_items2', [])
+        if len(sub_items) == 0:
+            raise JsonOutputException('请输入子题信息')
+        for item in sub_items:
+            item_quest_type_id = item.get('quest_type_id', 0)
+            correct_answer = item.get('correct_answer', '')
+            if correct_answer == '':
+                raise JsonOutputException('请输入正确答案')
+            sub_quest = SubQuestion(parent_id=question.id,
+                quest_content=item.get('quest_content', ''),
+                quest_content_html=item.get('quest_content_html', ''),
+                correct_answer=correct_answer,
+                quest_no=item.get('sort', 0),
+                qtype_id=item_quest_type_id,
+                group=2,
+                operator_id=g.user.id)
+            if item_quest_type_id == 1:
+                options = item.get('options', [])
+                option_count = len(options)
+                # 插入选项
+                sub_quest.qoptjson = json.dumps(options)
+                sub_quest.option_count = option_count
+            elif item_quest_type_id == 2:
+                correct_answer = item.get('correct_answer', [])
+                if len(correct_answer) == 0:
+                    raise JsonOutputException('请输入正确答案')
+                correct_answer = json.dumps(correct_answer)
+                sub_quest.correct_answer = correct_answer
+            elif item_quest_type_id == 3:
+                pass
+            else:
+                raise JsonOutputException('子题题型错误')
+            db.session.add(sub_quest)
+    else:
+        raise JsonOutputException('题型错误')
+    quest_check_data.state = state
+    question.state = state
+    db.session.add(quest_check_data)
+    db.session.add(question)
+    db.session.commit()
+    return render_api({})

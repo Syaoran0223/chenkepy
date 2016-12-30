@@ -28,6 +28,8 @@ class SubQuestion(db.Model, SessionMixin):
     qrows = db.Column(db.Integer, default=0)
     qcols = db.Column(db.Integer, default=0)
     qoptjson = db.Column(db.Text)
+    operator_id = db.Column(db.Integer)
+    group = db.Column(db.Integer, default=1) # 1-首次提交的答案 2-第二次提交的答案
 
     def __repr__(self):
         return '<SubQuestion: %r>' % self.id

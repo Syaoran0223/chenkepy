@@ -132,12 +132,16 @@ def answer_quest(id):
             if correct_answer == '':
                 raise JsonOutputException('子题({})请输入正确答案'.format(sub_quest.quest_no))
             sub_quest.correct_answer = correct_answer
+            sub_quest.operator_id = g.user.id
             if sub_quest.qtype_id == 2:
                 correct_answer = item.get('correct_answer', [])
                 if len(correct_answer) == 0:
                     raise JsonOutputException('子题({})请输入正确答案'.format(sub_quest.quest_no))
                 correct_answer = json.dumps(correct_answer)
                 sub_quest.correct_answer = correct_answer
+            elif sub_quest.qtype_id == 1:
+                qoptjson = item.get('options', [])
+                sub_quest.qoptjson = json.dumps(qoptjson)
             db.session.add(sub_quest)
     else:
         raise JsonOutputException('题型错误')

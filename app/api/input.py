@@ -152,7 +152,8 @@ def input_quest(id):
                 quest_content_html=item.get('quest_content_html', ''),
                 correct_answer=correct_answer,
                 quest_no=item.get('sort', 0),
-                qtype_id=item_quest_type_id)
+                qtype_id=item_quest_type_id,
+                operator_id=g.user.id)
             if item_quest_type_id == '1':
                 options = item.get('options', [])
                 option_count = len(options)

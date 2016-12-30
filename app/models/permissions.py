@@ -5,4 +5,4 @@ class Permission():
     INPUT_PERMISSION = ['WaitInput', 'PaperInput', 'InputList']
     ANSWER_PERMISSION = ['WaitAnswer', 'PaperAnswer', 'AnswerList']
     CHECK_PERMISSION = ['WaitCheck', 'QuestCheck', 'CheckList']
-    JUDGE_PERMISSION = []
+    JUDGE_PERMISSION = ['WaitJudge', 'QUestJudge', 'JudgeList']
