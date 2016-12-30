@@ -6,7 +6,7 @@ from app.utils import upload, pagination
 from flask import request, g
 from app.const import QUEST_STATUS
 from . import api_blueprint
-from app.models import Question, QuestAnswer, QOption, SubQuestion
+from app.models import Question, QuestCheck, QOption, SubQuestion
 from app.utils import render_api
 import datetime
 
@@ -18,48 +18,48 @@ def answer_check_wait():
     data = Question.get_quest_by_state(QUEST_STATUS['完成解答'])
     return render_api(data)
 
-# # 领取录题任务
-# @api_blueprint.route('/paper/answer/<int:id>')
-# @api_login_required
-# @permission_required('CHECK_PERMISSION')
-# def get_answer_task(id):
-#     question = Question.query.get(id)
-#     if not question:
-#         raise JsonOutputException('题目不存在')
-#     if question.state != QUEST_STATUS['完成录题'] and question.state != QUEST_STATUS['正在解答']:
-#         raise JsonOutputException('暂时无法处理该题目')
-#     quest_answer_data = QuestAnswer.query.\
-#         filter_by(state=QUEST_STATUS['正在解答']).\
-#         filter_by(quest_id=id).\
-#         order_by(QuestAnswer.created_at.desc()).\
-#         first()
-#     if not quest_answer_data:
-#         quest_answer_data = QuestAnswer(
-#             quest_id=id,
-#             exam_id=question.exam_id,
-#             quest_no=question.quest_no,
-#             state=QUEST_STATUS['正在解答'],
-#             operator_id=g.user.id,
-#         )
-#         quest_answer_data.save()
-#     if quest_answer_data.operator_id != g.user.id:
-#         raise JsonOutputException('该题目已被他人领取')
-#     question.state = QUEST_STATUS['正在解答']
-#     question.save()
-#     res = question.get_answer_dtl()
-#     return render_api(res)
+# 领取检查任务
+@api_blueprint.route('/paper/answer/check/<int:id>')
+@api_login_required
+@permission_required('CHECK_PERMISSION')
+def get_check_task(id):
+    question = Question.query.get(id)
+    if not question:
+        raise JsonOutputException('题目不存在')
+    if question.state != QUEST_STATUS['完成解答'] and question.state != QUEST_STATUS['正在检查']:
+        raise JsonOutputException('暂时无法处理该题目')
+    quest_check_data = QuestCheck.query.\
+        filter_by(state=QUEST_STATUS['正在检查']).\
+        filter_by(quest_id=id).\
+        order_by(QuestCheck.created_at.desc()).\
+        first()
+    if not quest_check_data:
+        quest_check_data = QuestCheck(
+            quest_id=id,
+            exam_id=question.exam_id,
+            quest_no=question.quest_no,
+            state=QUEST_STATUS['正在检查'],
+            operator_id=g.user.id,
+        )
+        quest_check_data.save()
+    if quest_check_data.operator_id != g.user.id:
+        raise JsonOutputException('该题目已被他人领取')
+    question.state = QUEST_STATUS['正在检查']
+    question.save()
+    res = question.get_answer_dtl()
+    return render_api(res)
 
-# # 答题记录
-# @api_blueprint.route('/paper/answer/list')
-# @api_login_required
-# @permission_required('CHECK_PERMISSION')
-# def answer_list():
-#     query = QuestAnswer.query.\
-#         filter_by(operator_id=g.user.id)
-#     res = pagination(query, None, False)
-#     items = [item.get_question_dtl() for item in res['items']]
-#     res['items'] = items
-#     return render_api(res)
+# 检查记录
+@api_blueprint.route('/paper/answer/check/list')
+@api_login_required
+@permission_required('CHECK_PERMISSION')
+def check_list():
+    query = QuestCheck.query.\
+        filter_by(operator_id=g.user.id)
+    res = pagination(query, None, False)
+    items = [item.get_question_dtl() for item in res['items']]
+    res['items'] = items
+    return render_api(res)
 
 # # 题目解答
 # @api_blueprint.route('/paper/answer/<int:id>', methods=['PUT'])

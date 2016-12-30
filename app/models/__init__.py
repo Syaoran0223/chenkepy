@@ -17,3 +17,4 @@ from .qtype import QType
 from .qoption import QOption
 from .sub_quest import SubQuestion
 from .quest_answer import QuestAnswer
+from .quest_check import QuestCheck

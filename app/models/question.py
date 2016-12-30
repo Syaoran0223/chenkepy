@@ -33,6 +33,7 @@ class Question(db.Model, SessionMixin):
     fenxi = db.Column(db.Text)
     jieda = db.Column(db.Text)
     correct_answer = db.Column(db.Text)
+    correct_answer2 = db.Column(db.Text)
     dianpin = db.Column(db.Text)
     knowledge_point = db.Column(db.Text)
     state = db.Column(db.Integer)
