@@ -30,6 +30,7 @@ class SubQuestion(db.Model, SessionMixin):
     qoptjson = db.Column(db.Text)
     operator_id = db.Column(db.Integer)
     group = db.Column(db.Integer, default=1) # 1-首次提交的答案 2-第二次提交的答案
+    finish_state = db.Column(db.String(16), default='')
 
     def __repr__(self):
         return '<SubQuestion: %r>' % self.id

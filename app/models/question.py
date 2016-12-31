@@ -27,12 +27,19 @@ class Question(db.Model, SessionMixin):
     quest_content = db.Column(db.Text)
     quest_content_html = db.Column(db.Text)
     option_count = db.Column(db.Integer)
+    options1 = db.Column(db.JsonBlob(), default=[])
+    options2 = db.Column(db.JsonBlob(), default=[])
+    answer_list1 = db.Column(db.JsonBlob(), default=[])
+    answer_list2 = db.Column(db.JsonBlob(), default=[])
+    sub_items1 = db.Column(db.JsonBlob(), default=[])
+    sub_items2 = db.Column(db.JsonBlob(), default=[])
     qrows = db.Column(db.Integer)
     qcols = db.Column(db.Integer)
     kaodian = db.Column(db.Text)
     fenxi = db.Column(db.Text)
     jieda = db.Column(db.Text)
     correct_answer = db.Column(db.Text)
+    correct_answer1 = db.Column(db.Text)
     correct_answer2 = db.Column(db.Text)
     dianpin = db.Column(db.Text)
     knowledge_point = db.Column(db.Text)
@@ -57,17 +64,6 @@ class Question(db.Model, SessionMixin):
         exam_dict = School.bind_auto(exam_dict, 'name')
         res = self.to_dict()
         res['exam'] = exam_dict
-        # 选择题
-        if self.quest_type_id == '1':
-            options = QOption.query.filter_by(qid=self.id).all()
-            res['options'] = [option.to_dict() for option in options]
-        # 填空题
-        elif self.quest_type_id == '2':
-            res['correct_answer'] = json.loads(self.correct_answer)
-        # 大小题
-        elif self.quest_type_id == '4':
-            sub_items = SubQuestion.query.filter_by(parent_id=self.id, group=1).all()
-            res['sub_items'] = [item.to_dict() for item in sub_items]
         return res
 
     @staticmethod

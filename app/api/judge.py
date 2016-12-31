@@ -6,7 +6,7 @@ from app.utils import upload, pagination
 from flask import request, g
 from app.const import QUEST_STATUS
 from . import api_blueprint
-from app.models import Question, QuestCheck, QOption, SubQuestion
+from app.models import Question, QuestJudge, QOption, SubQuestion
 from app.utils import render_api
 import datetime
 
@@ -18,48 +18,48 @@ def judge_wait():
     data = Question.get_quest_by_state(QUEST_STATUS['待裁定'])
     return render_api(data)
 
-# # 领取检查任务
-# @api_blueprint.route('/paper/answer/check/<int:id>')
-# @api_login_required
-# @permission_required('JUDGE_PERMISSION')
-# def get_check_task(id):
-#     question = Question.query.get(id)
-#     if not question:
-#         raise JsonOutputException('题目不存在')
-#     if question.state != QUEST_STATUS['完成解答'] and question.state != QUEST_STATUS['正在检查']:
-#         raise JsonOutputException('暂时无法处理该题目')
-#     quest_check_data = QuestCheck.query.\
-#         filter_by(state=QUEST_STATUS['正在检查']).\
-#         filter_by(quest_id=id).\
-#         order_by(QuestCheck.created_at.desc()).\
-#         first()
-#     if not quest_check_data:
-#         quest_check_data = QuestCheck(
-#             quest_id=id,
-#             exam_id=question.exam_id,
-#             quest_no=question.quest_no,
-#             state=QUEST_STATUS['正在检查'],
-#             operator_id=g.user.id,
-#         )
-#         quest_check_data.save()
-#     if quest_check_data.operator_id != g.user.id:
-#         raise JsonOutputException('该题目已被他人领取')
-#     question.state = QUEST_STATUS['正在检查']
-#     question.save()
-#     res = question.get_answer_dtl()
-#     return render_api(res)
+# 领取裁定任务
+@api_blueprint.route('/quest/judge/<int:id>')
+@api_login_required
+@permission_required('JUDGE_PERMISSION')
+def get_judge_task(id):
+    question = Question.query.get(id)
+    if not question:
+        raise JsonOutputException('题目不存在')
+    if question.state != QUEST_STATUS['待裁定'] and question.state != QUEST_STATUS['正在裁定']:
+        raise JsonOutputException('暂时无法处理该题目')
+    quest_judge_data = QuestJudge.query.\
+        filter_by(state=QUEST_STATUS['正在裁定']).\
+        filter_by(quest_id=id).\
+        order_by(QuestJudge.created_at.desc()).\
+        first()
+    if not quest_judge_data:
+        quest_judge_data = QuestJudge(
+            quest_id=id,
+            exam_id=question.exam_id,
+            quest_no=question.quest_no,
+            state=QUEST_STATUS['正在裁定'],
+            operator_id=g.user.id,
+        )
+        quest_judge_data.save()
+    if quest_judge_data.operator_id != g.user.id:
+        raise JsonOutputException('该题目已被他人领取')
+    question.state = QUEST_STATUS['正在裁定']
+    question.save()
+    res = question.get_answer_dtl()
+    return render_api(res)
 
-# # 检查记录
-# @api_blueprint.route('/paper/answer/check/list')
-# @api_login_required
-# @permission_required('JUDGE_PERMISSION')
-# def check_list():
-#     query = QuestCheck.query.\
-#         filter_by(operator_id=g.user.id)
-#     res = pagination(query, None, False)
-#     items = [item.get_question_dtl() for item in res['items']]
-#     res['items'] = items
-#     return render_api(res)
+# 裁定记录
+@api_blueprint.route('/quest/judge/list')
+@api_login_required
+@permission_required('JUDGE_PERMISSION')
+def judge_list():
+    query = QuestJudge.query.\
+        filter_by(operator_id=g.user.id)
+    res = pagination(query, None, False)
+    items = [item.get_question_dtl() for item in res['items']]
+    res['items'] = items
+    return render_api(res)
 
 # # 答案正确
 # @api_blueprint.route('/paper/answer/check/right/<int:id>', methods=['PUT'])
@@ -69,19 +69,19 @@ def judge_wait():
 #     question = Question.query.get(id)
 #     if not question:
 #         raise JsonOutputException('题目不存在')
-#     if question.state != QUEST_STATUS['正在检查']:
+#     if question.state != QUEST_STATUS['正在裁定']:
 #         raise JsonOutputException('暂时无法处理该题目')
-#     quest_check_data = QuestCheck.query.\
-#         filter_by(state=QUEST_STATUS['正在检查']).\
+#     quest_judge_data = QuestJudge.query.\
+#         filter_by(state=QUEST_STATUS['正在裁定']).\
 #         filter_by(quest_id=id).\
-#         order_by(QuestCheck.created_at.desc()).\
+#         order_by(QuestJudge.created_at.desc()).\
 #         first()
-#     if quest_check_data.operator_id != g.user.id:
+#     if quest_judge_data.operator_id != g.user.id:
 #         raise JsonOutputException('该题目已被他人领取')
 #     state = QUEST_STATUS['待校对']
-#     quest_check_data.state = state
+#     quest_judge_data.state = state
 #     question.state = state
-#     db.session.add(quest_check_data)
+#     db.session.add(quest_judge_data)
 #     db.session.add(question)
 #     db.session.commit()
 #     return render_api({})
@@ -94,14 +94,14 @@ def judge_wait():
 #     question = Question.query.get(id)
 #     if not question:
 #         raise JsonOutputException('题目不存在')
-#     if question.state != QUEST_STATUS['正在检查']:
+#     if question.state != QUEST_STATUS['正在裁定']:
 #         raise JsonOutputException('暂时无法处理该题目')
-#     quest_check_data = QuestCheck.query.\
-#         filter_by(state=QUEST_STATUS['正在检查']).\
+#     quest_judge_data = QuestJudge.query.\
+#         filter_by(state=QUEST_STATUS['正在裁定']).\
 #         filter_by(quest_id=id).\
-#         order_by(QuestCheck.created_at.desc()).\
+#         order_by(QuestJudge.created_at.desc()).\
 #         first()
-#     if quest_check_data.operator_id != g.user.id:
+#     if quest_judge_data.operator_id != g.user.id:
 #         raise JsonOutputException('该题目已被他人领取')
 
 #     # 题目类型
@@ -167,9 +167,9 @@ def judge_wait():
 #             db.session.add(sub_quest)
 #     else:
 #         raise JsonOutputException('题型错误')
-#     quest_check_data.state = state
+#     quest_judge_data.state = state
 #     question.state = state
-#     db.session.add(quest_check_data)
+#     db.session.add(quest_judge_data)
 #     db.session.add(question)
 #     db.session.commit()
 #     return render_api({})

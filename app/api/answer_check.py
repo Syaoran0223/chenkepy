@@ -79,6 +79,42 @@ def check_right(id):
     if quest_check_data.operator_id != g.user.id:
         raise JsonOutputException('该题目已被他人领取')
     state = QUEST_STATUS['待校对']
+    # 选择题
+    if question.quest_type_id == '1':
+        question.correct_answer = question.correct_answer1
+        for option in question.options1:
+            option = QOption(
+                qid = question.id,
+                qok = option.get('_selected', False),
+                qsn = option.get('sort', ''),
+                qopt = option.get('content', '')
+            )
+            db.session.add(option)
+    elif question.quest_type_id == '2' or question.quest_type_id == '3':
+        question.correct_answer = question.correct_answer1  
+    elif question.quest_type_id == '4':
+        for item in question.sub_items1:
+            sub_quest = SubQuestion(parent_id=question.id,
+                quest_content=item.get('quest_content', ''),
+                quest_content_html=item.get('quest_content_html', ''),
+                correct_answer=item.get('correct_answer', ''),
+                quest_no=item.get('sort', 0),
+                qtype_id=item.get('quest_type_id', 0),
+                operator_id=item.get('operator_id', 0),
+                finish_state=item.get('finish_state', ''))
+            if sub_quest.qtype_id == 1:
+                options = item.get('options', [])
+                option_count = len(options)
+                # 插入选项
+                sub_quest.qoptjson = json.dumps(options)
+                sub_quest.option_count = option_count
+            elif sub_quest.qtype_id == '2':
+                correct_answer = item.get('correct_answer', [])
+                correct_answer = json.dumps(correct_answer)
+                sub_quest.correct_answer = correct_answer
+            elif sub_quest.qtype_id == '3':
+                pass
+            db.session.add(sub_quest)
     quest_check_data.state = state
     question.state = state
     db.session.add(quest_check_data)
@@ -116,16 +152,26 @@ def check_quest(id):
     question.has_sub = False
     state = QUEST_STATUS['待裁定']
     quest_type_id = request.json.get('quest_type_id')
+    # 选择
+    if quest_type_id == '1':
+        correct_answer2 = request.json.get('correct_answer2', '')
+        if not correct_answer2:
+            raise JsonOutputException('请输入正确答案')
+        options2 = request.json.get('options2', [])
+        question.correct_answer2 = correct_answer2
+        question.options2 = options2
     # 填空
-    if quest_type_id == '2':
+    elif quest_type_id == '2':
         correct_answer2 = request.json.get('correct_answer2', [])
+        answer_list2 = request.json.get('answer_list2', [])
         if len(correct_answer2) == 0:
             raise JsonOutputException('请输入正确答案')
         correct_answer2 = json.dumps(correct_answer2)
         question.correct_answer2 = correct_answer2
+        question.answer_list2 = answer_list2
         
-    # 解答/选择题
-    elif quest_type_id == '3' or quest_type_id == '1':
+    # 解答
+    elif quest_type_id == '3':
         correct_answer2 = request.json.get('correct_answer2', '')
         question.correct_answer2 = correct_answer2
         if not question.correct_answer2:
@@ -139,32 +185,25 @@ def check_quest(id):
             item_quest_type_id = item.get('quest_type_id', 0)
             correct_answer = item.get('correct_answer', '')
             if correct_answer == '':
-                raise JsonOutputException('请输入正确答案')
-            sub_quest = SubQuestion(parent_id=question.id,
-                quest_content=item.get('quest_content', ''),
-                quest_content_html=item.get('quest_content_html', ''),
-                correct_answer=correct_answer,
-                quest_no=item.get('sort', 0),
-                qtype_id=item_quest_type_id,
-                group=2,
-                operator_id=g.user.id)
-            if item_quest_type_id == 1:
+                raise JsonOutputException('子题({})请输入正确答案'.format(item.get('sort', '')))
+            if item_quest_type_id == '1':
                 options = item.get('options', [])
                 option_count = len(options)
-                # 插入选项
-                sub_quest.qoptjson = json.dumps(options)
-                sub_quest.option_count = option_count
-            elif item_quest_type_id == 2:
+                if option_count == 0:
+                    raise JsonOutputException('子题({})请输入正确答案'.format(item.get('sort', '')))
+            elif item_quest_type_id == '2':
                 correct_answer = item.get('correct_answer', [])
                 if len(correct_answer) == 0:
-                    raise JsonOutputException('请输入正确答案')
-                correct_answer = json.dumps(correct_answer)
-                sub_quest.correct_answer = correct_answer
-            elif item_quest_type_id == 3:
+                    raise JsonOutputException('子题({})请输入正确答案'.format(item.get('sort', '')))
+            elif item_quest_type_id == '3':
                 pass
             else:
                 raise JsonOutputException('子题题型错误')
-            db.session.add(sub_quest)
+        question.sub_items2 = []
+        for item in sub_items:
+            item['operator_id'] = g.user.id
+            item['finish_state'] = 'answer_check'
+            question.sub_items2.append(item)
     else:
         raise JsonOutputException('题型错误')
     quest_check_data.state = state
