@@ -87,93 +87,68 @@ def verify_right(id):
     db.session.commit()
     return render_api({})
 
-# # 重新输入答案
-# @api_blueprint.route('/paper/answer/check/<int:id>', methods=['PUT'])
-# @api_login_required
-# @permission_required('VERIFY_PERMISSION')
-# def check_quest(id):
-#     question = Question.query.get(id)
-#     if not question:
-#         raise JsonOutputException('题目不存在')
-#     if question.state != QUEST_STATUS['正在校对']:
-#         raise JsonOutputException('暂时无法处理该题目')
-#     quest_verify_data = QuestVerify.query.\
-#         filter_by(state=QUEST_STATUS['正在校对']).\
-#         filter_by(quest_id=id).\
-#         order_by(QuestVerify.created_at.desc()).\
-#         first()
-#     if quest_verify_data.operator_id != g.user.id:
-#         raise JsonOutputException('该题目已被他人领取')
+# 重新输入答案
+@api_blueprint.route('/quest/verify/<int:id>', methods=['PUT'])
+@api_login_required
+@permission_required('VERIFY_PERMISSION')
+def verify_quest(id):
+    question = Question.query.get(id)
+    if not question:
+        raise JsonOutputException('题目不存在')
+    if question.state != QUEST_STATUS['正在校对']:
+        raise JsonOutputException('暂时无法处理该题目')
+    quest_verify_data = QuestVerify.query.\
+        filter_by(state=QUEST_STATUS['正在校对']).\
+        filter_by(quest_id=id).\
+        order_by(QuestVerify.created_at.desc()).\
+        first()
+    if quest_verify_data.operator_id != g.user.id:
+        raise JsonOutputException('该题目已被他人领取')
 
-#     # 题目类型
-#     jieda = request.json.get('jieda', '')
-#     fenxi = request.json.get('fenxi', '')
-#     dianpin = request.json.get('dianpin', '')
-#     kaodian = request.json.get('kaodian', '')
-#     question.jieda = jieda
-#     question.fenxi = fenxi
-#     question.dianpin = dianpin
-#     question.kaodian = kaodian
-#     question.has_sub = False
-#     state = QUEST_STATUS['待裁定']
-#     quest_type_id = request.json.get('quest_type_id')
-#     # 选择
-#     if quest_type_id == '1':
-#         correct_answer2 = request.json.get('correct_answer2', '')
-#         if not correct_answer2:
-#             raise JsonOutputException('请输入正确答案')
-#         options2 = request.json.get('options2', [])
-#         question.correct_answer2 = correct_answer2
-#         question.options2 = options2
-#     # 填空
-#     elif quest_type_id == '2':
-#         correct_answer2 = request.json.get('correct_answer2', [])
-#         answer_list2 = request.json.get('answer_list2', [])
-#         if len(correct_answer2) == 0:
-#             raise JsonOutputException('请输入正确答案')
-#         correct_answer2 = json.dumps(correct_answer2)
-#         question.correct_answer2 = correct_answer2
-#         question.answer_list2 = answer_list2
-        
-#     # 解答
-#     elif quest_type_id == '3':
-#         correct_answer2 = request.json.get('correct_answer2', '')
-#         question.correct_answer2 = correct_answer2
-#         if not question.correct_answer2:
-#             raise JsonOutputException('请输入正确答案')
-#     # 大小题
-#     elif quest_type_id == '4':
-#         sub_items = request.json.get('sub_items2', [])
-#         if len(sub_items) == 0:
-#             raise JsonOutputException('请输入子题信息')
-#         for item in sub_items:
-#             item_quest_type_id = item.get('quest_type_id', 0)
-#             correct_answer = item.get('correct_answer', '')
-#             if correct_answer == '':
-#                 raise JsonOutputException('子题({})请输入正确答案'.format(item.get('sort', '')))
-#             if item_quest_type_id == '1':
-#                 options = item.get('options', [])
-#                 option_count = len(options)
-#                 if option_count == 0:
-#                     raise JsonOutputException('子题({})请输入正确答案'.format(item.get('sort', '')))
-#             elif item_quest_type_id == '2':
-#                 correct_answer = item.get('correct_answer', [])
-#                 if len(correct_answer) == 0:
-#                     raise JsonOutputException('子题({})请输入正确答案'.format(item.get('sort', '')))
-#             elif item_quest_type_id == '3':
-#                 pass
-#             else:
-#                 raise JsonOutputException('子题题型错误')
-#         question.sub_items2 = []
-#         for item in sub_items:
-#             item['operator_id'] = g.user.id
-#             item['finish_state'] = 'answer_check'
-#             question.sub_items2.append(item)
-#     else:
-#         raise JsonOutputException('题型错误')
-#     quest_verify_data.state = state
-#     question.state = state
-#     db.session.add(quest_verify_data)
-#     db.session.add(question)
-#     db.session.commit()
-#     return render_api({})
+    # 题目类型
+    jieda = request.json.get('jieda', '')
+    fenxi = request.json.get('fenxi', '')
+    dianpin = request.json.get('dianpin', '')
+    kaodian = request.json.get('kaodian', '')
+    quest_content = request.json.get('quest_content', '')
+    quest_content_html = request.json.get('quest_content_html', '')
+    question.jieda = jieda
+    question.fenxi = fenxi
+    question.dianpin = dianpin
+    question.kaodian = kaodian
+    question.quest_content = quest_content
+    question.quest_content_html = quest_content_html
+    state = QUEST_STATUS['结束录题']
+    quest_type_id = request.json.get('quest_type_id')
+    # 选择
+    if quest_type_id == '1':
+        options = request.json.get('options', [])
+        for data in options:
+            option = QOption.query.get(data['id'])
+            if not option:
+                continue
+            option.qopt = data['content']
+            db.session.add(option)
+    # 大小题
+    elif quest_type_id == '4':
+        sub_items = request.json.get('sub_items', [])
+        for item in sub_items:
+            sub_item = SubQuestion.query.get(item.get('id', 0))
+            if not sub_item:
+                continue
+            sub_quest_content = item.get('quest_content', '')
+            sub_quest_content_html = item.get('quest_content_html', '')
+            sub_item.quest_content = sub_quest_content
+            sub_item.quest_content_html = sub_quest_content_html
+            
+            if sub_item.qtype_id == 1:
+                options = item.get('options', [])
+                sub_item.qoptjson = json.dumps(options)
+            db.session.add(sub_item)
+            
+    quest_verify_data.state = state
+    question.state = state
+    db.session.add(quest_verify_data)
+    db.session.add(question)
+    db.session.commit()
+    return render_api({})
