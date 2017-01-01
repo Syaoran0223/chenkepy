@@ -66,6 +66,25 @@ class Question(db.Model, SessionMixin):
         res['exam'] = exam_dict
         return res
 
+    def get_verify_dtl(self):
+        exam = Exam.query.get(self.exam_id)
+        exam_dict = exam.to_dict() if exam else {}
+        exam_dict = School.bind_auto(exam_dict, 'name')
+        res = self.to_dict()
+        res['exam'] = exam_dict
+        # 选择题
+        if self.quest_type_id == '1':
+            options = QOption.query.filter_by(qid=self.id).all()
+            res['options'] = [option.to_dict() for option in options]
+        # 填空题
+        elif self.quest_type_id == '2':
+            res['correct_answer'] = json.loads(self.correct_answer)
+        # 大小题
+        elif self.quest_type_id == '4':
+            sub_items = SubQuestion.query.filter_by(parent_id=self.id).all()
+            res['sub_items'] = [item.to_dict() for item in sub_items]
+        return res
+
     @staticmethod
     def add_pre_process_quest(exam_id, quest_no,has_sub, quest_type_id, option_count, quest_image, user_id, review_memo, answer_image):
         quest = Question(exam_id=exam_id, quest_no=quest_no,

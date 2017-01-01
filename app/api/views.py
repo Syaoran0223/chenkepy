@@ -75,7 +75,6 @@ def send_msg():
 
 @api_blueprint.route('/uploads', methods=['POST'])
 @api_login_required
-@permission_required('UPLOAD_PERMISSION')
 def upload_attachment():
     file = request.files.get('file')
     thumb = bool(request.args.get('thumb', False))

@@ -19,3 +19,4 @@ from .sub_quest import SubQuestion
 from .quest_answer import QuestAnswer
 from .quest_check import QuestCheck
 from .quest_judge import QuestJudge
+from .quest_verify import QuestVerify

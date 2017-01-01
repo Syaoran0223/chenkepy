@@ -6,3 +6,4 @@ class Permission():
     ANSWER_PERMISSION = ['WaitAnswer', 'PaperAnswer', 'AnswerList']
     CHECK_PERMISSION = ['WaitCheck', 'QuestCheck', 'CheckList']
     JUDGE_PERMISSION = ['WaitJudge', 'QuestJudge', 'JudgeList']
+    VERIFY_PERMISSION = ['WaitVerify', 'QuestVerify', 'VerifyList']

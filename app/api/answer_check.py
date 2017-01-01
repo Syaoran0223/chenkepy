@@ -102,17 +102,17 @@ def check_right(id):
                 qtype_id=item.get('quest_type_id', 0),
                 operator_id=item.get('operator_id', 0),
                 finish_state=item.get('finish_state', ''))
-            if sub_quest.qtype_id == 1:
+            if int(sub_quest.qtype_id) == 1:
                 options = item.get('options', [])
                 option_count = len(options)
                 # 插入选项
                 sub_quest.qoptjson = json.dumps(options)
                 sub_quest.option_count = option_count
-            elif sub_quest.qtype_id == '2':
+            elif int(sub_quest.qtype_id) == 2:
                 correct_answer = item.get('correct_answer', [])
                 correct_answer = json.dumps(correct_answer)
                 sub_quest.correct_answer = correct_answer
-            elif sub_quest.qtype_id == '3':
+            elif int(sub_quest.qtype_id) == 3:
                 pass
             db.session.add(sub_quest)
     quest_check_data.state = state
