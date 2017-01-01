@@ -37,6 +37,7 @@ def review_exam(id):
     review_data = Review.query.\
         filter_by(exam_id=exam.id).\
         filter_by(review_state=EXAM_STATUS['正在审核']).\
+        filter_by(reviewer_id=g.user.id).\
         order_by(Review.created_at.desc()).\
         first()
     #新增
