@@ -8,7 +8,7 @@ from app import create_app
 
 enable_pretty_logging()
 
-app = create_app('development')
+app = create_app('production')
 http_server = HTTPServer(WSGIContainer(app))
 http_server.listen(5000)  #flask默认的端口
 IOLoop.instance().start()

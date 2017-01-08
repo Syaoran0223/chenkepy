@@ -28,6 +28,8 @@ class DevelopmentConfig(Config):
 
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{username}:{password}@{mysql_addr}:{mysql_port}/{db_name}'.\
         format(username=USER_NAME, password=PASSWORD, mysql_addr=MYSQL_ADDR, db_name=DB_NAME, mysql_port=MYQSL_PORT)
+
+    SITE_URL = 'http://127.0.0.1:5000'
 class TestingConfig(Config):
     TESTING = True
     WTF_CSRF_ENABLED = False
@@ -48,6 +50,8 @@ class ProductionConfig(Config):
 
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{username}:{password}@{mysql_addr}/{db_name}'.\
         format(username=USER_NAME, password=PASSWORD, mysql_addr=MYSQL_ADDR, db_name=DB_NAME)
+
+    SITE_URL = 'http://192.168.2.131:5000'
 
 config = {
     'development' : DevelopmentConfig,
