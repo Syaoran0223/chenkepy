@@ -17,4 +17,4 @@ class Review(db.Model, SessionMixin):
     reviewer_id = db.Column(db.Integer)
     review_state = db.Column(db.Integer)
     review_memo = db.Column(db.String(100))
-    review_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now())
+    review_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)

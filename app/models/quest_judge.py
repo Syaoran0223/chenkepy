@@ -17,7 +17,7 @@ class QuestJudge(db.Model, SessionMixin):
     quest_id= db.Column(db.Integer)
     state = db.Column(db.Integer)
     operator_id = db.Column(db.Integer)
-    date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now())
+    date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
 
     def get_question_dtl(self):
         exam = Exam.query.get(self.exam_id)

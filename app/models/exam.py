@@ -25,7 +25,7 @@ class Exam(db.Model, SessionMixin):
     state = db.Column(db.Integer)
     upload_user = db.Column(db.Integer)
     attachments = db.Column(db.JsonBlob(), default=[])
-    review_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now())
+    review_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
 
     def get_dtl(self):
         result = {

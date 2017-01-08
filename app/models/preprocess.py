@@ -14,4 +14,4 @@ class Preprocess(db.Model, SessionMixin):
     operator_id = db.Column(db.Integer)
     state = db.Column(db.Integer)
     memo = db.Column(db.String(100))
-    date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now())
+    date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)

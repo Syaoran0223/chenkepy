@@ -36,12 +36,12 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     #mysql数据库IP地址
-    MYSQL_ADDR = os.getenv('MYSQL_PORT_3306_TCP_ADDR')
-    DB_NAME = 'test'
-    USER_NAME = 'root'
-    PASSWORD = 'ztesoft'
+    MYSQL_ADDR = "127.0.0.1"
+    DB_NAME = 'pdb'
+    USER_NAME = 'information'
+    PASSWORD = 'information@i3ke.com'
 
-    CACHE_TYPE ='redis'
+    CACHE_TYPE ='simple'
     CACHE_REDIS_HOST = '127.0.0.1'
     CACHE_REDIS_PASSWORD = ''
     CACHE_REDIS_DB = 0
