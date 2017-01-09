@@ -5,6 +5,8 @@ from flask.ext.login import UserMixin, AnonymousUserMixin
 from app import db, login_manager
 from app.models.permissions import Permission
 from ._base import SessionMixin
+from app.models.regions import Region
+from app.models.schools import School
 
 class User(db.Model, SessionMixin, UserMixin):
     __tablename__ = 'user'
@@ -57,6 +59,14 @@ class User(db.Model, SessionMixin, UserMixin):
         for p in permissions:
             menus += Permission.__dict__.get(p, [])
         return [{'identity': m} for m in menus]
+
+    def to_dict(self):
+        res = super(User, self).to_dict()
+        res = Region.bind_auto(res, 'name', 'province_id', 'id', 'province')
+        res = Region.bind_auto(res, 'name', 'city_id', 'id', 'city')
+        res = Region.bind_auto(res, 'name', 'area_id', 'id', 'area')
+        res = School.bind_auto(res, 'name', 'school_id', 'id', 'school')
+        return res
 
     
 

@@ -110,6 +110,7 @@ def paper_upload():
     exam = Exam(name=form.name.data, section=form.section.data, subject=form.subject.data, paper_types=form.paper_types.data, \
                 province_id=form.province_id.data, city_id=form.city_id.data, area_id=form.area_id.data,\
                 school_id=form.school_id.data,
+                exam_date=form.exam_date.data,
                 year=form.year.data, grade=form.grade.data, state=0, attachments=attachments, upload_user=g.user.id)
     result = exam.save()
     ExamLog.log(exam.id, g.user.id, EXAM_STATUS['未审核'], 'UPLOAD')
@@ -187,10 +188,6 @@ def delexam(id):
 @api_login_required
 def user_info():
     data = g.user.to_dict()
-    data = School.bind_auto(data, 'name')
-    data = Region.bind_auto(data, 'name', 'city_id', 'id', 'city')
-    data = Region.bind_auto(data, 'name', 'province_id', 'id', 'province')
-    data = Region.bind_auto(data, 'name', 'area_id', 'id', 'area')
     return render_api(data)
 
 #更新用户信息

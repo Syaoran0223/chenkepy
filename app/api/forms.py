@@ -1,7 +1,7 @@
 from wtforms.form import Form
 from wtforms import validators
 from wtforms.validators import ValidationError
-from wtforms.fields import StringField, IntegerField
+from wtforms.fields import StringField, IntegerField, DateField
 
 from app import const
 
@@ -28,5 +28,7 @@ class PaperUploadForm(Form):
         validators.AnyOf(list(const.GRADE.keys()), '年级不正确')])
     name = StringField('Name', validators=[
         validators.DataRequired('请输入试卷名称')])
+    exam_date = DateField('ExamDate', validators=[
+        validators.DataRequired('请选择考试时间')])
 
 

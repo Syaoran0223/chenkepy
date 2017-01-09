@@ -25,13 +25,14 @@ class Exam(db.Model, SessionMixin):
     state = db.Column(db.Integer)
     upload_user = db.Column(db.Integer)
     attachments = db.Column(db.JsonBlob(), default=[])
+    exam_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
     review_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
 
     def get_dtl(self):
         result = {
             'id': self.id,
             'name': self.name,
-            'sections': self.section,
+            'section': self.section,
             'subject': self.subject,
             'paper_types': self.paper_types,
             'province_id': self.province_id,
