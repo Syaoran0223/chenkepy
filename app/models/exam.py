@@ -29,23 +29,7 @@ class Exam(db.Model, SessionMixin):
     review_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
 
     def get_dtl(self):
-        result = {
-            'id': self.id,
-            'name': self.name,
-            'section': self.section,
-            'subject': self.subject,
-            'paper_types': self.paper_types,
-            'province_id': self.province_id,
-            'city_id': self.city_id,
-            'area_id': self.area_id,
-            'school_id': self.school_id,
-            'year': self.year,
-            'grade': self.grade,
-            'state': self.state,
-            'upload_user': self.upload_user,
-            'attachments': self.attachments,
-            'review_date': self.review_date.strftime('%Y-%m-%d %H:%M:%S')
-        }
+        result = super(Exam, self).to_dict()
         result = Region.bind_auto(result, 'name', 'city_id', 'id', 'city')
         result = Region.bind_auto(result, 'name', 'province_id', 'id', 'province')
         result = Region.bind_auto(result, 'name', 'area_id', 'id', 'area')
@@ -62,7 +46,7 @@ class Exam(db.Model, SessionMixin):
         return res
 
     @staticmethod
-    def list_exams(state=EXAM_STATUS['已审核'] ):
+    def list_exams(state=EXAM_STATUS['已采纳'] ):
         res = pagination(Exam.query.filter(Exam.state == state).order_by(Exam.created_at.desc()))
         items = res.get('items',[])
         items = School.bind_auto(items,'name')

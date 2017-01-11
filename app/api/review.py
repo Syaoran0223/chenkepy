@@ -15,7 +15,7 @@ import datetime
 @permission_required('CONFIRM_PERMISSION')
 def listexam():
     query = Exam.query.filter(Exam.state == EXAM_STATUS['未审核'],
-        Exam.upload_user!=g.user.id).order_by(Exam.created_at.desc())
+        Exam.upload_user!=g.user.id, Exam.school_id==g.user.school_id).order_by(Exam.created_at.desc())
     res = pagination(query)
     items = res.get('items', [])
     items = School.bind_auto(items, 'name')
@@ -34,6 +34,8 @@ def review_exam(id):
         raise JsonOutputException('试卷不存在')
     if not exam.state in (EXAM_STATUS['正在审核'], EXAM_STATUS['未审核']):
         raise JsonOutputException('试卷状态错误')
+    if exam.school_id != g.user.school_id:
+        raise JsonOutputException('没有权限审核该试卷')
     review_data = Review.query.\
         filter_by(exam_id=exam.id).\
         filter_by(review_state=EXAM_STATUS['正在审核']).\
@@ -73,7 +75,7 @@ def review_exam(id):
 def review_exam_update(id):
     state = request.json.get('state')
     memo = request.json.get('memo')
-    if not state or state not in [-1, 2]:
+    if not state or state not in [-1, 2, 5]:
         raise JsonOutputException('状态错误')
 
     #查询是否已审核

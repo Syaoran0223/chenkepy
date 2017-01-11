@@ -13,7 +13,7 @@ from app.utils import render_api
 @api_login_required
 @permission_required('DEAL_PERMISSION')
 def list_deal_wait():
-    data = Exam.list_exams(EXAM_STATUS['已审核'])
+    data = Exam.list_exams(EXAM_STATUS['已采纳'])
     return render_api(data)
 
 #进行处理
@@ -24,7 +24,7 @@ def view_exam_file_pre_process(id):
     exam = Exam.query.get(int(id))
     if not exam:
         raise JsonOutputException('试卷不存在')
-    if not exam.state in (EXAM_STATUS['已审核'], EXAM_STATUS['预处理']):
+    if not exam.state in (EXAM_STATUS['已采纳'], EXAM_STATUS['预处理']):
         raise JsonOutputException('试卷状态错误')
     process_data = Preprocess.query.\
         filter_by(exam_id=id, state=EXAM_STATUS['预处理']).\

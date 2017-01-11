@@ -22,6 +22,8 @@ class Message(db.Model, SessionMixin):
 
     @staticmethod
     def set_is_read(message_ids):
+        if not message_ids:
+            return
         message_ids = ','.join(message_ids)
         sql = text('update message set is_read=1 where id in ({})'.format(message_ids))
         db.engine.execute(sql)
