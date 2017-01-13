@@ -120,3 +120,12 @@ def list_examreview_log():
 def list_upload_log():
     data = Exam.get_exams(1)##(g.user.id)
     return render_api(data)
+
+#获取相似试卷记录
+@api_blueprint.route('/paper/confirm/<int:id>/history')
+def list_confirm_history(id):
+    exam = Exam.query.get(id)
+    if not exam:
+        return render_api({})
+    return render_api(exam.get_history())
+    

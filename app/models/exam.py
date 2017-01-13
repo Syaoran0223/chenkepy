@@ -67,5 +67,20 @@ class Exam(db.Model, SessionMixin):
 
         return result
 
+    def get_history(self):
+        start_date = self.exam_date - datetime.timedelta(days=5)
+        end_date = self.exam_date + datetime.timedelta(days=5)
+        query = Exam.query.filter_by(subject=self.subject,
+            year=self.year,
+            section=self.section,
+            school_id=self.school_id,
+            grade=self.grade).\
+            filter(Exam.id!=self.id).\
+            filter(Exam.exam_date >= start_date).\
+            filter(Exam.exam_date <= end_date).\
+            order_by(Exam.exam_date.desc())
+        res = pagination(query)
+        return res
+
     def __repr__(self):
         return '<Exam: %r>' % self.name
