@@ -120,17 +120,8 @@ def verify_quest(id):
     question.quest_content_html = quest_content_html
     state = QUEST_STATUS['结束录题']
     quest_type_id = request.json.get('quest_type_id')
-    # 选择
-    if quest_type_id == '1':
-        options = request.json.get('options', [])
-        for data in options:
-            option = QOption.query.get(data['id'])
-            if not option:
-                continue
-            option.qopt = data['content']
-            db.session.add(option)
     # 大小题
-    elif quest_type_id == '4':
+    if question.has_sub:
         sub_items = request.json.get('sub_items', [])
         for item in sub_items:
             sub_item = SubQuestion.query.get(item.get('id', 0))
@@ -145,6 +136,16 @@ def verify_quest(id):
                 options = item.get('options', [])
                 sub_item.qoptjson = json.dumps(options)
             db.session.add(sub_item)
+    else:
+        # 选择
+        if quest_type_id == '1':
+            options = request.json.get('options', [])
+            for data in options:
+                option = QOption.query.get(data['id'])
+                if not option:
+                    continue
+                option.qopt = data['content']
+                db.session.add(option)
             
     quest_verify_data.state = state
     question.state = state

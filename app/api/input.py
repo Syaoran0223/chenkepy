@@ -85,6 +85,7 @@ def input_quest(id):
     fenxi = request.json.get('fenxi', '')
     dianpin = request.json.get('dianpin', '')
     kaodian = request.json.get('kaodian', '')
+    has_sub = request.json.get('has_sub', 0)
     question.quest_content = quest_content
     question.quest_content_html = quest_content_html
     question.quest_type_id = quest_type_id
@@ -92,50 +93,10 @@ def input_quest(id):
     question.fenxi = fenxi
     question.dianpin = dianpin
     question.kaodian = kaodian
-    question.has_sub = False
+    question.has_sub = has_sub
     state = QUEST_STATUS['完成解答']
-    # 选择题
-    if quest_type_id == '1':
-        options1 = request.json.get('options1', [])
-        option_count = len(options1)
-        correct_answer1 = request.json.get('correct_answer1', '')
-        show_type = request.json.get('show_type', 'C')
-        if show_type == 'C':
-            qcols = 1
-            qrows = option_count / qcols
-        if show_type == 'B':
-            qrows = 2
-            qcols = math.ceil(option_count / qrows)
-        if show_type == 'A':
-            qrows = 1
-            qcols = option_count / qrows
-        question.option_count = option_count
-        question.qrows = qrows
-        question.qcols = qcols
-        question.correct_answer1 = correct_answer1
-        if not question.correct_answer1:
-            state = QUEST_STATUS['完成录题']
-        # 插入选项
-        question.options1 = options1
-    # 填空
-    elif quest_type_id == '2':
-        correct_answer1 = request.json.get('correct_answer1', [])
-        answer_list1 = request.json.get('answer_list1', [])
-        question.answer_list1 = answer_list1
-        if len(correct_answer1) == 0:
-            state = QUEST_STATUS['完成录题']
-        correct_answer1 = json.dumps(correct_answer1)
-        question.correct_answer1 = correct_answer1
-        
-    # 解答
-    elif quest_type_id == '3':
-        correct_answer1 = request.json.get('quest_answer', '')
-        question.correct_answer1 = correct_answer1
-        if question.correct_answer1 == '':
-            state = QUEST_STATUS['完成录题']
     # 大小题
-    elif quest_type_id == '4':
-        question.has_sub = True
+    if has_sub:
         sub_items = request.json.get('sub_items1', [])
         for item in sub_items:
             item_quest_type_id = item.get('quest_type_id', 0)
@@ -162,7 +123,47 @@ def input_quest(id):
             item['finish_state'] = 'input'
             question.sub_items1.append(item)
     else:
-        raise JsonOutputException('题型错误')
+        # 选择题
+        if quest_type_id == '1':
+            options1 = request.json.get('options1', [])
+            option_count = len(options1)
+            correct_answer1 = request.json.get('correct_answer1', '')
+            show_type = request.json.get('show_type', 'C')
+            if show_type == 'C':
+                qcols = 1
+                qrows = option_count / qcols
+            if show_type == 'B':
+                qrows = 2
+                qcols = math.ceil(option_count / qrows)
+            if show_type == 'A':
+                qrows = 1
+                qcols = option_count / qrows
+            question.option_count = option_count
+            question.qrows = qrows
+            question.qcols = qcols
+            question.correct_answer1 = correct_answer1
+            if not question.correct_answer1:
+                state = QUEST_STATUS['完成录题']
+            # 插入选项
+            question.options1 = options1
+        # 填空
+        elif quest_type_id == '2':
+            correct_answer1 = request.json.get('correct_answer1', [])
+            answer_list1 = request.json.get('answer_list1', [])
+            question.answer_list1 = answer_list1
+            if len(correct_answer1) == 0:
+                state = QUEST_STATUS['完成录题']
+            correct_answer1 = json.dumps(correct_answer1)
+            question.correct_answer1 = correct_answer1
+            
+        # 解答
+        elif quest_type_id == '3':
+            correct_answer1 = request.json.get('quest_answer', '')
+            question.correct_answer1 = correct_answer1
+            if question.correct_answer1 == '':
+                state = QUEST_STATUS['完成录题']
+        else:
+            raise JsonOutputException('题型错误')
     quest_typing_data.state = state
     question.state = state
     db.session.add(quest_typing_data)

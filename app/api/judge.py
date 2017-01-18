@@ -85,20 +85,8 @@ def judge_accepy(id):
     correct_answer_key = 'correct_answer{}'.format(types)
     option_key = 'options{}'.format(types)
     sub_item_key = 'sub_items{}'.format(types)
-    # 选择题
-    if question.quest_type_id == '1':
-        question.correct_answer = getattr(question, correct_answer_key)
-        for option in getattr(question, option_key):
-            option = QOption(
-                qid = question.id,
-                qok = option.get('_selected', False),
-                qsn = option.get('sort', ''),
-                qopt = option.get('content', '')
-            )
-            db.session.add(option)
-    elif question.quest_type_id == '2' or question.quest_type_id == '3':
-        question.correct_answer = getattr(question, correct_answer_key)
-    elif question.quest_type_id == '4':
+    # 大小题
+    if question.has_sub:
         for item in getattr(question, sub_item_key):
             sub_quest = SubQuestion(parent_id=question.id,
                 quest_content=item.get('quest_content', ''),
@@ -121,6 +109,20 @@ def judge_accepy(id):
             elif int(sub_quest.qtype_id) == 3:
                 pass
             db.session.add(sub_quest)
+    else:
+        # 选择题
+        if question.quest_type_id == '1':
+            question.correct_answer = getattr(question, correct_answer_key)
+            for option in getattr(question, option_key):
+                option = QOption(
+                    qid = question.id,
+                    qok = option.get('_selected', False),
+                    qsn = option.get('sort', ''),
+                    qopt = option.get('content', '')
+                )
+                db.session.add(option)
+        elif question.quest_type_id == '2' or question.quest_type_id == '3':
+            question.correct_answer = getattr(question, correct_answer_key)
     quest_judge_data.state = state
     question.state = state
     db.session.add(quest_judge_data)
