@@ -1,3 +1,4 @@
+from itertools import groupby
 from app import db
 from ._base import SessionMixin
 from app.utils import pagination
@@ -80,6 +81,14 @@ class Exam(db.Model, SessionMixin):
             filter(Exam.exam_date <= end_date).\
             order_by(Exam.exam_date.desc())
         res = pagination(query)
+        return res
+
+    @staticmethod
+    def deal_quest_items(items):
+        res = [{'exam_id': eid, 'items': list(items), 'open': True} for eid, items in groupby(items, lambda x: x['exam_id'])]
+        for item in res:
+            exam = Exam.query.get(item['exam_id'])
+            item['exam'] = exam.get_dtl()
         return res
 
     def __repr__(self):

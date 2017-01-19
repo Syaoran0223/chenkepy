@@ -6,7 +6,7 @@ from app.utils import upload, pagination
 from flask import request, g
 from app.const import QUEST_STATUS
 from . import api_blueprint
-from app.models import Question, QuestJudge, QOption, SubQuestion
+from app.models import Question, QuestJudge, QOption, SubQuestion, Exam
 from app.utils import render_api
 import datetime
 
@@ -58,7 +58,7 @@ def judge_list():
         filter_by(operator_id=g.user.id)
     res = pagination(query, None, False)
     items = [item.get_question_dtl() for item in res['items']]
-    res['items'] = items
+    res['items'] = Exam.deal_quest_items(items)
     return render_api(res)
 
 # 裁定结果

@@ -20,7 +20,7 @@ class QuestTyping(db.Model, SessionMixin):
     date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
 
     def get_question_dtl(self):
-        exam = Exam.query.get(self.exam_id)
         res = self.to_dict()
-        res['exam'] = exam.get_dtl() if exam else {}
+        question = Question.query.get(self.quest_id)
+        res['question'] = question.to_dict()
         return res
