@@ -144,6 +144,20 @@ def list_quest_review_log():
     res['items'] = items
     return render_api(res)
 
+# 试卷详情
+@api_blueprint.route('/paper/preprocess/list/<int:id>', methods=['GET'])
+@api_login_required
+@permission_required('DEAL_PERMISSION')
+def get_preprocess_exam(id):
+    data = Exam.get_exam(id)
+    if data is not None:
+        return {
+            'code': 0,
+            'data': data
+        }
+    else:
+        raise JsonOutputException('没有数据')
+
 #试卷预处理完成
 @api_blueprint.route('/paper/preprocess/finish',methods=['POST'])
 @api_login_required

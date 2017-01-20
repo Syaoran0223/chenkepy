@@ -116,6 +116,20 @@ def list_examreview_log():
     res['items'] = items
     return render_api(res)
 
+# 试卷详情
+@api_blueprint.route('/examreview/list/<int:id>', methods=['GET'])
+@api_login_required
+@permission_required('CONFIRM_PERMISSION')
+def get_confirm_exam(id):
+    data = Exam.get_exam(id)
+    if data is not None:
+        return {
+            'code': 0,
+            'data': data
+        }
+    else:
+        raise JsonOutputException('没有数据')
+
 @api_blueprint.route('/courier/history',methods=['GET'])
 def list_upload_log():
     data = Exam.get_exams(1)##(g.user.id)
