@@ -25,6 +25,8 @@ class Exam(db.Model, SessionMixin):
     grade = db.Column(db.Integer)
     state = db.Column(db.Integer)
     upload_user = db.Column(db.Integer)
+    struct = db.Column(db.JsonBlob(), default=[])
+    has_struct = db.Column(db.Boolean, default=False)
     attachments = db.Column(db.JsonBlob(), default=[])
     exam_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
     review_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)

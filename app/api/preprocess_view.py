@@ -6,6 +6,7 @@ from flask import request, g
 from app.const import EXAM_STATUS, QUEST_STATUS
 from . import api_blueprint
 from app.utils import render_api
+from app import db
 
 
 #试卷待处理列表
@@ -47,6 +48,32 @@ def view_exam_file_pre_process(id):
         all()
     data['quest_list'] = [item.to_dict() for item in questList]
     return render_api(data)
+
+# 录入试卷结构
+@api_blueprint.route('/paper/preprocess/struct/<int:id>', methods=['PUT'])
+@api_login_required
+@permission_required('DEAL_PERMISSION')
+def add_struct(id):
+    exam = Exam.query.get(int(id))
+    if not exam:
+        raise JsonOutputException('试卷不存在')
+    if not exam.state==EXAM_STATUS['预处理']:
+        raise JsonOutputException('试卷状态错误')
+    process_data = Preprocess.query.\
+        filter_by(exam_id=id, state=EXAM_STATUS['预处理']).\
+        order_by(Preprocess.created_at.desc()).\
+        first()
+    if not process_data:
+        raise JsonOutputException('无法处理')
+    if not process_data.operator_id == g.user.id:
+        raise JsonOutputException('该试卷已经被他人领取')
+    struct = request.json.get('struct', [])
+    if not struct:
+        raise JsonOutputException('请输入试卷结构')
+    exam.struct = struct
+    exam.has_struct = True
+    exam.save()
+    return render_api({})
 
 #添加上题目图片
 @api_blueprint.route('/paper/preprocess/view',methods=['POST'])
@@ -157,6 +184,47 @@ def get_preprocess_exam(id):
         }
     else:
         raise JsonOutputException('没有数据')
+
+# 试卷预处理
+@api_blueprint.route('/paper/preprocess/tips', methods=['POST'])
+@api_login_required
+@permission_required('DEAL_PERMISSION')
+def exam_process():
+    id = request.json.get('exam_id')
+    if not id:
+        raise JsonOutputException('请输入试卷id')
+    exam = Exam.query.get(id)
+    if not exam:
+        raise JsonOutputException('试卷不存在')
+    if not exam.state==EXAM_STATUS['预处理']:
+        raise JsonOutputException('试卷状态错误')
+    process_data = Preprocess.query.\
+        filter_by(exam_id=id, state=EXAM_STATUS['预处理']).\
+        order_by(Preprocess.created_at.desc()).\
+        first()
+    if not process_data:
+        raise JsonOutputException('无法处理')
+    if not process_data.operator_id == g.user.id:
+        raise JsonOutputException('该试卷已经被他人领取')
+    tips = request.json.get('tips', [])
+    if not tips:
+        raise JsonOutputException('请输入试卷切割信息')
+    for tip in tips:
+        quest_image = tip.get('formData', {}).get('quest_image', [])
+        answer_image = tip.get('formData', {}).get('answer_image', [])
+        for i in range(int(tip['formData']['start_no']), int(tip['formData']['end_no']) + 1):
+            quest = Question(exam_id=id, quest_no=i,
+                quest_image=quest_image,
+                answer_image=answer_image, state=QUEST_STATUS['未处理'],
+                insert_user_id=g.user.id)
+            db.session.add(quest)
+    db.session.commit()
+    process_data.state = EXAM_STATUS['预处理完成']
+    process_data.save()
+    exam.state = EXAM_STATUS['预处理完成']
+    exam.save()
+    return render_api({})
+
 
 #试卷预处理完成
 @api_blueprint.route('/paper/preprocess/finish',methods=['POST'])
