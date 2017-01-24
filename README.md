@@ -1,27 +1,36 @@
 部署
 ===========
 
-后端
-===========
-1. 安装python3及相关库
-    yum install python34
-    yum install python34-devel
-    curl https://bootstrap.pypa.io/get-pip.py | python3.4
-    pip install virtualenv
+### 后端
 
-2.安装项目依赖(在information项目目录下操作)
+1. 安装python3及相关库
+
+    `yum install python34`
+
+    `yum install python34-devel`
+
+    `curl https://bootstrap.pypa.io/get-pip.py | python3.4`
+
+    `pip install virtualenv`
+
+2. 安装项目依赖(在information项目目录下操作)
     virtualenv venv
     source ./venv/bin/active
     pip3 install -r requirement.txt  -i  https://pypi.douban.com/simple
 
-3.初始化数据
-    export BLOG_CONFIG=production
-    python3 ./manage.py db upgrade
-    python3 ./manage.py init_data
-    # 学校、地区数据
-    导入sql文件 ./data/*.sql
+3. 初始化数据
 
-4.配置文件
+    `export BLOG_CONFIG=production`
+
+    `python3 ./manage.py db upgrade`
+
+    `python3 ./manage.py init_data`
+    
+    > 学校、地区数据
+
+    > `mysql`中 使用`source`命令 导入sql文件 ./data/*.sql
+
+4. 配置文件
     ./config.py
 
     class ProductionConfig(Config):
@@ -45,8 +54,8 @@
 5.启动项目
     python3 ./run.py
 
-前端
-==========
+### 前端
+
 1. nodejs安装
     yum install gcc-c++ make
     curl --silent --location https://rpm.nodesource.com/setup_6.x | bash -
