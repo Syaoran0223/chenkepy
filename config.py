@@ -51,7 +51,7 @@ class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{username}:{password}@{mysql_addr}/{db_name}'.\
         format(username=USER_NAME, password=PASSWORD, mysql_addr=MYSQL_ADDR, db_name=DB_NAME)
 
-    SITE_URL = 'j.i3ke.com'
+    SITE_URL = 'http://j.i3ke.com'
 
 config = {
     'development' : DevelopmentConfig,

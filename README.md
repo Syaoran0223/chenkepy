@@ -15,6 +15,8 @@
   pip3 install -r requirement.txt  -i  https://pypi.douban.com/simple
 
 3.初始化数据
+  export BLOG_CONFIG=production
+  python3 ./manage.py db upgrade
   python3 ./manage.py init_data
   # 学校、地区数据
   导入sql文件 ./data/*.sql
