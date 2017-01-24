@@ -26,6 +26,11 @@ def test():
     tests = unittest.TestLoader().discover('tests')
     unittest.TextTestRunner(verbosity=2).run(tests)
 
+@manager.command
+def init_data():
+    from app.models import InviteCode
+    InviteCode.init_data()
+
 
 if __name__ == '__main__':
     manager.run()

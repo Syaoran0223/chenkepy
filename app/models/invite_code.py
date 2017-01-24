@@ -19,6 +19,13 @@ class InviteCode(db.Model, SessionMixin):
         res = InviteCode.query.filter_by(state=1, invite_code=invite_code).first()
         return res is not None
 
+    @staticmethod
+    def init_data():
+        for i in range(1000000, 1000099):
+            code = InviteCode(invite_code=str(i), state=1)
+            db.session.add(code)
+        db.session.commit()
+
     def __repr__(self):
         return '<Invite Code: %r>' % self.name
 
