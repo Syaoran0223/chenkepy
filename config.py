@@ -39,9 +39,9 @@ class TestingConfig(Config):
 class ProductionConfig(Config):
     #mysql数据库IP地址
     MYSQL_ADDR = "127.0.0.1"
-    DB_NAME = 'pdb'
-    USER_NAME = 'information'
-    PASSWORD = 'information@i3ke.com'
+    DB_NAME = 'info'
+    USER_NAME = 'info'
+    PASSWORD = 'info..pwd..adsfaf324rdsf'
 
     CACHE_TYPE ='simple'
     CACHE_REDIS_HOST = '127.0.0.1'
@@ -51,7 +51,7 @@ class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{username}:{password}@{mysql_addr}/{db_name}'.\
         format(username=USER_NAME, password=PASSWORD, mysql_addr=MYSQL_ADDR, db_name=DB_NAME)
 
-    SITE_URL = 'http://192.168.2.131:5000'
+    SITE_URL = 'j.i3ke.com'
 
 config = {
     'development' : DevelopmentConfig,
