@@ -68,9 +68,25 @@ def add_struct(id):
     if not process_data.operator_id == g.user.id:
         raise JsonOutputException('该试卷已经被他人领取')
     struct = request.json.get('struct', [])
+    attachments = request.json.get('attachments', [])
+    is_word = request.json.get('is_word', False)
     if not struct:
         raise JsonOutputException('请输入试卷结构')
     exam.struct = struct
+    # word文档直接生成题目
+    if is_word:
+        for tip in struct:
+            quest_image = attachments
+            for i in range(int(tip['start_no']), int(tip['end_no']) + 1):
+                quest = Question(exam_id=id, quest_no=i,
+                    quest_image=quest_image,
+                    state=QUEST_STATUS['未处理'],
+                    insert_user_id=g.user.id)
+                db.session.add(quest)
+        db.session.commit()
+        process_data.state = EXAM_STATUS['预处理完成']
+        process_data.save()
+        exam.state = EXAM_STATUS['预处理完成']
     exam.has_struct = True
     exam.save()
     return render_api({})

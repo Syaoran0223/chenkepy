@@ -277,3 +277,8 @@ def q_search():
         'totalPage': math.ceil(jsonResult['total']/jsonResult['size'])
     }
     return render_api(res)
+
+@api_blueprint.route('/word')
+def render_word():
+    from flask.helpers import send_file
+    return send_file('/Users/chenke/dev/python/information/app/static/uploads/20170208/1486552110.3344362016.docx', mimetype="application/msword")
