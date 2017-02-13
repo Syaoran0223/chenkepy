@@ -84,10 +84,14 @@ def answer_quest(id):
     fenxi = request.json.get('fenxi', '')
     dianpin = request.json.get('dianpin', '')
     kaodian = request.json.get('kaodian', '')
+    quest_content_html = request.json.get('quest_content_html')
+    quest_content = request.json.get('quest_content')
     question.jieda = jieda
     question.fenxi = fenxi
     question.dianpin = dianpin
     question.kaodian = kaodian
+    question.quest_content_html = quest_content_html
+    question.quest_content = quest_content
     state = QUEST_STATUS['完成解答']
     quest_type_id = request.json.get('quest_type_id')
     # 大小题
