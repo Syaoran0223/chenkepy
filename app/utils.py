@@ -39,6 +39,23 @@ def upload(file, thumb=False, allow_extensions=default_extensions):
         return res
     return {'status': False}
 
+def image_save(image):
+    sub_folder = datetime.today().strftime('%Y%m%d')
+    upload_folder = os.path.join(current_app.static_folder, 'uploads/{}'.format(sub_folder))
+    if not os.path.isdir(upload_folder):
+        os.mkdir(upload_folder)
+    filename = str(time.time()) + '.png'
+    file_static = '/static/uploads/{}/'.format(sub_folder) + filename
+    real_file = os.path.join(upload_folder, filename)
+    image.save(real_file)
+    return {
+        "code": 0,
+        "data": {
+            "url": file_static
+        }
+    }
+
+
 # def get_thumb(filename):
 #     path, ext = os.path.splitext(filename)
 #     thumb_file = '{}_thumb{}'.format(path, ext)

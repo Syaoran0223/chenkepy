@@ -1,8 +1,10 @@
-import json, math
+import json, math, os
+from flask import current_app
+from PIL import Image
 from app.exceptions import JsonOutputException, FormValidateError
 from app.decorators import api_login_required, permission_required
 from app.models import Attachment, Exam, User, Message
-from app.utils import upload, pagination
+from app.utils import upload, pagination, image_save
 from flask import request, g
 from .forms import SmsForm, PaperUploadForm
 from werkzeug.datastructures import MultiDict
@@ -95,6 +97,23 @@ def upload_attachment():
             'data': [attachment.url]
         }
     raise JsonOutputException('上传失败')
+
+@api_blueprint.route('/cropper', methods=['POST'])
+@api_login_required
+def cropper_image():
+    file_url = request.json.get('file_url')
+    box = request.json.get('box')
+    if not file_url:
+        raise JsonOutputException('请传入图片')
+    if not box or len(box) != 4:
+        raise JsonOutputException('切割参数错误')
+    app_path = current_app.config['APP_PATH']
+    file_path = '{}{}'.format(app_path, file_url)
+    if not os.path.isfile(file_path):
+        raise JsonOutputException('图片不存在')
+    origin_image = Image.open(file_path)
+    dest_image = origin_image.crop(box)
+    return image_save(dest_image)
 
 #上传试卷
 @api_blueprint.route('/paper/upload', methods=['POST'])
@@ -281,4 +300,4 @@ def q_search():
 @api_blueprint.route('/word')
 def render_word():
     from flask.helpers import send_file
-    return send_file('/Users/chenke/dev/python/information/app/static/uploads/20170208/1486552110.3344362016.docx', mimetype="application/msword")
+    return send_file('/Users/chenke/dev/python/information/app/static/uploads/20170208/1486552110.3344362016.docx', mimetype="application/msword", as_attachment=True)

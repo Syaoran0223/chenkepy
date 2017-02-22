@@ -7,6 +7,7 @@ class Config:
     #SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     #日志文件
     LOG_FILENAME = os.path.join(basedir, 'data/app.log')
+    APP_PATH = '{}/app'.format(basedir)
 
     PER_PAGE = 20
     @staticmethod
