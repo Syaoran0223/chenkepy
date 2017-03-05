@@ -108,7 +108,9 @@ def review_exam_update(id):
 @api_login_required
 @permission_required('CONFIRM_PERMISSION')
 def list_examreview_log():
-    query = Review.query.filter_by(reviewer_id=g.user.id)
+    query = Review.query.\
+        filter_by(reviewer_id=g.user.id).\
+        order_by(Review.created_at.desc())
     res = pagination(query)
     items = res.get('items', [])
     items = Exam.bind_auto(items, ['name', 'section', 'school_id', 'subject', 'grade', 'paper_types'])

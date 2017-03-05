@@ -179,7 +179,9 @@ def del_quest(id):
 @permission_required('DEAL_PERMISSION')
 def list_quest_review_log():
 
-    query = Preprocess.query.filter_by(operator_id=g.user.id)
+    query = Preprocess.query.\
+        filter_by(operator_id=g.user.id).\
+        order_by(Preprocess.created_at.desc())
     res = pagination(query)
     items = res.get('items', [])
     items = Exam.bind_auto(items, ['name', 'section', 'school_id', 'subject', 'grade', 'paper_types'])

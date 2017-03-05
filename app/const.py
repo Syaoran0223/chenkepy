@@ -66,12 +66,17 @@ SCHOOL_YEAR = {
 
 PAPER_TYPE = {
   'PAPER_UNIT': '单元考',
+  'PAPER_MONTH': '月考',
   'PAPER_MIDLE_TERM': '半期考',
   'PAPER_LAST': '期末考',
+  'PAPER_TEST': '小测',
+  'PAPER_LX': '练习',
+  'PAPER_HK': '会考',
   'PAPER_QULITY': '质检',
   'PAPER_MODEL': '模拟考',
   'PAPER_MIDLE': '中考',
-  'PAPER_HIGH': '高考'
+  'PAPER_HIGH': '高考',
+  'PAPER_ZZZS': '自主招生考试'
 }
 
 EXAM_STATUS = {
