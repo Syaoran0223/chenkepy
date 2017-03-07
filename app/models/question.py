@@ -46,6 +46,7 @@ class Question(db.Model, SessionMixin):
     state = db.Column(db.Integer)
     insert_user_id = db.Column(db.Integer)
     refer_quest_id = db.Column(db.Integer, default=0)
+    order = db.Column(db.Integer, nullable=False, default=0)
     
     def __repr__(self):
         return '<Question: %r>' % self.id
@@ -101,6 +102,7 @@ class Question(db.Model, SessionMixin):
     @staticmethod
     def get_quest_by_state(state):
         query = Question.query.filter_by(state=state).\
+            order_by(Question.order.desc()).\
             order_by(Question.created_at.desc())
         res = pagination(query)
         items = res.get('items',[])

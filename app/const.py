@@ -79,6 +79,21 @@ PAPER_TYPE = {
   'PAPER_ZZZS': '自主招生考试'
 }
 
+PAPER_TYPE_ORDER = {
+  'PAPER_UNIT': 1,
+  'PAPER_MONTH': 1,
+  'PAPER_MIDLE_TERM': 2,
+  'PAPER_LAST': 2,
+  'PAPER_TEST': 0,
+  'PAPER_LX': 0,
+  'PAPER_HK': 2,
+  'PAPER_QULITY': 3,
+  'PAPER_MODEL': 2,
+  'PAPER_MIDLE': 3,
+  'PAPER_HIGH': 3,
+  'PAPER_ZZZS': 1
+}
+
 EXAM_STATUS = {
     '已删除': -99,
     '审核超时': -2,

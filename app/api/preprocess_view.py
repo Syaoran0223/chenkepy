@@ -233,8 +233,10 @@ def exam_process():
         for i in range(int(tip['formData']['start_no']), int(tip['formData']['end_no']) + 1):
             quest = Question(exam_id=id, quest_no=i,
                 quest_image=quest_image,
-                answer_image=answer_image, state=QUEST_STATUS['未处理'],
-                insert_user_id=g.user.id)
+                answer_image=answer_image,
+                state=QUEST_STATUS['未处理'],
+                insert_user_id=g.user.id,
+                order=exam.order)
             db.session.add(quest)
     db.session.commit()
     process_data.state = EXAM_STATUS['预处理完成']

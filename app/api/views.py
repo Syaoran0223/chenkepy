@@ -8,7 +8,7 @@ from app.utils import upload, pagination, image_save
 from flask import request, g
 from .forms import SmsForm, PaperUploadForm
 from werkzeug.datastructures import MultiDict
-from app.const import EXAM_STATUS
+from app.const import EXAM_STATUS, PAPER_TYPE_ORDER
 from . import api_blueprint
 from app.models import Region, School, ExamLog
 from app.sms import SmsServer
@@ -130,7 +130,12 @@ def paper_upload():
                 province_id=form.province_id.data, city_id=form.city_id.data, area_id=form.area_id.data,\
                 school_id=form.school_id.data,
                 exam_date=form.exam_date.data,
-                year=form.year.data, grade=form.grade.data, state=0, attachments=attachments, upload_user=g.user.id)
+                year=form.year.data,
+                grade=form.grade.data,
+                state=0,
+                attachments=attachments,
+                upload_user=g.user.id,
+                order=PAPER_TYPE_ORDER[form.paper_types.data])
     result = exam.save()
     ExamLog.log(exam.id, g.user.id, EXAM_STATUS['未审核'], 'UPLOAD')
     if result.id is not None:

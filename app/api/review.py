@@ -15,7 +15,9 @@ import datetime
 @permission_required('CONFIRM_PERMISSION')
 def listexam():
     query = Exam.query.filter(Exam.state == EXAM_STATUS['未审核'],
-        Exam.upload_user!=g.user.id, Exam.school_id==g.user.school_id).order_by(Exam.created_at.desc())
+        Exam.upload_user!=g.user.id, Exam.school_id==g.user.school_id).\
+            order_by(Exam.order.desc()).\
+            order_by(Exam.created_at.desc())
     res = pagination(query)
     items = res.get('items', [])
     items = School.bind_auto(items, 'name')

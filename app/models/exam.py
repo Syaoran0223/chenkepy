@@ -30,6 +30,7 @@ class Exam(db.Model, SessionMixin):
     attachments = db.Column(db.JsonBlob(), default=[])
     exam_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
     review_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
+    order = db.Column(db.Integer, nullable=False, default=0)
 
     def get_dtl(self):
         result = super(Exam, self).to_dict()
@@ -50,7 +51,10 @@ class Exam(db.Model, SessionMixin):
 
     @staticmethod
     def list_exams(state=EXAM_STATUS['已采纳'] ):
-        res = pagination(Exam.query.filter(Exam.state == state).order_by(Exam.created_at.desc()))
+        res = pagination(Exam.query.filter(
+            Exam.state == state).\
+                order_by(Exam.order.desc()).\
+                order_by(Exam.created_at.desc()))
         items = res.get('items',[])
         items = School.bind_auto(items,'name')
         res['items'] = items
