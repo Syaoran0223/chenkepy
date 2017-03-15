@@ -15,7 +15,7 @@ import datetime
 @api_login_required
 @permission_required('ANSWER_PERMISSION')
 def answer_wait():
-    data = Question.get_quest_by_state(QUEST_STATUS['完成录题'])
+    data = Question.get_exam_by_state(QUEST_STATUS['完成录题'])
     return render_api(data)
 
 # 领取录题任务
@@ -54,11 +54,7 @@ def get_answer_task(id):
 @api_login_required
 @permission_required('ANSWER_PERMISSION')
 def answer_list():
-    query = QuestAnswer.query.\
-        filter_by(operator_id=g.user.id)
-    res = pagination(query, None, False)
-    items = [item.get_question_dtl() for item in res['items']]
-    res['items'] = Exam.deal_quest_items(items)
+    res = Exam.get_deal_list(QuestAnswer)
     return render_api(res)
 
 # 题目解答

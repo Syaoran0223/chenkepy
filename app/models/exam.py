@@ -1,4 +1,6 @@
+from flask import g
 from itertools import groupby
+from sqlalchemy import distinct
 from app import db
 from ._base import SessionMixin
 from app.utils import pagination
@@ -91,11 +93,36 @@ class Exam(db.Model, SessionMixin):
 
     @staticmethod
     def deal_quest_items(items):
-        res = [{'exam_id': eid, 'items': list(items), 'open': True} for eid, items in groupby(items, lambda x: x['exam_id'])]
+        items.sort(key=lambda x: x['exam_id'])
+        res = [{'exam_id': eid, 'items': list(items), 'open': False} for eid, items in groupby(items, lambda x: x['exam_id'])]
         for item in res:
             exam = Exam.query.get(item['exam_id'])
             item['exam'] = exam.get_dtl()
         return res
+
+    @staticmethod
+    def get_deal_list(deal_obj):
+        query = db.session.query(distinct(deal_obj.exam_id)).\
+            filter_by(operator_id=g.user.id).\
+            order_by(deal_obj.created_at.desc())
+        exam_ids = query.all()
+        exam_ids = [id[0] for id in exam_ids]
+        exam_query = Exam.query.filter(Exam.id.in_(exam_ids))
+        exams = pagination(exam_query)
+        items = []
+        for item in exams['items']:
+            questions = deal_obj.query.\
+                filter_by(operator_id=g.user.id).\
+                filter_by(exam_id=item['id']).\
+                order_by(deal_obj.created_at.desc()).\
+                all()
+            
+            questions = [q.get_question_dtl() for q in questions]
+            item['open'] = False
+            item['questions'] = questions
+            items.append(item)
+        exams['items'] = School.bind_auto(items, 'name')
+        return exams
 
     def __repr__(self):
         return '<Exam: %r>' % self.name

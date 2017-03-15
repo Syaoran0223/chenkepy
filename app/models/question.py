@@ -1,4 +1,7 @@
 import json
+from math import ceil
+from flask import request, current_app
+from sqlalchemy import distinct
 from app import db
 from app.const import EXAM_STATUS,QUEST_STATUS
 from app.utils import pagination
@@ -109,4 +112,43 @@ class Question(db.Model, SessionMixin):
         items = Exam.bind_auto(items,['name', 'year', 'school_id', 'section', 'subject', 'grade'])
         items = School.bind_auto(items, 'name', 'exam_school_id')
         res['items'] = items
+        return res
+
+    # 获取题目状态为state的试卷列表
+    @staticmethod
+    def get_exam_by_state(state):
+        page = int(request.args.get('pageIndex', 0))
+        pageSize = int(request.args.get('pageSize', 5))
+        query = db.session.query(distinct(Question.exam_id)).\
+            filter_by(state=state)
+        totalCount = query.count()
+        totalPage = ceil(totalCount / pageSize)
+        query = query.\
+            order_by(Question.order.desc()).\
+            order_by(Question.created_at.desc()).\
+            offset(page * pageSize).\
+            limit(pageSize)
+        exam_ids = query.all()
+        
+        exam_ids = [id[0] for id in exam_ids]
+        exams = Exam.query.filter(Exam.id.in_(exam_ids)).all()
+        items = []
+        for item in exams:
+            questions = Question.query.filter_by(state=state).\
+                filter_by(exam_id=item.id).\
+                order_by(Question.order.desc()).\
+                order_by(Question.created_at.desc())
+            questions = [q.to_dict() for q in questions]
+            item = item.get_dtl()
+            item['open'] = False
+            item['questions'] = questions
+            items.append(item)
+
+        res = {
+            'items': items,
+            'pageIndex': page,
+            'pageSize': pageSize,
+            'totalCount': totalCount,
+            'totalPage': totalPage
+        }
         return res

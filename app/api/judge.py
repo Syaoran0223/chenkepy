@@ -15,7 +15,7 @@ import datetime
 @api_login_required
 @permission_required('JUDGE_PERMISSION')
 def judge_wait():
-    data = Question.get_quest_by_state(QUEST_STATUS['待裁定'])
+    data = Question.get_exam_by_state(QUEST_STATUS['待裁定'])
     return render_api(data)
 
 # 领取裁定任务
@@ -54,11 +54,7 @@ def get_judge_task(id):
 @api_login_required
 @permission_required('JUDGE_PERMISSION')
 def judge_list():
-    query = QuestJudge.query.\
-        filter_by(operator_id=g.user.id)
-    res = pagination(query, None, False)
-    items = [item.get_question_dtl() for item in res['items']]
-    res['items'] = Exam.deal_quest_items(items)
+    res = Exam.get_deal_list(QuestJudge)
     return render_api(res)
 
 # 裁定结果

@@ -1,4 +1,5 @@
 import json, math
+from sqlalchemy import distinct
 from app import db
 from app.exceptions import JsonOutputException
 from app.decorators import api_login_required, permission_required
@@ -6,7 +7,7 @@ from app.utils import upload, pagination
 from flask import request, g
 from app.const import QUEST_STATUS
 from . import api_blueprint
-from app.models import Question, QuestTyping, QOption, SubQuestion, Exam
+from app.models import Question, QuestTyping, QOption, SubQuestion, Exam, School
 from app.utils import render_api
 import datetime
 
@@ -15,7 +16,7 @@ import datetime
 @api_login_required
 @permission_required('INPUT_PERMISSION')
 def input_wait():
-    data = Question.get_quest_by_state(QUEST_STATUS['未处理'])
+    data = Question.get_exam_by_state(QUEST_STATUS['未处理'])
     return render_api(data)
 
 # 领取录题任务
@@ -178,10 +179,5 @@ def input_quest(id):
 @api_login_required
 @permission_required('INPUT_PERMISSION')
 def input_list():
-    query = QuestTyping.query.\
-        filter_by(operator_id=g.user.id).\
-        order_by(QuestTyping.created_at.desc())
-    res = pagination(query, None, False)
-    items = [item.get_question_dtl() for item in res['items']]
-    res['items'] = Exam.deal_quest_items(items)
+    res = Exam.get_deal_list(QuestTyping)
     return render_api(res)

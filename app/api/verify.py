@@ -15,7 +15,7 @@ import datetime
 @api_login_required
 @permission_required('VERIFY_PERMISSION')
 def verify_wait():
-    data = Question.get_quest_by_state(QUEST_STATUS['待校对'])
+    data = Question.get_exam_by_state(QUEST_STATUS['待校对'])
     return render_api(data)
 
 #领取校对任务
@@ -54,12 +54,9 @@ def get_verify_task(id):
 @api_login_required
 @permission_required('VERIFY_PERMISSION')
 def verify_list():
-    query = QuestVerify.query.\
-        filter_by(operator_id=g.user.id)
-    res = pagination(query, None, False)
-    items = [item.get_question_dtl() for item in res['items']]
-    res['items'] = Exam.deal_quest_items(items)
+    res = Exam.get_deal_list(QuestVerify)
     return render_api(res)
+    
 
 # 校对正确
 @api_blueprint.route('/quest/verify/right/<int:id>', methods=['PUT'])
