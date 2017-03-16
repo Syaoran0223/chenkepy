@@ -224,6 +224,11 @@ def exam_process():
         raise JsonOutputException('无法处理')
     if not process_data.operator_id == g.user.id:
         raise JsonOutputException('该试卷已经被他人领取')
+    struct = request.json.get('struct', [])
+    if not struct:
+        raise JsonOutputException('请录入试卷结构')
+    exam.struct = struct
+    exam.has_struct = True
     tips = request.json.get('tips', [])
     if not tips:
         raise JsonOutputException('请输入试卷切割信息')
