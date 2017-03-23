@@ -11,6 +11,11 @@ from app.models.schools import School
 class User(db.Model, SessionMixin, UserMixin):
     __tablename__ = 'user'
     protected_field = ['password','password_hash', 'last_login_ip', 'code']
+    search_fields = ['name_like',
+        'phone_like', 'state', 'created_at_begin',
+        'created_at_end', 'school_id', 'grade_id',
+        'city_id', 'province_id', 'area_id',
+        'permissions_like']
 
     def __init__(self, *args, **kwargs):
         User.register()

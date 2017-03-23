@@ -8,7 +8,7 @@ from app.search import Search
 
 from . import admin
 
-@admin.route('/admin', methods=['POST'])
+@admin.route('/admins', methods=['POST'])
 @admin_login_required
 def create():
     name = request.json.get('name')
@@ -25,20 +25,20 @@ def create():
     admin.save()
     return admin.to_dict()
 
-@admin.route('/admin', methods=['GET'])
+@admin.route('/admins', methods=['GET'])
 @admin_login_required
 def get_admins():
     search = Search()
     res = search.load(Admin).paginate()
     return res
 
-@admin.route('/admin/<int:id>')
+@admin.route('/admins/<int:id>')
 @admin_login_required
 def get_admin(id):
     admin = Admin.query.get_or_404(id)
     return admin.to_dict()
 
-@admin.route('/admin/<int:id>', methods=['DELETE'])
+@admin.route('/admins/<int:id>', methods=['DELETE'])
 @admin_login_required
 def delete_admin(id):
     admin = Admin.query.get_or_404(id)
@@ -46,3 +46,19 @@ def delete_admin(id):
         raise AdminException('不允许删除自己')
     admin.delete()
     return {}
+
+@admin.route('/admins/<int:id>', methods=['PUT'])
+@admin_login_required
+def update_admin(id):
+    admin = Admin.query.get_or_404(id)
+    name = request.json.get('name')
+    email = request.json.get('email')
+    state = request.json.get('state')
+    if admin:
+        admin.name = name
+    if email:
+        admin.email = email
+    if state:
+        admin.state = state
+    admin.save()
+    return admin.to_dict()
