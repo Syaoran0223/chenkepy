@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import request
+from flask import request, g, redirect, url_for
 from flask.ext.login import current_user
 
 
@@ -11,6 +11,22 @@ def api_login_required(func):
                 'code': '403',
                 'msg': '请登录后再访问'
             }
+        return func(*args, **kwargs)
+    return decorated_view
+
+def admin_login_required(func):
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        if not g.admin.is_authenticated():
+            return {'msg': '请登录后再访问'}, 403
+        return func(*args, **kwargs)
+    return decorated_view
+
+def admin_render_login_required(func):
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        if not g.admin.is_authenticated():
+            return redirect(url_for('admin.login'))
         return func(*args, **kwargs)
     return decorated_view
 

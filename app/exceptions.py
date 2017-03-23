@@ -9,3 +9,6 @@ class ValidationError(ValueError):
 
 class FormValidateError(ValueError):
     pass
+
+class AdminException(ValueError):
+    pass

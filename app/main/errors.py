@@ -1,5 +1,5 @@
 from flask import render_template, request, jsonify
-from app.exceptions import JsonOutputException, FormValidateError
+from app.exceptions import JsonOutputException, FormValidateError, AdminException
 from . import main
 
 @main.app_errorhandler(404)
@@ -37,4 +37,10 @@ def form_validate(e):
             msg += key
     response = jsonify({'code': '400', 'msg': msg})
     response.status_code = 200
+    return response
+
+@main.app_errorhandler(AdminException)
+def admin_error(e):
+    response = jsonify({'msg': str(e)})
+    response.status_code = 400
     return response
