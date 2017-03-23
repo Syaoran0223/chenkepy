@@ -12,6 +12,7 @@ API 规范
 | /admin/admin/1 | DELETE | 删除1号人员 | 202 |
 
 *实例*
+
     {
       "created_at": "2017-03-20 22:23:27",
       "email": null,
