@@ -17,6 +17,14 @@ API 规范
     }
 
 
+### 省市县接口
+
+| url | method | description |
+| ---- | ----- | ----- |
+| /api/province | GET | 获取省份 |
+| /api/city?pro_id=20 | GET | 获取城市 |
+| /api/area?city_id=2 | GET | 获取区 |
+
 
 ### 后台人员管理
 
