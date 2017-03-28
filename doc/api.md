@@ -1,6 +1,23 @@
 API 规范
 ======
 
+### 登录登出
+
+| url | method | description |
+| ---- | ----- | ----- |
+| /admin/login | GET | 登录页 |
+| /admin/login | POST | 登录接口 |
+| /admin/logout | GET | 登出 |
+
+*登录接口*
+
+    {
+        "password": "123456",
+        "phone": "18558707091"
+    }
+
+
+
 ### 后台人员管理
 
 | url | method | description |

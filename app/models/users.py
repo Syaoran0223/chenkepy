@@ -73,6 +73,17 @@ class User(db.Model, SessionMixin, UserMixin):
         res = School.bind_auto(res, 'name', 'school_id', 'id', 'school')
         return res
 
+    def get_admin_summary(self, begin_time, end_time):
+        sql = '''select
+                    sum(case when state=0 then 1 else 0 end) as ready,
+                    sum(case when state=1 then 1 else 0 end) as confirming,
+                    sum(case when state=5 then 1 else 0 end) as pass,
+                    sum(case when state>=2 and state <=4 then 1 else 0 end) as useage
+                from `exam`
+                where upload_user=2
+                and created_at >= %s and created_at <= %s;'''
+
+
     
 
     def __repr__(self):

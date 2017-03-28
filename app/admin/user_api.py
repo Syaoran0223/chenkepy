@@ -35,3 +35,32 @@ def update_user(id):
     user.permissions = permissions
     user.save()
     return user.to_dict()
+
+    
+@admin.route('/users/statistic')
+@admin_login_required
+def user_statistic():
+    user_id = request.args.get('user_id')
+    begin_time = request.args.get('begin_time')
+    end_time = request.args.get('end_time')
+    time_type = request.get('time_type')
+    statistic_type = request.args.get('statistic_type')
+    status = request.args.get('status')
+    user = User.query.get_or_40(user_id)
+
+    return {
+        'sumary': [{
+            'title': '录题',
+            'done': 14,
+            'doing': 2
+        },
+        {
+            'title': '裁定',
+            'done': 10,
+            'doing': 2
+        }],
+        'statistic': [
+            {'time': '2017-03-12', 'value': 12},
+            {'time': '2017-03-13', 'value': 10},
+        ]
+    }

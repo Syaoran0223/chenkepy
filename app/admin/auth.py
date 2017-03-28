@@ -28,7 +28,7 @@ def login():
 @admin.route('/')
 @admin_render_login_required
 def index():
-    return 'hello world'
+    return render_template('admin_index.html')
 
 @admin.route("/logout")
 @admin_render_login_required
