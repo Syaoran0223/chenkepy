@@ -43,24 +43,13 @@ def user_statistic():
     user_id = request.args.get('user_id')
     begin_time = request.args.get('begin_time')
     end_time = request.args.get('end_time')
-    time_type = request.get('time_type')
+    time_type = request.args.get('time_type')
     statistic_type = request.args.get('statistic_type')
     status = request.args.get('status')
-    user = User.query.get_or_40(user_id)
-
+    user = User.query.get_or_404(user_id)
+    sumary = user.get_admin_summary(begin_time, end_time)
+    statistic = user.get_statistic(begin_time, end_time, time_type, statistic_type, status)
     return {
-        'sumary': [{
-            'title': '录题',
-            'done': 14,
-            'doing': 2
-        },
-        {
-            'title': '裁定',
-            'done': 10,
-            'doing': 2
-        }],
-        'statistic': [
-            {'time': '2017-03-12', 'value': 12},
-            {'time': '2017-03-13', 'value': 10},
-        ]
+        'sumary':sumary,
+        'statistic': statistic
     }
