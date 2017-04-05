@@ -1,4 +1,4 @@
-import json
+import json, math
 from math import ceil
 from flask import request, current_app
 from sqlalchemy import distinct
@@ -51,13 +51,60 @@ class Question(db.Model, SessionMixin):
     refer_quest_id = db.Column(db.Integer, default=0)
     order = db.Column(db.Integer, nullable=False, default=0)
     
+    search_fields = ['exam_id','state',
+        'created_at_begin', 'subject',
+        'created_at_end', 'school_id', 'grade_id',
+        'city_id', 'province_id', 'area_id']
+
+    @staticmethod
+    def search(args):
+        query = db.session.query(Question, Exam).\
+            outerjoin(Exam, Question.exam_id==Exam.id)
+        if args.get('exam_id'):
+            query = query.filter(Question.exam_id==args.get('exam_id'))
+        if args.get('state') is not None:
+            query = query.filter(Question.state==args.get('state'))
+        if args.get('created_at_begin'):
+            query = query.filter(Question.create_at>=args.get('created_at_begin'))
+        if args.get('created_at_end'):
+            query = query.filter(Question.created_at<=args.get('created_at_end'))
+        if args.get('subject'):
+            query = query.filter(Exam.subject==args.get('subject'))
+        if args.get('school_id'):
+            query = query.filter(Exam.school_id==args.get('school_id'))
+        if args.get('grade_id'):
+            query = query.filter(Exam.grade_id==args.get('grade_id'))
+        if args.get('city_id'):
+            query = query.filter(Exam.city_id==args.get('city_id'))
+        if args.get('province_id'):
+            query = query.filter(Exam.province_id==args.get('province_id'))
+        if args.get('area_id'):
+            query = query.filter(Exam.area_id==args.get('area_id'))
+        page = int(args.get('pageIndex', 0))
+        pageSize = int(args.get('pageSize', current_app.config['PER_PAGE']))
+        total = query.count()
+        query = query.limit(pageSize).offset(pageSize * page)
+        res = query.all()
+        data = []
+        for (question, exam) in res:
+            q = question.to_dict()
+            q['exam_dict'] = exam.to_dict()
+            data.append(q)
+        return {
+            'items': data,
+            'pageIndex': page,
+            'pageSize': pageSize,
+            'totalCount': total,
+            'totalPage': math.ceil(total/pageSize)
+        }
+        
+    
     def __repr__(self):
         return '<Question: %r>' % self.id
 
     def get_dtl(self):
         exam = Exam.query.get(self.exam_id)
         exam_dict = exam.to_dict() if exam else {}
-        exam_dict = School.bind_auto(exam_dict, 'name')
         res = self.to_dict()
         res['exam'] = exam_dict
         return res
@@ -65,7 +112,6 @@ class Question(db.Model, SessionMixin):
     def get_answer_dtl(self):
         exam = Exam.query.get(self.exam_id)
         exam_dict = exam.to_dict() if exam else {}
-        exam_dict = School.bind_auto(exam_dict, 'name')
         res = self.to_dict()
         res['exam'] = exam_dict
         return res
@@ -73,7 +119,6 @@ class Question(db.Model, SessionMixin):
     def get_verify_dtl(self):
         exam = Exam.query.get(self.exam_id)
         exam_dict = exam.to_dict() if exam else {}
-        exam_dict = School.bind_auto(exam_dict, 'name')
         res = self.to_dict()
         res['exam'] = exam_dict
         # 大小题

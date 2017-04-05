@@ -34,6 +34,12 @@ class Exam(db.Model, SessionMixin):
     review_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
     order = db.Column(db.Integer, nullable=False, default=0)
 
+    search_fields = ['name_like','state',
+        'created_at_begin', 'subject', 'paper_types',
+        'created_at_end', 'school_id', 'grade_id',
+        'city_id', 'province_id', 'area_id', 'year',
+        'grade']
+
     def get_dtl(self):
         result = super(Exam, self).to_dict()
         result = Region.bind_auto(result, 'name', 'city_id', 'id', 'city')
@@ -42,13 +48,13 @@ class Exam(db.Model, SessionMixin):
         result = School.bind_auto(result, 'name', 'school_id', 'id', 'school')
         return result
 
+    def to_dict(self):
+        return self.get_dtl()
+
     @staticmethod
     def get_exams(upload_user):
         #查询上传用户试卷记录
         res = pagination(Exam.query.filter(Exam.upload_user == upload_user, Exam.state >= EXAM_STATUS['审核不通过']).order_by(Exam.created_at.desc(), Exam.state))
-        items = res.get('items', [])
-        items = School.bind_auto(items, 'name')
-        res['items'] = items
         return res
 
     @staticmethod
@@ -57,9 +63,6 @@ class Exam(db.Model, SessionMixin):
             Exam.state == state).\
                 order_by(Exam.order.desc()).\
                 order_by(Exam.created_at.desc()))
-        items = res.get('items',[])
-        items = School.bind_auto(items,'name')
-        res['items'] = items
         return res
 
     @staticmethod
