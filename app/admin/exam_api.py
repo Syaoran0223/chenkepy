@@ -14,3 +14,15 @@ def get_exams():
     search = Search()
     res = search.load(Exam).paginate()
     return res
+
+@admin.route('/exams/statistic', methods=['GET'])
+@admin_login_required
+def exam_statistic():
+    sumary = Exam.get_sumary(request.args)
+    time_line = Exam.get_timeline(request.args)
+    statistic = Exam.get_statistic(request.args)
+    return {
+        'sumary': sumary,
+        'time_line': time_line,
+        'statistic': statistic
+    }

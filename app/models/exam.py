@@ -1,6 +1,6 @@
 from flask import g
 from itertools import groupby
-from sqlalchemy import distinct
+from sqlalchemy import distinct, func
 from app import db
 from ._base import SessionMixin
 from app.utils import pagination
@@ -36,7 +36,7 @@ class Exam(db.Model, SessionMixin):
 
     search_fields = ['name_like','state',
         'created_at_begin', 'subject', 'paper_types',
-        'created_at_end', 'school_id', 'grade_id',
+        'created_at_end', 'school_id',
         'city_id', 'province_id', 'area_id', 'year',
         'grade']
 
@@ -126,6 +126,72 @@ class Exam(db.Model, SessionMixin):
             items.append(item)
         exams['items'] = School.bind_auto(items, 'name')
         return exams
+
+    @staticmethod
+    def get_query(args, query):
+        query = query.filter(Exam.state!=-99)
+        if args.get('begin_time'):
+            query = query.filter(Exam.created_at>=args.get('begin_time'))
+        if args.get('end_time'):
+            query = query.filter(Exam.created_at<=args.get('end_time'))
+        if args.get('province_id'):
+            query = query.filter_by(province_id=args.get('province_id'))
+        if args.get('city_id'):
+            query = query.filter_by(city_id=args.get('city_id'))
+        if args.get('area_id'):
+            query = query.filter_by(area_id=args.get('area_id'))
+        if args.get('school_id'):
+            query = query.filter_by(school_id=args.get('school_id'))
+        if args.get('grade'):
+            query = query.filter_by(grade=args.get('grade'))
+        return query
+
+    @staticmethod
+    def get_timeline(args):
+        query = db.session.query(func.date(Exam.created_at), func.count(Exam.id))
+        query = Exam.get_query(args, query)
+        res = query.group_by(func.date(Exam.created_at)).all()
+        data = {}
+        for (t, count) in res:
+            data[t.strftime('%Y-%m-%d')] = count
+        return data
+
+    @staticmethod
+    def get_sumary(args):
+        query = Exam.query.filter(Exam.state!=-99)
+        query = Exam.get_query(args, query)
+        total = query.count()
+        ready = query.filter_by(state=0).count()
+        reject = query.filter_by(state=-1).count()
+        confirming = query.filter_by(state=1).count()
+        confirm_pass = query.filter_by(state=5).count()
+        usage = query.filter(Exam.state>=2).filter(Exam.state<=4).count()
+
+        return {
+            'total': total,
+            'ready': ready,
+            'reject': reject,
+            'confirming': confirming,
+            'confirm_pass': confirm_pass,
+            'usage': usage
+        }
+        
+    @staticmethod
+    def get_statistic(args):
+        statistic_type = args.get('statistic_type', 'paper_types')
+        return Exam.type_statistic(args, statistic_type)
+        
+
+    @staticmethod
+    def type_statistic(args, types):
+        query = db.session.query(getattr(Exam, types), func.count(Exam.id))
+        query = Exam.get_query(args, query)
+        res = query.group_by(getattr(Exam, types)).all()
+        data = {}
+        for (key, count) in res:
+            data[key] = count
+        return data
+
 
     def __repr__(self):
         return '<Exam: %r>' % self.name

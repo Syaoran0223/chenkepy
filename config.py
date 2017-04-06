@@ -17,7 +17,7 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     #mysql数据库IP地址
-    MYSQL_ADDR = '115.28.18.59'
+    MYSQL_ADDR = '139.162.109.187'
     MYQSL_PORT = 3306
     DB_NAME = 'pdb'
     USER_NAME = 'chenke91'
