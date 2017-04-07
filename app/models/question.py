@@ -1,7 +1,7 @@
 import json, math
 from math import ceil
 from flask import request, current_app
-from sqlalchemy import distinct
+from sqlalchemy import distinct, func
 from app import db
 from app.const import EXAM_STATUS,QUEST_STATUS
 from app.utils import pagination
@@ -53,7 +53,7 @@ class Question(db.Model, SessionMixin):
     
     search_fields = ['exam_id','state',
         'created_at_begin', 'subject',
-        'created_at_end', 'school_id', 'grade_id',
+        'created_at_end', 'school_id',
         'city_id', 'province_id', 'area_id']
 
     @staticmethod
@@ -197,3 +197,92 @@ class Question(db.Model, SessionMixin):
             'totalPage': totalPage
         }
         return res
+
+    @staticmethod
+    def get_sumary(args):
+        query = Question.query.join(Exam, Question.exam_id==Exam.id)
+        query = Exam.get_query(args, query)
+        total = query.count()
+        ready = query.filter(Question.state==0).count()
+        typing = query.filter(Question.state==1).count()
+        no_pass = query.filter(Question.state==2).count()
+        ready_answer = query.filter(Question.state==3).count()
+        answering = query.filter(Question.state==4).count()
+        ready_check = query.filter(Question.state==5).count()
+        checking = query.filter(Question.state==6).count()
+        ready_judge = query.filter(Question.state==7).count()
+        judging = query.filter(Question.state==8).count()
+        ready_verify = query.filter(Question.state==9).count()
+        verifying = query.filter(Question.state==10).count()
+        finished = query.filter(Question.state==99).count()
+
+        return {
+            'total': total,
+            'ready': ready,
+            'typing': typing,
+            'no_pass': no_pass,
+            'ready_answer': ready_answer,
+            'answering': answering,
+            'ready_check': ready_check,
+            'checking': checking,
+            'ready_judge': ready_judge,
+            'judging': judging,
+            'ready_verify': ready_verify,
+            'verifying': verifying,
+            'finished': finished
+        }
+
+    @staticmethod
+    def get_timeline(args):
+        query = db.session.query(func.date(Question.created_at), func.count(Question.id)).\
+            join(Exam, Question.exam_id==Exam.id)
+        query = Question.get_query(args, query)
+        res = query.group_by(func.date(Question.created_at)).all()
+        data = {}
+        for (t, count) in res:
+            data[t.strftime('%Y-%m-%d')] = count
+        return data
+
+    @staticmethod
+    def get_statistic(args):
+        statistic_type = args.get('statistic_type', 'quest_type_id')
+        if statistic_type in ('quest_type_id', 'state'):
+            return Question.type_statistic(args, statistic_type, Question)
+        else:
+            return Question.type_statistic(args, statistic_type, Exam)
+        
+
+    @staticmethod
+    def type_statistic(args, types, Obj):
+        query = db.session.query(getattr(Obj, types), func.count(Question.id))
+        if Obj is Question:
+            query = query.join(Exam, Question.exam_id==Exam.id)
+        else:
+            query = query.join(Question, Question.exam_id==Exam.id)
+        query = Question.get_query(args, query)
+        res = query.group_by(getattr(Obj, types)).all()
+        data = {}
+        for (key, count) in res:
+            if key is None:
+                key = 'unknown'
+            data[key] = count
+        return data
+    
+    @staticmethod
+    def get_query(args, query):
+        query = query.filter(Question.state!=-99)
+        if args.get('begin_time'):
+            query = query.filter(Question.created_at>=args.get('begin_time'))
+        if args.get('end_time'):
+            query = query.filter(Question.created_at<=args.get('end_time'))
+        if args.get('province_id'):
+            query = query.filter(Exam.province_id==args.get('province_id'))
+        if args.get('city_id'):
+            query = query.filter(Exam.city_id==args.get('city_id'))
+        if args.get('area_id'):
+            query = query.filter(Exam.area_id==args.get('area_id'))
+        if args.get('school_id'):
+            query = query.filter(Exam.school_id==args.get('school_id'))
+        if args.get('grade'):
+            query = query.filter(Exam.grade==args.get('grade'))
+        return query
