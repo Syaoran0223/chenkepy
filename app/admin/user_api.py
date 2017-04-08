@@ -44,7 +44,7 @@ def user_statistic():
     begin_time = request.args.get('begin_time')
     end_time = request.args.get('end_time')
     time_type = request.args.get('time_type')
-    statistic_type = request.args.get('statistic_type')
+    statistic_type = request.args.get('statistic_type', 'UPLOAD_PERMISSION')
     status = request.args.get('status')
     user = User.query.get_or_404(user_id)
     sumary = user.get_admin_summary(begin_time, end_time)

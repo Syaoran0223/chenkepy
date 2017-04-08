@@ -101,3 +101,107 @@ API 规范
         "updated_at": "2016-12-26 21:34:56",
         "user_type": null
     }
+
+### 个人工作统计
+
+| url | method | description |
+| ---- | ----- | ----- |
+| /admin/users/statistic | GET | 获取个人工作统计 |
+
+`/admin/users/statistic`
+
+*参数*
+
+    user_id
+    begin_time
+    end_time
+    time_type: `HOUR` `MONTH` `DATE`
+    statistic_type: 
+        `UPLOAD_PERMISSION` 上传
+            state:
+                `ready` 待审核
+                `confirming` 正在审核
+                `pass`  审核通过
+                `useage`    采纳
+        `CONFIRM_PERMISSION` 审核
+            state:
+                `reject`    审核不通过
+                `confirming` 正在审核
+                `pass` 审核通过
+                `usage` 采纳
+        `DEAL_PERMISSION` 预处理
+            state:
+                `dealing` 正在处理
+                `complete` 处理结束
+        `INPUT_PERMISSION`  录题
+            state:
+                `complete` 完成录题
+                `complete_answer` 完成解答
+                `finish` 结束录题
+                `typing` 正在录题
+        `ANSWER_PERMISSION` 解答
+            state:
+                `answering` 正在解答
+                `complete_answer` 完成解答
+        `CHECK_PERMISSION` 检查
+            state:
+                `checking` 正在检查
+                `complete` 完成检查
+        `JUDGE_PERMISSION` 裁定
+            state:
+                `judging` 正在裁定
+                `complete` 完成裁定
+        `VERIFY_PERMISSION` 校对
+            state:
+                `verifying` 正在校对
+                `completes` 完成校对
+                
+### 试卷管理
+
+| url | method | description |
+| ---- | ----- | ----- |
+| /admin/exams | GET | 获取试卷列表 |
+| /admin/exams/statistic | GET | 获取试卷列表 |
+
+
+`/admin/exams/statistic`
+
+*参数*
+
+    begin_time
+    end_time
+    province_id
+    city_id
+    area_id
+    school_id
+    grade
+    statistic_type  统计类型
+        `paper_types` 类型统计
+        `state` 状态统计
+        `subject` 学科统计
+        `grade` 年级统计
+
+### 题目管理
+
+| url | method | description |
+| ---- | ----- | ----- |
+| /admin/questions | GET | 获取试卷列表 |
+| /admin/questions/statistic | GET | 获取试卷列表 |
+
+
+`/admin/questions/statistic`
+
+*参数*
+
+    begin_time
+    end_time
+    province_id
+    city_id
+    area_id
+    school_id
+    grade
+    statistic_type  统计类型
+        `quest_type_id` 题型统计
+        `state` 状态统计
+        `subject` 学科统计
+        `grade` 年级统计

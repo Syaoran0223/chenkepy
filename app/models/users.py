@@ -321,6 +321,174 @@ class User(db.Model, SessionMixin, UserMixin):
         res = [{'count': d[0], 'time': d[1].strftime('%Y-%m-%d') if isinstance(d[1], date) else d[1]} for d in res]
         return res
     
+    def get_confirm_statistic(self, begin_time, end_time, time_type, status):
+        if time_type == 'HOUR':
+            time = 'HOUR(created_at)'
+        elif time_type == 'MONTH':
+            time = 'MONTH(created_at)'
+        else:
+            time = 'date(created_at)'
+        sql = '''select count(*) as count, {} as time from review where reviewer_id={} '''.format(time, self.id)
+        if status == 'reject':
+            sql = sql + ' and review_state=-1'
+        elif status == 'confirming':
+            sql = sql + ' and review_state=1'
+        elif status == 'pass':
+            sql = sql + ' and review_state=5'
+        elif status == 'usage':
+            sql = sql + ' and review_state=2'
+        if begin_time:
+            sql = sql + ' and created_at >= "{}"'.format(begin_time)
+        if end_time:
+            sql = sql + ' and created_at <= "{}"'.format(end_time)
+        sql = sql + ' group by {}'.format(time)
+        sql = text(sql)
+        res = db.engine.execute(sql)
+        res = res.fetchall()
+        res = [{'count': d[0], 'time': d[1].strftime('%Y-%m-%d') if isinstance(d[1], date) else d[1]} for d in res]
+        return res
+
+    def get_deal_statistic(self, begin_time, end_time, time_type, status):
+        if time_type == 'HOUR':
+            time = 'HOUR(created_at)'
+        elif time_type == 'MONTH':
+            time = 'MONTH(created_at)'
+        else:
+            time = 'date(created_at)'
+        sql = '''select count(*) as count, {} as time from pre_process where operator_id={} '''.format(time, self.id)
+        if status == 'dealing':
+            sql = sql + ' and state=3'
+        elif status == 'complete':
+            sql = sql + ' and state=4'
+        if begin_time:
+            sql = sql + ' and created_at >= "{}"'.format(begin_time)
+        if end_time:
+            sql = sql + ' and created_at <= "{}"'.format(end_time)
+        sql = sql + ' group by {}'.format(time)
+        sql = text(sql)
+        res = db.engine.execute(sql)
+        res = res.fetchall()
+        res = [{'count': d[0], 'time': d[1].strftime('%Y-%m-%d') if isinstance(d[1], date) else d[1]} for d in res]
+        return res
+
+    def get_input_statistic(self, begin_time, end_time, time_type, status):
+        if time_type == 'HOUR':
+            time = 'HOUR(created_at)'
+        elif time_type == 'MONTH':
+            time = 'MONTH(created_at)'
+        else:
+            time = 'date(created_at)'
+        sql = '''select count(*) as count, {} as time from quest_typing where operator_id={} '''.format(time, self.id)
+        if status == 'complete':
+            sql = sql + ' and state=3'
+        elif status == 'complete_answer':
+            sql = sql + ' and state=4'
+        elif status == 'finish':
+            sql = sql + ' and state=4'
+        elif status == 'typing':
+            sql = sql + ' and state=4'
+        if begin_time:
+            sql = sql + ' and created_at >= "{}"'.format(begin_time)
+        if end_time:
+            sql = sql + ' and created_at <= "{}"'.format(end_time)
+        sql = sql + ' group by {}'.format(time)
+        sql = text(sql)
+        res = db.engine.execute(sql)
+        res = res.fetchall()
+        res = [{'count': d[0], 'time': d[1].strftime('%Y-%m-%d') if isinstance(d[1], date) else d[1]} for d in res]
+        return res
+
+    def get_anwer_statistic(self, begin_time, end_time, time_type, status):
+        if time_type == 'HOUR':
+            time = 'HOUR(created_at)'
+        elif time_type == 'MONTH':
+            time = 'MONTH(created_at)'
+        else:
+            time = 'date(created_at)'
+        sql = '''select count(*) as count, {} as time from quest_answer where operator_id={} '''.format(time, self.id)
+        if status == 'answering':
+            sql = sql + ' and state=4'
+        elif status == 'complete_answer':
+            sql = sql + ' and state=5'
+        if begin_time:
+            sql = sql + ' and created_at >= "{}"'.format(begin_time)
+        if end_time:
+            sql = sql + ' and created_at <= "{}"'.format(end_time)
+        sql = sql + ' group by {}'.format(time)
+        sql = text(sql)
+        res = db.engine.execute(sql)
+        res = res.fetchall()
+        res = [{'count': d[0], 'time': d[1].strftime('%Y-%m-%d') if isinstance(d[1], date) else d[1]} for d in res]
+        return res
+
+    def get_check_statistic(self, begin_time, end_time, time_type, status):
+        if time_type == 'HOUR':
+            time = 'HOUR(created_at)'
+        elif time_type == 'MONTH':
+            time = 'MONTH(created_at)'
+        else:
+            time = 'date(created_at)'
+        sql = '''select count(*) as count, {} as time from quest_check where operator_id={} '''.format(time, self.id)
+        if status == 'checking':
+            sql = sql + ' and state=6'
+        elif status == 'complete':
+            sql = sql + ' and state=7'
+        if begin_time:
+            sql = sql + ' and created_at >= "{}"'.format(begin_time)
+        if end_time:
+            sql = sql + ' and created_at <= "{}"'.format(end_time)
+        sql = sql + ' group by {}'.format(time)
+        sql = text(sql)
+        res = db.engine.execute(sql)
+        res = res.fetchall()
+        res = [{'count': d[0], 'time': d[1].strftime('%Y-%m-%d') if isinstance(d[1], date) else d[1]} for d in res]
+        return res
+
+    def get_judge_statistic(self, begin_time, end_time, time_type, status):
+        if time_type == 'HOUR':
+            time = 'HOUR(created_at)'
+        elif time_type == 'MONTH':
+            time = 'MONTH(created_at)'
+        else:
+            time = 'date(created_at)'
+        sql = '''select count(*) as count, {} as time from quest_judge where operator_id={} '''.format(time, self.id)
+        if status == 'judging':
+            sql = sql + ' and state=8'
+        elif status == 'complete':
+            sql = sql + ' and state=9'
+        if begin_time:
+            sql = sql + ' and created_at >= "{}"'.format(begin_time)
+        if end_time:
+            sql = sql + ' and created_at <= "{}"'.format(end_time)
+        sql = sql + ' group by {}'.format(time)
+        sql = text(sql)
+        res = db.engine.execute(sql)
+        res = res.fetchall()
+        res = [{'count': d[0], 'time': d[1].strftime('%Y-%m-%d') if isinstance(d[1], date) else d[1]} for d in res]
+        return res
+
+    def get_verify_statistic(self, begin_time, end_time, time_type, status):
+        if time_type == 'HOUR':
+            time = 'HOUR(created_at)'
+        elif time_type == 'MONTH':
+            time = 'MONTH(created_at)'
+        else:
+            time = 'date(created_at)'
+        sql = '''select count(*) as count, {} as time from quest_verify where operator_id={} '''.format(time, self.id)
+        if status == 'verifying':
+            sql = sql + ' and state=10'
+        elif status == 'complete':
+            sql = sql + ' and state=99'
+        if begin_time:
+            sql = sql + ' and created_at >= "{}"'.format(begin_time)
+        if end_time:
+            sql = sql + ' and created_at <= "{}"'.format(end_time)
+        sql = sql + ' group by {}'.format(time)
+        sql = text(sql)
+        res = db.engine.execute(sql)
+        res = res.fetchall()
+        res = [{'count': d[0], 'time': d[1].strftime('%Y-%m-%d') if isinstance(d[1], date) else d[1]} for d in res]
+        return res
 
     def __repr__(self):
         return '<User: %r>' % self.name
