@@ -5,6 +5,7 @@ from app.exceptions import AdminException
 from app.decorators import admin_login_required
 from app.search import Search
 from app.models import Exam
+from app.utils import pagination
 
 from . import admin
 
@@ -26,3 +27,9 @@ def exam_statistic():
         'time_line': time_line,
         'statistic': statistic
     }
+
+@admin.route('/exams/suggest', methods=['GET'])
+@admin_login_required
+def get_exam_suggest():
+    res = Exam.get_suggest(request.args)
+    return res

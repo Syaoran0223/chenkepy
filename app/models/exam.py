@@ -1,4 +1,4 @@
-from flask import g
+from flask import g, current_app
 from itertools import groupby
 from sqlalchemy import distinct, func
 from app import db
@@ -50,6 +50,9 @@ class Exam(db.Model, SessionMixin):
 
     def to_dict(self):
         return self.get_dtl()
+
+    def to_suggest(self):
+        return {'id': self.id, 'name': self.name}
 
     @staticmethod
     def get_exams(upload_user):
@@ -191,6 +194,26 @@ class Exam(db.Model, SessionMixin):
         for (key, count) in res:
             data[key] = count
         return data
+
+    @staticmethod
+    def get_suggest(args):
+        name = args.get('name', '')
+        query = Exam.query.filter(Exam.name.like('%{}%'.format(name)))
+        page = int(args.get('pageIndex', 0))
+        pageSize = int(args.get('pageSize', current_app.config['PER_PAGE']))
+        data = query.paginate(page+1, pageSize, error_out=False)
+        items = []
+        for item in data.items:
+            items.append(item.to_suggest())
+
+        res = {
+            'items': items,
+            'pageIndex': data.page - 1,
+            'pageSize': data.per_page,
+            'totalCount': data.total,
+            'totalPage': data.pages
+        }
+        return res
 
 
     def __repr__(self):
