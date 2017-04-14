@@ -1,5 +1,6 @@
 #coding: utf-8
 
+import json
 from flask import render_template, request, url_for, redirect, g
 from app.exceptions import AdminException
 from app.models import Admin
@@ -28,7 +29,7 @@ def login():
 @admin.route('/')
 @admin_render_login_required
 def index():
-    return render_template('admin_index.html')
+    return render_template('admin_index.html', admin=g.admin.name)
 
 @admin.route("/logout")
 @admin_render_login_required
