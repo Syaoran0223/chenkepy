@@ -3,18 +3,55 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>思明试卷情报系统</title>
+    <title>思明试卷情报系统后台管理-登录</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="{$=url_for('static', filename='css/bootstrap-3.3.6.min.css')}">
-    <link rel="stylesheet" type="text/css" href="{$=url_for('static', filename='css/app.css')}">
+    <link rel="stylesheet" type="text/css" href="http://localhost:3000/login_css.css">
 </head>
 <body>
-<div class="login-page container">
-
-    登录页
-    
-
-</div>
-
+    <div class="top-content">    
+        <div class="inner-bg">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3 form-box">
+                        <div class="form-top">
+                            <div class="form-top-left">
+                                <h3>登录</h3>
+                                <p>思明试卷情报系统后台管理</p>
+                            </div>
+                            <div class="form-top-right">
+                                <i class="fa fa-lock"></i>
+                            </div>
+                        </div>
+                        <div class="form-bottom">
+                            <form role="form" action="" method="post" class="login-form" id="login-form">
+                                <div class="form-group">
+                                    <label class="sr-only" for="phone">手机号码</label>
+                                    <input type="text" 
+                                           name="phone" 
+                                           placeholder="请输入手机号码" 
+                                           class="form-phone form-control" 
+                                           id="phone">
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="password">密码</label>
+                                    <input type="password" 
+                                           name="password" 
+                                           placeholder="请输入密码" 
+                                           class="form-password form-control" 
+                                           id="password">
+                                </div>
+                                <button type="submit" class="btn">登录</button>
+                                <p class="error-msg" id="error-msg"></p>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="{$=url_for('static', filename='js/jquery-2.2.4.min.js')}"></script>
+    <script type="text/javascript" src="http://localhost:3000/common.js"></script>
+    <script type="text/javascript" src="http://localhost:3000/login.js"></script>
 </body>
 </html>
