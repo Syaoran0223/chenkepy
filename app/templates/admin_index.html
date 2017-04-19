@@ -5,16 +5,16 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <meta name="renderer" content="webkit">
         <title>思明试卷情报系统后台管理</title>
-        <link rel="bookmark" type="image/x-icon" href="http://localhost:3000/images/common/icon.png">
-        <link rel="shortcut icon" href="http://localhost:3000/images/common/icon.png">
-        <link rel="stylesheet" type="text/css" href="http://localhost:3000/app.css">
+        <link rel="bookmark" type="image/x-icon" href="{$=url_for('static', filename='public/admin/images/common/icon.png')}">
+        <link rel="shortcut icon" href="{$=url_for('static', filename='public/admin/images/common/icon.png')}">
+        <link rel="stylesheet" type="text/css" href="{$=url_for('static', filename='public/admin/app.css')}">
         <script>
             var admin_name = "{$=admin}";
         </script>
     </head>
     <body>
         <app></app>
-        <script type="text/javascript" src="http://localhost:3000/vendor.bundle.js"></script>
-        <script type="text/javascript" src="http://localhost:3000/app.js"></script>     
+        <script type="text/javascript" src="{$=url_for('static', filename='public/admin/vendor.bundle.js')}"></script>
+        <script type="text/javascript" src="{$=url_for('static', filename='public/admin/app.js')}"></script>     
     </body>
 </html>
