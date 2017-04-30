@@ -1,7 +1,7 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from app import db
-from flask.ext.login import UserMixin
+from flask_login import UserMixin
 from app import db
 from ._base import SessionMixin
 

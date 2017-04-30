@@ -1,5 +1,6 @@
 import json, math, os
 from flask import current_app
+from flask_cors import cross_origin
 from PIL import Image
 from app.exceptions import JsonOutputException, FormValidateError
 from app.decorators import api_login_required, permission_required
@@ -270,6 +271,7 @@ def user_message():
 
 
 @api_blueprint.route('/paper/search', methods=['GET', 'OPTION'])
+@cross_origin()
 def q_search():
     import http.client, urllib.parse
     import json
@@ -300,7 +302,7 @@ def q_search():
         'totalCount': jsonResult['total'],
         'totalPage': math.ceil(jsonResult['total']/jsonResult['size'])
     }
-    return render_api(res), 200, {'Access-Control-Allow-Origin': '*'}
+    return render_api(res)
 
 @api_blueprint.route('/word')
 def render_word():

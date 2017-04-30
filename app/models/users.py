@@ -2,7 +2,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, date
 
 from sqlalchemy import text
-from flask.ext.login import UserMixin, AnonymousUserMixin
+from flask_login import UserMixin, AnonymousUserMixin
 from app import db, login_manager
 from app.models.permissions import Permission
 from ._base import SessionMixin
