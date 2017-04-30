@@ -270,7 +270,7 @@ def user_message():
     return render_api(data)
 
 
-@api_blueprint.route('/paper/search', methods=['GET', 'OPTION'])
+@api_blueprint.route('/paper/search', methods=['GET'])
 @cross_origin()
 def q_search():
     import http.client, urllib.parse
