@@ -269,7 +269,7 @@ def user_message():
     return render_api(data)
 
 
-@api_blueprint.route('/paper/search', methods=['GET'])
+@api_blueprint.route('/paper/search', methods=['GET', 'OPTION'])
 def q_search():
     import http.client, urllib.parse
     import json
@@ -300,7 +300,7 @@ def q_search():
         'totalCount': jsonResult['total'],
         'totalPage': math.ceil(jsonResult['total']/jsonResult['size'])
     }
-    return render_api(res)
+    return render_api(res), 200, {'Access-Control-Allow-Origin': '*'}
 
 @api_blueprint.route('/word')
 def render_word():
