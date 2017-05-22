@@ -1,6 +1,5 @@
 import json, math, os
 from flask import current_app
-from flask_cors import cross_origin
 from PIL import Image
 from app.exceptions import JsonOutputException, FormValidateError
 from app.decorators import api_login_required, permission_required
@@ -271,7 +270,6 @@ def user_message():
 
 
 @api_blueprint.route('/paper/search', methods=['GET'])
-@cross_origin()
 def q_search():
     import http.client, urllib.parse
     import json
