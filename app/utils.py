@@ -7,7 +7,7 @@ from werkzeug import secure_filename
 from datetime import datetime, timedelta, date
 from random import randint
 import os, time, requests, json, hashlib, math
-from flask_sqlalchemy import BaseQuery
+from flask.ext.sqlalchemy import BaseQuery
 import json
 
 def allowed_file(filename, allow_extensions):

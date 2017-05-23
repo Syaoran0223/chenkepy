@@ -1,12 +1,12 @@
 from flask import Flask, render_template
-from flask_bootstrap import Bootstrap
-from flask_moment import Moment
+from flask.ext.bootstrap import Bootstrap
+from flask.ext.moment import Moment
 from flask_mail import Mail
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
+from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.login import LoginManager
 from factories import Jinja2
 from config import config
-from flask_cache import Cache
+from flask.ext.cache import Cache
 from app._flask import make_response, extends_db
 
 bootstrap = Bootstrap()

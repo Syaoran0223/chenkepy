@@ -1,6 +1,6 @@
 from functools import wraps
 from flask import request, g, redirect, url_for
-from flask_login import current_user
+from flask.ext.login import current_user
 
 
 def api_login_required(func):

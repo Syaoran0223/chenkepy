@@ -1,7 +1,7 @@
 
 import datetime
 from app import db
-from flask_sqlalchemy import BaseQuery
+from flask.ext.sqlalchemy import BaseQuery
 
 class SessionMixin(object):
     created_at = db.Column('created_at', db.DateTime, nullable=False)

@@ -1,7 +1,7 @@
 #coding: utf-8
 
 from flask import g, session
-from flask_login import current_user
+from flask.ext.login import current_user
 from app.admin.login_service import get_admin
 from . import main
 
