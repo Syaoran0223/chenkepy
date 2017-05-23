@@ -29,7 +29,8 @@ def login():
 @admin.route('/')
 @admin_render_login_required
 def index():
-    return render_template('admin_index.html', admin=g.admin.name)
+    admin = g.admin.to_dict()
+    return render_template('admin_index.html', admin=admin)
 
 @admin.route("/logout")
 @admin_render_login_required

@@ -30,6 +30,14 @@ def admin_render_login_required(func):
         return func(*args, **kwargs)
     return decorated_view
 
+def super_admin_required(func):
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        if not g.admin.is_super:
+            return {'msg': '超级管理员才允许操作'}, 401
+        return func(*args, **kwargs)
+    return decorated_view
+
 def permission_required(permission):
     def decorator(func):
         @wraps(func)

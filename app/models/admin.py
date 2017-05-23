@@ -21,6 +21,7 @@ class Admin(db.Model, SessionMixin, UserMixin):
     last_login_ip = db.Column(db.String(64))
     state = db.Column(db.Integer, default=0)
     phone = db.Column(db.String(16))
+    is_super = db.Column(db.Boolean, default=False)
 
     @property
     def password(self):
