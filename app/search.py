@@ -31,5 +31,5 @@ class Search(object):
                     self.query = self.query.filter(getattr(model, k)==getattr(self, k))
         return self
 
-    def paginate(self):
-        return pagination(self.query)
+    def paginate(self, to_dict=True):
+        return pagination(self.query, None, to_dict)

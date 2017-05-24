@@ -205,3 +205,7 @@ API 规范
         `state` 状态统计
         `subject` 学科统计
         `grade` 年级统计
+
+### 工作统计列表
+
+`/admin/users/works`

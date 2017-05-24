@@ -53,3 +53,17 @@ def user_statistic():
         'sumary':sumary,
         'statistic': statistic
     }
+
+@admin.route('/works')
+@admin_login_required
+def user_works():
+    search = Search()
+    res = search.load(User).paginate(to_dict=False)
+    items = []
+    for item in res['items']:
+        sumary = item.get_admin_summary(False, False)
+        item = item.to_dict()
+        item['sumary'] = sumary
+        items.append(item)
+    res['items'] = items
+    return res
