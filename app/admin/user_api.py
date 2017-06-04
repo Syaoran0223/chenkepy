@@ -54,7 +54,7 @@ def user_statistic():
         'statistic': statistic
     }
 
-@admin.route('/works')
+@admin.route('/users/works')
 @admin_login_required
 def user_works():
     search = Search()
