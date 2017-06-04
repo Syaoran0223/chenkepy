@@ -166,8 +166,6 @@ class Question(db.Model, SessionMixin):
         pageSize = int(request.args.get('pageSize', 5))
         query = db.session.query(distinct(Question.exam_id)).\
             filter_by(state=state)
-        totalCount = query.count()
-        totalPage = ceil(totalCount / pageSize)
         query = query.\
             order_by(Question.order.desc()).\
             order_by(Question.created_at.desc()).\
@@ -176,7 +174,28 @@ class Question(db.Model, SessionMixin):
         exam_ids = query.all()
         
         exam_ids = [id[0] for id in exam_ids]
-        exams = Exam.query.filter(Exam.id.in_(exam_ids)).all()
+        exam_query = Exam.query.filter(Exam.id.in_(exam_ids))
+        if request.args.get('name'):
+            exam_query = exam_query.filter(Exam.name.like('%{}%'.format(request.args.get('name'))))
+        if request.args.get('subject'):
+            exam_query = exam_query.filter(Exam.subject==request.args.get('subject'))
+        if request.args.get('paper_types'):
+            exam_query = exam_query.filter(Exam.paper_types==request.args.get('paper_types'))
+        if request.args.get('province_id'):
+            exam_query = exam_query.filter(Exam.province_id==request.args.get('province_id'))
+        if request.args.get('city_id'):
+            exam_query = exam_query.filter(Exam.city_id==request.args.get('city_id'))
+        if request.args.get('area_id'):
+            exam_query = exam_query.filter(Exam.area_id==request.args.get('area_id'))
+        if request.args.get('school_id'):
+            exam_query = exam_query.filter(Exam.school_id==request.args.get('school_id'))
+        if request.args.get('year'):
+            exam_query = exam_query.filter(Exam.year==request.args.get('year'))
+        if request.args.get('grade'):
+            exam_query = exam_query.filter(Exam.grade==request.args.get('grade'))
+        totalCount = exam_query.count()
+        totalPage = ceil(totalCount / pageSize)
+        exams = exam_query.all()
         items = []
         for item in exams:
             questions = Question.query.filter_by(state=state).\
