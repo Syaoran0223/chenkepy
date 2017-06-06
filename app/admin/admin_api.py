@@ -14,6 +14,7 @@ from . import admin
 def create():
     name = request.json.get('name')
     phone = request.json.get('phone')
+    email = request.json.get('email')
     password = request.json.get('password')
     is_super = request.json.get('is_super') or False
     if not name:
@@ -23,7 +24,7 @@ def create():
     admin = Admin.query.filter_by(phone=phone).first()
     if admin:
         raise AdminException('手机号已存在')
-    admin = Admin(name=name, password=password, phone=phone, is_super=is_super)
+    admin = Admin(name=name, password=password, phone=phone, is_super=is_super, email=email)
     admin.save()
     return admin.to_dict()
 

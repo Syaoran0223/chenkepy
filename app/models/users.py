@@ -74,7 +74,7 @@ class User(db.Model, SessionMixin, UserMixin):
         res = School.bind_auto(res, 'name', 'school_id', 'id', 'school')
         return res
 
-    def get_admin_summary(self, begin_time, end_time):
+    def get_admin_summary(self, begin_time=None, end_time=None):
         res = []
         if 'UPLOAD_PERMISSION' in self.permissions:
             data = self.get_upload_sumary(begin_time, end_time)

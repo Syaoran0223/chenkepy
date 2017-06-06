@@ -258,6 +258,12 @@ def user_info_update():
 def user_score():
     data = pagination(g.user.scores)
     return render_api(data)
+
+@api_blueprint.route('/user/works')
+@api_login_required
+def user_work():
+    data = g.user.get_admin_summary()
+    return render_api(data)
     
 # 消息记录
 @api_blueprint.route('/user/message')
