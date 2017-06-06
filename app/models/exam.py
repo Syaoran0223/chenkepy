@@ -1,4 +1,4 @@
-from flask import g, current_app
+from flask import g, current_app, request
 from itertools import groupby
 from sqlalchemy import distinct, func
 from app import db
@@ -62,10 +62,28 @@ class Exam(db.Model, SessionMixin):
 
     @staticmethod
     def list_exams(state=EXAM_STATUS['已采纳'] ):
-        res = pagination(Exam.query.filter(
-            Exam.state == state).\
+        query = Exam.query.filter(Exam.state == state).\
                 order_by(Exam.order.desc()).\
-                order_by(Exam.created_at.desc()))
+                order_by(Exam.created_at.desc())
+        if request.args.get('name'):
+            query = query.filter(Exam.name.like('%{}%'.format(request.args.get('name'))))
+        if request.args.get('subject'):
+            query = query.filter(Exam.subject==request.args.get('subject'))
+        if request.args.get('paper_types'):
+            query = query.filter(Exam.paper_types==request.args.get('paper_types'))
+        if request.args.get('province_id'):
+            query = query.filter(Exam.province_id==request.args.get('province_id'))
+        if request.args.get('city_id'):
+            query = query.filter(Exam.city_id==request.args.get('city_id'))
+        if request.args.get('area_id'):
+            query = query.filter(Exam.area_id==request.args.get('area_id'))
+        if request.args.get('school_id'):
+            query = query.filter(Exam.school_id==request.args.get('school_id'))
+        if request.args.get('year'):
+            query = query.filter(Exam.year==request.args.get('year'))
+        if request.args.get('grade'):
+            query = query.filter(Exam.grade==request.args.get('grade'))
+        res = pagination(query)
         return res
 
     @staticmethod

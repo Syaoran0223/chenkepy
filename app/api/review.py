@@ -18,6 +18,24 @@ def listexam():
         Exam.upload_user!=g.user.id, Exam.school_id==g.user.school_id).\
             order_by(Exam.order.desc()).\
             order_by(Exam.created_at.desc())
+    if request.args.get('name'):
+        exam_query = exam_query.filter(Exam.name.like('%{}%'.format(request.args.get('name'))))
+    if request.args.get('subject'):
+        exam_query = exam_query.filter(Exam.subject==request.args.get('subject'))
+    if request.args.get('paper_types'):
+        exam_query = exam_query.filter(Exam.paper_types==request.args.get('paper_types'))
+    if request.args.get('province_id'):
+        exam_query = exam_query.filter(Exam.province_id==request.args.get('province_id'))
+    if request.args.get('city_id'):
+        exam_query = exam_query.filter(Exam.city_id==request.args.get('city_id'))
+    if request.args.get('area_id'):
+        exam_query = exam_query.filter(Exam.area_id==request.args.get('area_id'))
+    if request.args.get('school_id'):
+        exam_query = exam_query.filter(Exam.school_id==request.args.get('school_id'))
+    if request.args.get('year'):
+        exam_query = exam_query.filter(Exam.year==request.args.get('year'))
+    if request.args.get('grade'):
+        exam_query = exam_query.filter(Exam.grade==request.args.get('grade'))
     res = pagination(query)
     items = res.get('items', [])
     items = School.bind_auto(items, 'name')

@@ -1,4 +1,4 @@
-from .errors import forbidden_erro
+from .errors import forbidden
 
 @api.befor_request
 @auth.login_required
