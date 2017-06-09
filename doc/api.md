@@ -209,3 +209,190 @@ API 规范
 ### 工作统计列表
 
 `/admin/users/works`
+
+### 试卷详情
+
+`/admin/exams/<id>`
+
+    "question": {
+      "answer_image": [],   //答案图片
+      "answer_list1": [],   //校对前答案列表->填空题
+      "answer_list2": [],   //校对后答案列表
+      "correct_answer": null,   //正确答案
+      "correct_answer1": null,  //校对前的正确答案
+      "correct_answer2": null,  //校对后的正确答案
+      "created_at": "2017-01-18 21:17:49",
+      "dianpin": null,  //点评
+      "exam_id": 10,
+      "fenxi": null,    //分析
+      "has_sub": 1,     //是否有子题
+      "id": 18,
+      "insert_user_id": 1,
+      "jieda": "<p>asdasd</p>\n",   //解答
+      "kaodian": null,  //考点
+      "knowledge_point": null,  //知识点
+      "option_count": 0,    //选项数
+      "options1": [],   //校对前的选项列表->选择题
+      "options2": [],   //校对后的选项列表->选择题
+      "order": 0,
+      "qcols": null,    //选项行数->选择题
+      "qrows": null,    //选项列数->选择题
+      "quest_content": "aaaaaaaaa", //题目内容
+      "quest_content_html": "<p>aaaaaaaaa</p>\n",   //题目内容
+      "quest_image": [],    //题目图片
+      "quest_no": 1,    //题号
+      "quest_type_id": "1", //题型 1选择题 2填空题 3解答题
+      "refer_quest_id": 0,  //题库系统的id
+      "state": 99,  // 题目状态: '已删除': -99, '未处理': 0, '正在录题': 1, '审核不通过': 2, '完成录题': 3, '正在解答': 4, '完成解答': 5, '正在检查': 6, '待裁定': 7, '正在裁定': 8, '待校对': 9, '正在校对': 10, '结束录题': 99
+      "sub_items1": [   //校对前的子题
+        {
+          "_id": "sub_item_47",
+          "answer_list": [],
+          "correct_answer": "A",
+          "finish_state": "answer",
+          "operator_id": 1,
+          "options": [
+            {
+              "_id": "option_50",
+              "_selected": true,
+              "content": "<p>aaa</p>\n",
+              "sort": "A"
+            },
+            {
+              "_id": "option_51",
+              "_selected": false,
+              "content": "<p>bbbbbb</p>\n",
+              "sort": "B"
+            },
+            {
+              "_id": "option_52",
+              "_selected": false,
+              "content": "<p>ccccc</p>\n",
+              "sort": "C"
+            }
+          ],
+          "quest_answer": "",
+          "quest_content": "aaaaaaa",
+          "quest_content_html": "<p>aaaaaaa</p>\n",
+          "quest_option_html": "",
+          "quest_type_id": "1",
+          "sort": 1
+        },
+        {
+          "_id": "sub_item_53",
+          "answer_list": [
+            {
+              "_id": "b_answer_58",
+              "content": "<p>aaaa</p>\n"
+            },
+            {
+              "_id": "b_answer_59",
+              "content": "<p>bbbb</p>\n"
+            }
+          ],
+          "correct_answer": [
+            "<p>aaaa</p>\n",
+            "<p>bbbb</p>\n"
+          ],
+          "finish_state": "answer",
+          "operator_id": 1,
+          "options": [],
+          "quest_answer": "",
+          "quest_content": "asdasdasd",
+          "quest_content_html": "<p>asdasdasd</p>\n",
+          "quest_option_html": "",
+          "quest_type_id": "2",
+          "sort": 2
+        },
+        {
+          "_id": "sub_item_54",
+          "answer_list": [],
+          "correct_answer": "<p>asdasdadd</p>\n",
+          "finish_state": "answer",
+          "operator_id": 1,
+          "options": [],
+          "quest_answer": "<p>asdasdadd</p>\n",
+          "quest_content": "cdcasdasd",
+          "quest_content_html": "<p>cdcasdasd</p>\n",
+          "quest_option_html": "",
+          "quest_type_id": "3",
+          "sort": 3
+        }
+      ],
+      "sub_items2": [   //校对后的子题
+        {
+          "_id": "sub_item_47",
+          "answer_list": [],
+          "correct_answer": "B",
+          "finish_state": "answer_check",
+          "operator_id": 1,
+          "options": [
+            {
+              "_id": "option_50",
+              "_selected": false,
+              "content": "<p>aaa</p>\n",
+              "sort": "A"
+            },
+            {
+              "_id": "option_51",
+              "_selected": true,
+              "content": "<p>bbbbbb</p>\n",
+              "sort": "B"
+            },
+            {
+              "_id": "option_52",
+              "_selected": false,
+              "content": "<p>ccccc</p>\n",
+              "sort": "C"
+            }
+          ],
+          "quest_answer": "",
+          "quest_content": "aaaaaaa",
+          "quest_content_html": "<p>aaaaaaa</p>\n",
+          "quest_option_html": "",
+          "quest_type_id": "1",
+          "sort": 1
+        },
+        {
+          "_id": "sub_item_53",
+          "answer_list": [
+            {
+              "_id": "b_answer_58",
+              "content": "<p>aaaa</p>\n"
+            },
+            {
+              "_id": "b_answer_59",
+              "content": "<p>bbbb</p>\n"
+            }
+          ],
+          "correct_answer": [
+            "<p>aaaa</p>\n",
+            "<p>bbbb</p>\n"
+          ],
+          "finish_state": "answer_check",
+          "operator_id": 1,
+          "options": [],
+          "quest_answer": "",
+          "quest_content": "asdasdasd",
+          "quest_content_html": "<p>asdasdasd</p>\n",
+          "quest_option_html": "",
+          "quest_type_id": "2",
+          "sort": 2
+        },
+        {
+          "_id": "sub_item_54",
+          "answer_list": [],
+          "correct_answer": "<p>asdasdadd</p>\n",
+          "finish_state": "answer_check",
+          "operator_id": 1,
+          "options": [],
+          "quest_answer": "<p>asdasdadd</p>\n",
+          "quest_content": "cdcasdasd",
+          "quest_content_html": "<p>cdcasdasd</p>\n",
+          "quest_option_html": "",
+          "quest_type_id": "3",
+          "sort": 3
+        }
+      ],
+      "updated_at": "2017-01-18 21:21:31"
+    }

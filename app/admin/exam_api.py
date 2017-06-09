@@ -4,7 +4,7 @@ from flask import request, g
 from app.exceptions import AdminException
 from app.decorators import admin_login_required
 from app.search import Search
-from app.models import Exam
+from app.models import Exam, Question
 from app.utils import pagination
 
 from . import admin
@@ -15,6 +15,17 @@ def get_exams():
     search = Search()
     res = search.load(Exam).paginate()
     return res
+
+@admin.route('/exams/<int:id>')
+@admin_login_required
+def get_exam(id):
+    exam = Exam.query.get_or_404(id)
+    data = exam.to_dict()
+    questions = Question.query.filter_by(exam_id=id).all()
+    data['questions'] = []
+    for q in questions:
+        data['questions'].append(q.to_dict())
+    return data
 
 @admin.route('/exams/statistic', methods=['GET'])
 @admin_login_required
