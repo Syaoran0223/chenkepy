@@ -1,6 +1,7 @@
 import json, math, os
 from flask import current_app
 from PIL import Image
+from flask.ext.login import login_user,logout_user,login_required,current_user
 from app.exceptions import JsonOutputException, FormValidateError
 from app.decorators import api_login_required, permission_required
 from app.models import Attachment, Exam, User, Message
@@ -314,3 +315,25 @@ def q_search():
 def render_word():
     from flask.helpers import send_file
     return send_file('/Users/chenke/dev/python/information/app/static/uploads/20170208/1486552110.3344362016.docx', mimetype="application/msword", as_attachment=True)
+
+@api_blueprint.route('/login/', methods=['POST'])
+def login():
+    if g.user is not None and g.user.is_authenticated():
+        return g.user.to_dict()
+    user_name = request.json.get('user_name')
+    password = request.json.get('password')
+    user = User.query.filter_by(name=user_name).first()
+    if user is None:
+        user = User.query.filter_by(phone=user_name).first()
+    if user is None:
+        raise JsonOutputException('用户不存在')
+    if user.verify_password(password):
+        login_user(user)
+        return user.to_dict()
+    raise JsonOutputException('密码错误')
+
+@api_blueprint.route("/logout/")
+@api_login_required
+def logout():
+    logout_user()
+    return {}
