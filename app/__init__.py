@@ -7,6 +7,7 @@ from flask.ext.login import LoginManager
 from factories import Jinja2
 from config import config
 from flask.ext.cache import Cache
+from flask.ext.cors import CORS
 from app._flask import make_response, extends_db
 
 bootstrap = Bootstrap()
@@ -35,6 +36,7 @@ def create_app(config_name):
     
     register_routes(app)
     cache.init_app(app)
+    CORS(app)
     
     return app
 
