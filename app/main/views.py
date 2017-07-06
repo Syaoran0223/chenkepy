@@ -24,7 +24,12 @@ def register():
         if not sms.check_code(form.valid_code.data, phone):
             flash('验证码错误')
             return render_template('register.html', form=form)
-        if not InviteCode.get_code(form.visit_code.data):
+        try:
+            int(form.visit_code.data)
+        except:
+            flash('邀请码错误')
+            return render_template('register.html', form=form)
+        if not (len(form.visit_code.data)==4 and sum([int(i) for i in form.visit_code.data])==16):
             flash('邀请码错误')
             return render_template('register.html', form=form)
         session['phone'] = phone
