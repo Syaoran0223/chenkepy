@@ -1,6 +1,7 @@
 #coding: utf-8
 
 import json
+import http.client, urllib.parse
 from flask import render_template, request, url_for, flash, redirect, session, g, current_app
 from flask.ext.login import login_user,logout_user,login_required,current_user
 
@@ -91,8 +92,21 @@ def index():
     user_info = json.dumps(user_info)
     menus = g.user.get_menus()
     menus = json.dumps(menus)
+
+    connection = http.client.HTTPConnection('i3ke.com', 80, timeout=10)
+    headers = {'Content-type': 'application/json'}
+    params = "{}"
+    connection.request('GET', '/api/v2/subjects', params, headers)
+
+    response = connection.getresponse()
+    jsonStr = response.read().decode()
+    subject_res = json.loads(jsonStr)
+    subjects = []
+    if subject_res.get('ok'):
+        subjects = subject_res['data']['subjects']
+    subjects = json.dumps(subjects)
     return render_template('index.html',
-        site_url=site_url, user_info=user_info, menus=menus)
+        site_url=site_url, user_info=user_info, menus=menus, subjects=subjects)
 
 @main.route("/logout")
 @login_required

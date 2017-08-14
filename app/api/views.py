@@ -283,7 +283,7 @@ def q_search():
     httpClient = None
     pageIndex = request.args.get("pageIndex","1")
     q = request.args.get("q","")
-    subject = request.args.get('subject', '')
+    subject_id = request.args.get('subject_id', '')
     qtype_id = request.args.get('qtype_id', '')
     pageIndex = request.args.get('pageIndex', 0)
 
@@ -292,7 +292,7 @@ def q_search():
 
     connection = http.client.HTTPConnection('search.i3ke.com', 80, timeout=10)
     headers = {'Content-type': 'application/json'}
-    param = {"subject": subject, "qtype_id": qtype_id, "mlt": {"fields": "qtxt", "like": "%"+q}, "allFields": ["qtxt"], "highlightedFields": ["qtxt"],
+    param = {"subject_id": subject_id, "qtype_id": qtype_id, "mlt": {"fields": "qtxt", "like": "%"+q}, "allFields": ["qtxt"], "highlightedFields": ["qtxt"],
           "from": _from, "size": size, "sort": {"_score": "desc"}}
     params = json.dumps(param)
 

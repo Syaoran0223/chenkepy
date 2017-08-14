@@ -10,6 +10,7 @@
         var siteUrl = "{$=site_url}";
         var userInfo = JSON.parse('{$=user_info | safe}');
         var menus = JSON.parse('{$=menus | safe}');
+        var subjects = JSON.parse('{$=subjects | safe}')
     </script>
 
     <link rel="stylesheet" href="{$=url_for('static', filename="public/app.css")}"/>
