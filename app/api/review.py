@@ -14,7 +14,7 @@ import datetime
 @api_login_required
 @permission_required('CONFIRM_PERMISSION')
 def listexam():
-    query = Exam.query.filter(Exam.state == EXAM_STATUS['未审核'],
+    exam_query = Exam.query.filter(Exam.state == EXAM_STATUS['未审核'],
         Exam.upload_user!=g.user.id, Exam.school_id==g.user.school_id).\
             order_by(Exam.order.desc()).\
             order_by(Exam.created_at.desc())
@@ -36,7 +36,7 @@ def listexam():
         exam_query = exam_query.filter(Exam.year==request.args.get('year'))
     if request.args.get('grade'):
         exam_query = exam_query.filter(Exam.grade==request.args.get('grade'))
-    res = pagination(query)
+    res = pagination(exam_query)
     items = res.get('items', [])
     items = School.bind_auto(items, 'name')
     res['items'] = items

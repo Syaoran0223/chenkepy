@@ -22,8 +22,7 @@ class PaperUploadForm(Form):
     city_id = IntegerField('CityId', validators=[validators.DataRequired('请选择城市')])
     area_id = IntegerField('AreaId', validators=[validators.DataRequired('请选择地区')])
 
-    subject = StringField('Subject', validators=[
-        validators.AnyOf(list(const.SUBJECT.keys()), '学科不正确')])
+    subject = IntegerField('Subject',validators=[validators.DataRequired('学科不正确')])
     grade = StringField('Subject', validators=[
         validators.AnyOf(list(const.GRADE.keys()), '年级不正确')])
     name = StringField('Name', validators=[
