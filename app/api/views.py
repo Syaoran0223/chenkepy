@@ -337,3 +337,10 @@ def login():
 def logout():
     logout_user()
     return {}
+
+@api_blueprint.route('/is_login')
+@api_login_required
+def is_login():
+    return {
+        "code": 200
+    }
