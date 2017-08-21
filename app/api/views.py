@@ -301,6 +301,9 @@ def q_search():
     response = connection.getresponse()
     jsonStr = response.read().decode()
     jsonResult = json.loads(jsonStr)
+    print(jsonResult)
+    if jsonResult['code'] != 0:
+        raise JsonOutputException('参数错误')
 
     res = {
         'items': jsonResult['datas'],
@@ -326,7 +329,7 @@ def login():
     if user is None:
         user = User.query.filter_by(phone=user_name).first()
     if user is None:
-        raise JsonOutputException('用户不存在')
+        raise ('参数错误')('用户不存在')
     if user.verify_password(password):
         login_user(user)
         return user.to_dict()
