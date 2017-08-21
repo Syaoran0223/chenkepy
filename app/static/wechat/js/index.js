@@ -60,7 +60,8 @@ $(function(){
                 },
                 success:function (date){
                     $('#loadingToast1').css("display","none");
-                    if(date.msg!="请登录后再访问") {
+                    console.log(date)
+                    if(date.code!=403) {
                         arr[sum] = {
                             "url": String(date.data),
                             "can_preview": true,  //如果是图片填true，word填false

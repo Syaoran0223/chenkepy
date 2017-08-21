@@ -92,7 +92,7 @@ $(function () {
         },
         success: function(data) {
             $('#loadingToast').css("display","none")
-            if(data.msg!="请登录后再访问"){
+            if(data.code!=403){
             $.each(data.data.items,function (index,elme) {
                 var date=elme.updated_at.substring(0,10);var shenhe="";
                 if (elme.state==0){
