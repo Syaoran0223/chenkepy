@@ -117,7 +117,7 @@ $(function () {
             console.log(err)
         }
     })
-
+//选择open
     function selectop(op,se) {
         var nextYear = op;
         for(var i=0; i<se.options.length; i++){
@@ -305,8 +305,27 @@ $(function () {
                   $("#school").prev().html(data.data.school_name).prev().val(data.data.school_name);
                   $("#grade").prev().html(GRADE[data.data.grade]);
                   selectop(data.data.grade, $("#grade")[0]);
-                  $("#subject").prev().html(SUBJECT[data.data.subject]);
+                  if(data.data.grade<7){
+                      $.each(subjects[0].children,function (index,elem) {
+                          console.log(elem.label)
+                          $("#subject").append("<option  value='"+elem.id+"' >"+elem.label+"</option>");
+                      });
+                  }else  if(data.data.grade<10){
+                      $.each(subjects[1].children,function (index,elem) {
+                          console.log(elem.label)
+                          $("#subject").append("<option  value='"+elem.id+"' >"+elem.label+"</option>");
+                      });
+                  }else{
+                      $.each(subjects[2].children,function (index,elem) {
+                          console.log(elem.label)
+                          $("#subject").append("<option  value='"+elem.id+"' >"+elem.label+"</option>");
+                      });
+                  }
+                  // $("#subject").prev().html(SUBJECT[data.data.subject]);
                   selectop(data.data.subject, $("#subject")[0]);
+                  $("#subject").prev().html($("#subject").find("option").not(function(){ return !this.selected }).text())
+                  console.log($("#subject")[0].options[$("#subject")[0].selectedIndex])
+                  console.log($("#subject").find("option").not(function(){ return !this.selected }).text())
                   $("#stage").prev().html(PAPER_TYPE[data.data.paper_types]);
                   selectop(data.data.paper_types, $("#stage")[0]);
                   $("#papuser").val(data.data.name);
@@ -598,11 +617,28 @@ $(function () {
     $("#schoolclass").change(function () {
         $(this).prev().html( $(this).val());
     })
-    $("#grade").change(function () {
+      $('#grade').change(function () {
+          $(this).prev().html( $("#grade").find("option:checked").text());
+          $("#subject").prev().html('请选择');
+          $("#subject").val('');
+          for(var i=1; i< $("#subject")[0].options.length; ){
+              $("#subject")[0].removeChild( $("#subject")[0].options[i]);
+          }
+          if(parseInt($(this).val())<7){
+              $.each(subjects[0].children,function (index,elem) {
+                  $("#subject").append("<option  value='"+elem.id+"' >"+elem.label+"</option>");
+              });
+          }else  if(parseInt($(this).val())<10){
+              $.each(subjects[1].children,function (index,elem) {
+                  $("#subject").append("<option  value='"+elem.id+"' >"+elem.label+"</option>");
+              });
+          }else{
+              $.each(subjects[2].children,function (index,elem) {
+                  $("#subject").append("<option  value='"+elem.id+"' >"+elem.label+"</option>");
+              });
+          }
 
-        $(this).prev().html( $("#grade").find("option:checked").text());
-        // $(this).prev().html( $(this).val());
-    })
+      })
     $("#subject").change(function () {
         $(this).prev().html( $("#subject").find("option:checked").text());
     })
@@ -704,7 +740,7 @@ $(function () {
 //点击返回
       $("#return").click(function () {
             $("#return_dialog").fadeIn(1)
-      })
+      });
       $("#cancel_return").click(function () {
           $("#return_dialog").fadeOut(1)
       })
@@ -713,12 +749,27 @@ $(function () {
           $("#continue").show()
           // $(".logout").show()
               $("#form").hide()
-
               $("#uploaderInput").val("");
               $('li').remove();
           // test=0;
               sum=0;
               arr=[];
+          for(var i=1; i< $("#city")[0].options.length; ){
+              $("#city")[0].removeChild( $("#city")[0].options[i]);
+          }
+          for(var i=1; i< $("#province")[0].options.length; ){
+              $("#province")[0].removeChild( $("#province")[0].options[i]);
+          }
+          for(var i=1; i< $("#school")[0].options.length; ){
+              $("#school")[0].removeChild( $("#school")[0].options[i]);
+          }
+          for(var i=1; i< $("#subject")[0].options.length; ){
+              $("#subject")[0].removeChild( $("#subject")[0].options[i]);
+          }
+          for(var i=1; i< $("#county")[0].options.length; ){
+              $("#county")[0].removeChild( $("#county")[0].options[i]);
+          }
+          
       })
 
     // $("#return").click(function () {

@@ -187,6 +187,28 @@ $(function () {
         '11': '高二',
         '12': '高三'
     }
+    console.log(subjects[0].children[0])
+    $('#grade').change(function () {
+        for(var i=1; i< $("#subject")[0].options.length; ){
+            $("#subject")[0].removeChild( $("#subject")[0].options[i]);
+        }
+        $("#subject").prev().html('请选择');
+        $("#subject").val('');
+            if(parseInt($(this).val())<7){
+                $.each(subjects[0].children,function (index,elem) {
+                    $("#subject").append("<option  value='"+elem.id+"' >"+elem.label+"</option>");
+                });
+            }else  if(parseInt($(this).val())<10){
+                $.each(subjects[1].children,function (index,elem) {
+                    $("#subject").append("<option  value='"+elem.id+"' >"+elem.label+"</option>");
+                });
+            }else{
+                $.each(subjects[2].children,function (index,elem) {
+                    $("#subject").append("<option  value='"+elem.id+"' >"+elem.label+"</option>");
+                });
+            }
+
+    })
     $("#schoolclass").change(function () {
         $(this).prev().html( $(this).val());
     })
