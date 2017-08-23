@@ -7,9 +7,6 @@
     <link rel="stylesheet" href="{$=url_for('static', filename='wechat/css/weui.min.css')}"/>
     <link rel="stylesheet" href="{$=url_for('static', filename='wechat/css/example.css')}"/>
     <script src="{$=url_for('static', filename='wechat/js/zepto.min.js')}"></script>
-    <!--<script src="{$=url_for('static', filename='wechat/js/example.js')}"></script>-->
-    <script src="{$=url_for('static', filename='wechat/js/picker.js')}"></script>
-    <!--<script src="{$=url_for('static', filename='wechat/js/laydate/laydate.js')}"></script>-->
     <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
     <script src="https://res.wx.qq.com/open/libs/weuijs/1.0.0/weui.min.js"></script>
     <style>
@@ -94,13 +91,12 @@
                 success: function(data) {
                     $("#submit").removeAttr("disabled").css("opacity","1");
                     $("#loadingToast").css("display","none");
-                if(data.code!=400){
-                    alert("登入成功")
-                    window.location.href="/wechat/index";
-                }
+                    if(data.code!=400){
+                        window.location.href="/wechat/index";
+                    }
                     else {
-                    alert("用户名或密码错误")
-                }
+                        alert("用户名或密码错误")
+                    }
                 },
                 error: function(err) {
                     console.log(err)
@@ -110,4 +106,3 @@
     });
 
 </script>
-</html>

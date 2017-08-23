@@ -1,10 +1,26 @@
 /**
  * Created by Administrator on 2017/6/7 0007.
  */
+$.ajax({
+    url: "/api/is_login",
+    crossDomain: true,
+    type: "get",
+    contentType: "application/json",
+    dataType: "json",
+    success: function(data) {
+        if(data.code==403){
+            alert('请登入后在访问');
+            window.location.href="/wechat/login";
+        }
+    },
+    error: function(err) {
+        console.log(err)
+    }
+})
 $(function(){
     var asd;
     var arr = new Array(),sum=0,test=0;
-    $('#date').val('')
+    $('#date').val('');
     var winH = $(window).height();
     var categorySpace = 10;
     //刷新页面
@@ -24,7 +40,7 @@ $(function(){
 
 
 
-        $gallery = $("#gallery"), $galleryImg = $("#galleryImg"),
+    $gallery = $("#gallery"), $galleryImg = $("#galleryImg"),
         $uploaderInput = $("#uploaderInput"),
         $uploaderFiles = $("#uploaderFiles");
 
@@ -44,17 +60,13 @@ $(function(){
             var formData = new FormData($("#uploadForm")[0]);
             // alert( $uploaderInput[0].files[0].name)
             $.ajax({
-                // url:'http://127.0.0.1:5000/api/uploads',
                 url:'/api/uploads',
                 type:'post',
-                // data:{'photo': $uploaderInput[0].files[0].name},
-               // async: false,
-                // data: {"id":"WU_FILE_0"},
-                // data: {user_name: "test1", password: "123456"},
-               data: formData,
-               cache: false,
-               contentType: false,
-               processData: false,
+                async: false,
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
                 beforeSend:function () {
                     $("#loadingToast1").removeAttr("style");
                 },
@@ -104,7 +116,7 @@ $(function(){
 //        var somearray = ["mon", "tue", "wed", "thur"]
 
     $uploaderFiles.on("click", "li", function(){
-         that=this,jqthat=$(this);
+        that=this,jqthat=$(this);
         $galleryImg.attr("style", this.getAttribute("style"));
         $gallery.fadeIn(100);
         $("#tabbar").hide();
@@ -129,15 +141,15 @@ $(function(){
     $("#submit").click(function () {
         if($('#year').val()=='请选择')
         { alert('请选择年度') }
-       else if($('#Semester').val()=='请选择')
+        else if($('#Semester').val()=='请选择')
         { alert('请选择学期') }
-       else if($('#date').val()=='')
+        else if($('#date').val()=='')
         { alert('请选择考试时间') }
-       else if($('#province').val()=='请选择')
-         { alert('请选择所在省份') }
-       else if($('#city').val()=='请选择')
+        else if($('#province').val()=='请选择')
+        { alert('请选择所在省份') }
+        else if($('#city').val()=='请选择')
         { alert('请选择所在城市') }
-       else if($('#county').val()=='请选择')
+        else if($('#county').val()=='请选择')
         { alert('请选择所在区县') }
         else if($('#schoolclass').val()=='请选择')
         { alert('请选择学校类别') }
@@ -157,55 +169,55 @@ $(function(){
             alert('请等待图片上传完成')
         }
         else {
-        $.ajax({
-            // url:'http://127.0.0.1:5000/api/paper/upload',
-            url:'/api/paper/upload',
-            type:'post',
-            data:JSON.stringify({
-                "year":$("#year").val(),
-                "section":$("#Semester").val(), // FIRST_HALF 上学期 SECOND_HALF 下学期
-                "province_id":proption.id,
-                "city_id":cioption.id ,
-                "area_id":option.id,
-                "school_id":schoolid.id,
-                "grade":$("#grade").val(),
-                "paper_types":$("#stage").val(),
-                "subject":$("#subject").val(),
-                "name":$("#papuser").val(),
-                "exam_date":$("#date").val(),
-                "attachments":arr
-            }),
-               // async: false,
+            $.ajax({
+                // url:'http://127.0.0.1:5000/api/paper/upload',
+                url:'/api/paper/upload',
+                type:'post',
+                data:JSON.stringify({
+                    "year":$("#year").val(),
+                    "section":$("#Semester").val(), // FIRST_HALF 上学期 SECOND_HALF 下学期
+                    "province_id":proption.id,
+                    "city_id":cioption.id ,
+                    "area_id":option.id,
+                    "school_id":schoolid.id,
+                    "grade":$("#grade").val(),
+                    "paper_types":$("#stage").val(),
+                    "subject":$("#subject").val(),
+                    "name":$("#papuser").val(),
+                    "exam_date":$("#date").val(),
+                    "attachments":arr
+                }),
+                // async: false,
 //                data: formData,
 //                cache: false,
-               // contentType: false,
-               // processData: false,
-            dataType: "json",
-            contentType: "application/json",
-            traditional:true,
-            beforeSend:function () {
-                $("#loadingToast2").removeAttr("style")
-                $("#submit").attr({"disabled":"disabled"});
+                // contentType: false,
+                // processData: false,
+                dataType: "json",
+                contentType: "application/json",
+                traditional:true,
+                beforeSend:function () {
+                    $("#loadingToast2").removeAttr("style")
+                    $("#submit").attr({"disabled":"disabled"});
 
-            },
-            success:function (date){
-                // console.log(date);
-                // alert(date)
-                // var  json=eval('('+date+')')
-                // if(date)
-                // {alert("上传成功")}
-                $('#formpaper')[0].reset();
-                $("#uploaderInput").val("");
-                $('li').remove();
-                arr=[];
-                alert('上传成功')
-                // window.location.href="http://127.0.0.1:5000/wechat/upload";
-                window.location.href="/wechat/upload";
-            },
-            error:function () {
-                alert("ajax错误");
-            }
-        });
+                },
+                success:function (date){
+                    // console.log(date);
+                    // alert(date)
+                    // var  json=eval('('+date+')')
+                    // if(date)
+                    // {alert("上传成功")}
+                    $('#formpaper')[0].reset();
+                    $("#uploaderInput").val("");
+                    $('li').remove();
+                    arr=[];
+                    alert('上传成功')
+                    // window.location.href="http://127.0.0.1:5000/wechat/upload";
+                    window.location.href="/wechat/upload";
+                },
+                error:function () {
+                    alert("ajax错误");
+                }
+            });
         }
     })
 });
