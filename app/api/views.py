@@ -347,20 +347,3 @@ def is_login():
     return {
         "code": 200
     }
-
-@api_blueprint.route('/setcookie')
-def set_cookie():
-    from flask import current_app
-    response = current_app.make_response('set cookie success')
-    response.set_cookie('cookie_name',value='I am Cookie')
-    return response
-
-@api_blueprint.route('/getcookie')
-def get_cookie():
-    return request.cookies.get('cookie_name', 'no cookie')
-
-@api_blueprint.route('/clearcookie')
-def clear_cookie():
-    response = current_app.make_response('clear success')
-    response.set_cookie('cookie_name', '', expires=0)
-    return response
