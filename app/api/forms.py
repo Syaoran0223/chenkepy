@@ -29,5 +29,6 @@ class PaperUploadForm(Form):
         validators.DataRequired('请输入试卷名称')])
     exam_date = DateField('ExamDate', validators=[
         validators.DataRequired('请选择考试时间')])
+    is_fast = IntegerField('IsFast')
 
 

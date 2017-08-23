@@ -33,6 +33,7 @@ class Exam(db.Model, SessionMixin):
     exam_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
     review_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
     order = db.Column(db.Integer, nullable=False, default=0)
+    is_fast = db.Column(db.Integer, nullable=False, default=0) # 是否快速通道
 
     search_fields = ['name_like','state',
         'created_at_begin', 'subject', 'paper_types',

@@ -133,6 +133,7 @@ def paper_upload():
                 exam_date=form.exam_date.data,
                 year=form.year.data,
                 grade=form.grade.data,
+                is_fast=form.is_fast.data,
                 state=0,
                 attachments=attachments,
                 upload_user=g.user.id,
