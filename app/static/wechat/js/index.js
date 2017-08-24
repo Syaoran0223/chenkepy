@@ -16,7 +16,7 @@ $.ajax({
     error: function(err) {
         console.log(err)
     }
-})
+});
 $(function(){
     var asd;
     var arr = new Array(),sum=0,test=0;
@@ -176,9 +176,9 @@ $(function(){
                 data:JSON.stringify({
                     "year":$("#year").val(),
                     "section":$("#Semester").val(), // FIRST_HALF 上学期 SECOND_HALF 下学期
-                    "province_id":proption.id,
-                    "city_id":cioption.id ,
-                    "area_id":option.id,
+                    "province_id":province_id,
+                    "city_id":city_id ,
+                    "area_id":county_id,
                     "school_id":schoolid.id,
                     "grade":$("#grade").val(),
                     "paper_types":$("#stage").val(),
