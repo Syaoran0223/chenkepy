@@ -59,7 +59,7 @@ class Exam(db.Model, SessionMixin):
     def get_exams(upload_user):
         #查询上传用户试卷记录
         query = Exam.query.\
-            filter(Exam.upload_user == upload_user, Exam.state >= EXAM_STATUS['审核不通过'], Exam.is_fast!=1).\
+            filter(Exam.upload_user == upload_user, Exam.state >= EXAM_STATUS['审核不通过']).\
             order_by(Exam.created_at.desc(), Exam.state)
         res = pagination(query)
         return res
@@ -109,6 +109,7 @@ class Exam(db.Model, SessionMixin):
         end_date = self.exam_date + datetime.timedelta(days=5)
         query = Exam.query.filter_by(subject=self.subject,
             year=self.year,
+            is_fast=0,
             section=self.section,
             school_id=self.school_id,
             grade=self.grade).\
