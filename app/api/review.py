@@ -88,6 +88,7 @@ def get_fast_exam(id):
     else:
         raise JsonOutputException('没有数据')
 
+
 # 进入快速通道状态
 @api_blueprint.route('/paper/into_fast/<int:id>', methods=['PUT'])
 @api_login_required
