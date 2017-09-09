@@ -7,7 +7,7 @@ from app.utils import upload, pagination
 from flask import request, g
 from app.const import QUEST_STATUS
 from . import api_blueprint
-from app.models import Question, QuestTyping, QOption, SubQuestion, Exam, School
+from app.models import Question, QuestTyping, QOption, SubQuestion, Exam, School, QType
 from app.utils import render_api
 import datetime
 
@@ -87,6 +87,9 @@ def input_quest(id):
     dianpin = request.json.get('dianpin', '')
     kaodian = request.json.get('kaodian', '')
     has_sub = request.json.get('has_sub', 0)
+    quest_type = QType.query.filter_by(id=quest_type_id).first()
+    if not quest_type:
+        raise JsonOutputException('题型不存在')
     question.quest_content = quest_content
     question.quest_content_html = quest_content_html
     question.quest_type_id = quest_type_id
@@ -101,23 +104,18 @@ def input_quest(id):
         sub_items = request.json.get('sub_items1', [])
         for item in sub_items:
             item_quest_type_id = item.get('quest_type_id', 0)
+            item_quest_type = QType.query.filter_by(id=item_quest_type_id).first()
+            if not item_quest_type:
+                raise JsonOutputException('子题题型不存在')
             correct_answer = item.get('correct_answer', '')
             if correct_answer == '':
                 state = QUEST_STATUS['完成录题']
                 break
-            if item_quest_type_id == '1':
+            if item_quest_type.is_selector():
                 options = item.get('options', [])
                 option_count = len(options)
                 if option_count == 0:
                     raise JsonOutputException('请输入选择题选项')
-            elif item_quest_type_id == '2':
-                correct_answer = item.get('correct_answer', [])
-                if len(correct_answer) == 0:
-                    state = QUEST_STATUS['完成录题']
-            elif item_quest_type_id == '3':
-                pass
-            else:
-                raise JsonOutputException('子题题型错误')
         question.sub_items1 = []
         for item in sub_items:
             item['operator_id'] = g.user.id
@@ -125,7 +123,7 @@ def input_quest(id):
             question.sub_items1.append(item)
     else:
         # 选择题
-        if quest_type_id == '1':
+        if quest_type.is_selector():
             options1 = request.json.get('options1', [])
             option_count = len(options1)
             correct_answer1 = request.json.get('correct_answer1', '')
@@ -147,24 +145,12 @@ def input_quest(id):
                 state = QUEST_STATUS['完成录题']
             # 插入选项
             question.options1 = options1
-        # 填空
-        elif quest_type_id == '2':
-            correct_answer1 = request.json.get('correct_answer1', [])
-            answer_list1 = request.json.get('answer_list1', [])
-            question.answer_list1 = answer_list1
-            if len(correct_answer1) == 0:
-                state = QUEST_STATUS['完成录题']
-            correct_answer1 = json.dumps(correct_answer1)
-            question.correct_answer1 = correct_answer1
-            
-        # 解答
-        elif quest_type_id == '3':
+        # 解答/填空
+        else:
             correct_answer1 = request.json.get('quest_answer', '')
             question.correct_answer1 = correct_answer1
             if question.correct_answer1 == '':
                 state = QUEST_STATUS['完成录题']
-        else:
-            raise JsonOutputException('题型错误')
     quest_typing_data.state = state
     question.state = state
     db.session.add(quest_typing_data)

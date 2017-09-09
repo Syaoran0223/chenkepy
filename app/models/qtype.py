@@ -14,6 +14,9 @@ class QType(db.Model, SessionMixin):
     parent_id = db.Column(db.Integer)
     orderid = db.Column(db.Integer)
 
+    def is_selector(self):
+        return self.name in ['选择题', '单选题', '不定项选择题', '双选题', '多选题']
+
     def __repr__(self):
         return '<SubQuestion: %r>' % self.id
 

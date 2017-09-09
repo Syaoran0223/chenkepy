@@ -6,7 +6,7 @@ from app.utils import upload, pagination
 from flask import request, g
 from app.const import QUEST_STATUS
 from . import api_blueprint
-from app.models import Question, QuestCheck, QOption, SubQuestion, Exam
+from app.models import Question, QuestCheck, QOption, SubQuestion, Exam, QType
 from app.utils import render_api
 import datetime
 
@@ -78,6 +78,9 @@ def check_right(id):
     # 大小题
     if question.has_sub:
         for item in question.sub_items1:
+            item_quest_type = QType.query.filter_by(id=item.get('quest_type_id', 0)).first()
+            if not item_quest_type:
+                raise JsonOutputException('子题题型不存在')
             sub_quest = SubQuestion(parent_id=question.id,
                 quest_content=item.get('quest_content', ''),
                 quest_content_html=item.get('quest_content_html', ''),
@@ -86,22 +89,19 @@ def check_right(id):
                 qtype_id=item.get('quest_type_id', 0),
                 operator_id=item.get('operator_id', 0),
                 finish_state=item.get('finish_state', ''))
-            if int(sub_quest.qtype_id) == 1:
+            if item_quest_type.is_selector():
                 options = item.get('options', [])
                 option_count = len(options)
                 # 插入选项
                 sub_quest.qoptjson = json.dumps(options)
                 sub_quest.option_count = option_count
-            elif int(sub_quest.qtype_id) == 2:
-                correct_answer = item.get('correct_answer', [])
-                correct_answer = json.dumps(correct_answer)
-                sub_quest.correct_answer = correct_answer
-            elif int(sub_quest.qtype_id) == 3:
-                pass
             db.session.add(sub_quest)
     else:
         # 选择题
-        if question.quest_type_id == '1':
+        quest_type = QType.query.filter_by(id=question.quest_type_id).first()
+        if not quest_type:
+            raise JsonOutputException('题型不存在')
+        if quest_type.is_selector():
             question.correct_answer = question.correct_answer1
             for option in question.options1:
                 option = QOption(
@@ -111,7 +111,7 @@ def check_right(id):
                     qopt = option.get('content', '')
                 )
                 db.session.add(option)
-        elif question.quest_type_id == '2' or question.quest_type_id == '3':
+        else:
             question.correct_answer = question.correct_answer1  
     quest_check_data.state = state
     question.state = state
@@ -149,6 +149,9 @@ def check_quest(id):
     question.kaodian = kaodian
     state = QUEST_STATUS['待裁定']
     quest_type_id = request.json.get('quest_type_id')
+    quest_type = QType.query.filter_by(id=quest_type_id).first()
+    if not quest_type:
+        raise JsonOutputException('题型不存在')
     # 大小题
     if question.has_sub:
         sub_items = request.json.get('sub_items2', [])
@@ -156,22 +159,17 @@ def check_quest(id):
             raise JsonOutputException('请输入子题信息')
         for item in sub_items:
             item_quest_type_id = item.get('quest_type_id', 0)
+            item_quest_type = QType.query.filter_by(id=item_quest_type_id).first()
+            if not item_quest_type:
+                raise JsonOutputException('子题题型不存在')
             correct_answer = item.get('correct_answer', '')
             if correct_answer == '':
                 raise JsonOutputException('子题({})请输入正确答案'.format(item.get('sort', '')))
-            if item_quest_type_id == '1':
+            if item_quest_type.is_selector():
                 options = item.get('options', [])
                 option_count = len(options)
                 if option_count == 0:
                     raise JsonOutputException('子题({})请输入正确答案'.format(item.get('sort', '')))
-            elif item_quest_type_id == '2':
-                correct_answer = item.get('correct_answer', [])
-                if len(correct_answer) == 0:
-                    raise JsonOutputException('子题({})请输入正确答案'.format(item.get('sort', '')))
-            elif item_quest_type_id == '3':
-                pass
-            else:
-                raise JsonOutputException('子题题型错误')
         question.sub_items2 = []
         for item in sub_items:
             item['operator_id'] = g.user.id
@@ -179,31 +177,19 @@ def check_quest(id):
             question.sub_items2.append(item)
     else:
         # 选择
-        if quest_type_id == '1':
+        if quest_type.is_selector():
             correct_answer2 = request.json.get('correct_answer2', '')
             if not correct_answer2:
                 raise JsonOutputException('请输入正确答案')
             options2 = request.json.get('options2', [])
             question.correct_answer2 = correct_answer2
             question.options2 = options2
-        # 填空
-        elif quest_type_id == '2':
-            correct_answer2 = request.json.get('correct_answer2', [])
-            answer_list2 = request.json.get('answer_list2', [])
-            if len(correct_answer2) == 0:
-                raise JsonOutputException('请输入正确答案')
-            correct_answer2 = json.dumps(correct_answer2)
-            question.correct_answer2 = correct_answer2
-            question.answer_list2 = answer_list2
-            
-        # 解答
-        elif quest_type_id == '3':
+        # 解答/填空
+        else:
             correct_answer2 = request.json.get('correct_answer2', '')
             question.correct_answer2 = correct_answer2
             if not question.correct_answer2:
                 raise JsonOutputException('请输入正确答案')
-        else:
-            raise JsonOutputException('题型错误')
     quest_check_data.state = state
     question.state = state
     db.session.add(quest_check_data)

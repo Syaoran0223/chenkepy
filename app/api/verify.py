@@ -6,7 +6,7 @@ from app.utils import upload, pagination
 from flask import request, g
 from app.const import QUEST_STATUS
 from . import api_blueprint
-from app.models import Question, QuestVerify, QOption, SubQuestion, Exam
+from app.models import Question, QuestVerify, QOption, SubQuestion, Exam, QType
 from app.utils import render_api
 import datetime
 
@@ -117,6 +117,9 @@ def verify_quest(id):
     question.quest_content_html = quest_content_html
     state = QUEST_STATUS['结束录题']
     quest_type_id = request.json.get('quest_type_id')
+    quest_type = QType.query.filter_by(id=quest_type_id).first()
+    if not quest_type:
+        raise JsonOutputException('题型不存在')
     # 大小题
     if question.has_sub:
         sub_items = request.json.get('sub_items', [])
@@ -128,14 +131,18 @@ def verify_quest(id):
             sub_quest_content_html = item.get('quest_content_html', '')
             sub_item.quest_content = sub_quest_content
             sub_item.quest_content_html = sub_quest_content_html
+
+            item_quest_type = QType.query.filter_by(id=sub_item.qtype_id).first()
+            if not item_quest_type:
+                raise JsonOutputException('子题题型不存在')
             
-            if sub_item.qtype_id == 1:
+            if item_quest_type.is_selector():
                 options = item.get('options', [])
                 sub_item.qoptjson = json.dumps(options)
             db.session.add(sub_item)
     else:
         # 选择
-        if quest_type_id == '1':
+        if quest_type.is_selector():
             options = request.json.get('options', [])
             for data in options:
                 option = QOption.query.get(data['id'])

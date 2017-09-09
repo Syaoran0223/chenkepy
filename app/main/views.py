@@ -8,7 +8,7 @@ from flask.ext.login import login_user,logout_user,login_required,current_user
 from . import main
 
 from .forms import LoginForm, RegisterForm, PasswordResetRequestForm, PasswordResetForm, RegisterInfoForm
-from app.models import User, Region, School, InviteCode
+from app.models import User, Region, School, InviteCode, QType
 
 from app.sms import SmsServer
 
@@ -111,9 +111,13 @@ def index():
     menus = json.dumps(menus)
     
     subjects = get_subjects()
+    qtypes = QType.query.all()
+    qtypes = [{'id': t.id, 'subject_id': t.subject_id, 'text': t.name} for t in qtypes]
+    qtypes = json.dumps(qtypes)
 
     return render_template('index.html',
-        site_url=site_url, user_info=user_info, menus=menus, subjects=subjects)
+        site_url=site_url, user_info=user_info,
+        menus=menus, subjects=subjects, qtypes=qtypes)
 
 @main.route("/logout")
 @login_required

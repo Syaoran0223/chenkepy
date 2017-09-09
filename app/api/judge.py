@@ -6,7 +6,7 @@ from app.utils import upload, pagination
 from flask import request, g
 from app.const import QUEST_STATUS
 from . import api_blueprint
-from app.models import Question, QuestJudge, QOption, SubQuestion, Exam
+from app.models import Question, QuestJudge, QOption, SubQuestion, Exam, QType
 from app.utils import render_api
 import datetime
 
@@ -84,30 +84,31 @@ def judge_accepy(id):
     # 大小题
     if question.has_sub:
         for item in getattr(question, sub_item_key):
+            tem_quest_type_id = item.get('quest_type_id', 0)
+            item_quest_type = QType.query.filter_by(id=item_quest_type_id).first()
+            if not item_quest_type:
+                raise JsonOutputException('子题题型不存在')
             sub_quest = SubQuestion(parent_id=question.id,
                 quest_content=item.get('quest_content', ''),
                 quest_content_html=item.get('quest_content_html', ''),
                 correct_answer=item.get('correct_answer', ''),
                 quest_no=item.get('sort', 0),
-                qtype_id=item.get('quest_type_id', 0),
+                qtype_id=tem_quest_type_id,
                 operator_id=item.get('operator_id', 0),
                 finish_state=item.get('finish_state', ''))
-            if int(sub_quest.qtype_id) == 1:
+            if iitem_quest_type.is_selector():
                 options = item.get('options', [])
                 option_count = len(options)
                 # 插入选项
                 sub_quest.qoptjson = json.dumps(options)
                 sub_quest.option_count = option_count
-            elif int(sub_quest.qtype_id) == 2:
-                correct_answer = item.get('correct_answer', [])
-                correct_answer = json.dumps(correct_answer)
-                sub_quest.correct_answer = correct_answer
-            elif int(sub_quest.qtype_id) == 3:
-                pass
             db.session.add(sub_quest)
     else:
         # 选择题
-        if question.quest_type_id == '1':
+        quest_type = QType.query.filter_by(id=question.quest_type_id).first()
+        if not quest_type:
+            raise JsonOutputException('题型不存在')
+        if quest_type.is_selector():
             question.correct_answer = getattr(question, correct_answer_key)
             for option in getattr(question, option_key):
                 option = QOption(
@@ -117,7 +118,7 @@ def judge_accepy(id):
                     qopt = option.get('content', '')
                 )
                 db.session.add(option)
-        elif question.quest_type_id == '2' or question.quest_type_id == '3':
+        else:
             question.correct_answer = getattr(question, correct_answer_key)
     quest_judge_data.state = state
     question.state = state
