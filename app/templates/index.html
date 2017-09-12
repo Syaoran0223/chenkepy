@@ -13,6 +13,9 @@
         var subjects = JSON.parse('{$=subjects | safe}');
         var qtypes = JSON.parse('{$=qtypes | safe}');
     </script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['\\(','\\)']]}});
+    </script>
 
     <link rel="stylesheet" href="{$=url_for('static', filename="public/app.css")}"/>
 </head>
@@ -31,5 +34,6 @@
 <script src="{$=url_for('static', filename="public/static/lodash.min.js")}"></script>
 <script src="{$=url_for('static', filename="public/static/ckeditor/ckeditor.js")}"></script>
 <script src="{$=url_for('static', filename="public/app.js")}"></script>
+<script src="/static/js/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>
