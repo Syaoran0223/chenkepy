@@ -12,7 +12,6 @@ from .exam import Exam
 from .schools import School
 from .qoption import QOption
 from .sub_quest import SubQuestion
-from .qtype import QType
 
 class Question(db.Model, SessionMixin):
     __tablename__ = 'quest'
@@ -127,11 +126,13 @@ class Question(db.Model, SessionMixin):
             sub_items = SubQuestion.query.filter_by(parent_id=self.id).all()
             res['sub_items'] = [item.to_dict() for item in sub_items]
         else:
-            qtype = QType.query.get(self.quest_type_id)
             # 选择题
-            if qtype.is_selector():
+            if self.quest_type_id == '1':
                 options = QOption.query.filter_by(qid=self.id).all()
                 res['options'] = [option.to_dict() for option in options]
+            # 填空题
+            elif self.quest_type_id == '2':
+                res['correct_answer'] = json.loads(self.correct_answer)
         return res
 
     @staticmethod
