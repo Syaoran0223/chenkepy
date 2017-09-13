@@ -35,5 +35,24 @@
 <script src="{$=url_for('static', filename="public/static/ckeditor/ckeditor.js")}"></script>
 <script src="{$=url_for('static', filename="public/app.js")}"></script>
 <script src="http://www.i3ke.com/static/siming/base/js/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script>
+    CKEDITOR.config={
+          language: 'zh-cn',
+          toolbarGroups: toolbar_group,
+          extraPlugins: 'kityformula,pastefromword,pastebase64',
+          removePlugins: 'elementspath',
+          pasteFromWord_heuristicsEdgeList: false,
+          pasteFromWordPromptCleanup: false,
+          mathJaxLib: 'http://www.i3ke.com/static/siming/base/js/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML',
+          autoGrow_maxHeight: 800,
+          autoGrow_onStartup: true,
+          removeButtons: 'Cut,Copy,Paste,Anchor,Underline,Strike,Subscript,Superscript',
+          removeDialogTabs: 'link:advanced',
+          pasteFilter: 'semantic-content',
+          enterMode: CKEDITOR.ENTER_BR,
+          allowedContent: true,
+          filebrowserUploadUrl: `/teacher/upload/ckeditor?module=teacher&dirname=ckeditor`
+        }
+</script>
 </body>
 </html>
