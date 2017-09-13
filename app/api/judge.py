@@ -96,7 +96,7 @@ def judge_accepy(id):
                 qtype_id=item_quest_type_id,
                 operator_id=item.get('operator_id', 0),
                 finish_state=item.get('finish_state', ''))
-            if iitem_quest_type.is_selector():
+            if item_quest_type.is_selector():
                 options = item.get('options', [])
                 option_count = len(options)
                 # 插入选项
