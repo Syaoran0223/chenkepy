@@ -84,7 +84,7 @@ def judge_accepy(id):
     # 大小题
     if question.has_sub:
         for item in getattr(question, sub_item_key):
-            tem_quest_type_id = item.get('quest_type_id', 0)
+            item_quest_type_id = item.get('quest_type_id', 0)
             item_quest_type = QType.query.filter_by(id=item_quest_type_id).first()
             if not item_quest_type:
                 raise JsonOutputException('子题题型不存在')
@@ -93,7 +93,7 @@ def judge_accepy(id):
                 quest_content_html=item.get('quest_content_html', ''),
                 correct_answer=item.get('correct_answer', ''),
                 quest_no=item.get('sort', 0),
-                qtype_id=tem_quest_type_id,
+                qtype_id=item_quest_type_id,
                 operator_id=item.get('operator_id', 0),
                 finish_state=item.get('finish_state', ''))
             if iitem_quest_type.is_selector():
