@@ -3,7 +3,7 @@ from itertools import groupby
 from sqlalchemy import distinct, func
 from app import db
 from ._base import SessionMixin
-from app.utils import pagination
+from app.utils import pagination, post_paper_to_i3ke, put_paper_attachment_to_i3ke
 from app.models import School, Region
 from app.const import EXAM_STATUS
 import datetime
@@ -237,6 +237,22 @@ class Exam(db.Model, SessionMixin):
             'totalPage': data.pages
         }
         return res
+
+    def push_attachments(self):
+        '''
+            附件推送
+        '''
+        data = {
+            "name": self.name,
+            "qids": "",
+            "subject_id": int(self.subject)
+        }
+        ref_paper_id = post_paper_to_i3ke(data)
+        for index, attachment in enumerate(self.attachments):
+            file_path = current_app.config['APP_PATH'] + attachment['url']
+            put_paper_attachment_to_i3ke(ref_paper_id, file_path, index+1)
+        return True
+
 
 
     def __repr__(self):

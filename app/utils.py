@@ -2,7 +2,7 @@
 
 from flask import current_app, request, g
 # from PIL import Image
-from .exceptions import ValidationError
+from .exceptions import ValidationError, JsonOutputException
 from werkzeug import secure_filename
 from datetime import datetime, timedelta, date
 from random import randint
@@ -142,3 +142,53 @@ def render_api(data):
         'code': 0,
         'data': data
     }
+
+def get_i3ke_token():
+    url = "http://www.i3ke.com/api/v2/user/auth"
+    headers = {'content-type': 'application/json'}
+    payload = {
+        "mobile": "18558707091",
+        "password": "chenke91.com",
+        "expire_hour": 1
+    }
+    payload = json.dumps(payload)
+    result = requests.post(url, data=payload, headers=headers)
+    if not result.ok:
+        raise JsonOutputException('请求失败')
+    res = result.json()
+    if res['ok']:
+        return 'Bearer ' + res['data']['login_token']
+    raise JsonOutputException('获取token失败！')
+
+def post_paper_to_i3ke(data):
+    url = "http://www.i3ke.com/api/v2/papers/famous"
+    headers = {
+        'content-type': "application/json;charset=UTF-8",
+        'authorization': get_i3ke_token()
+    }
+    data = json.dumps(data)
+    response = requests.post(url, data=data, headers=headers)
+    if not response.ok:
+        raise JsonOutputException('请求失败')
+    res = response.json()
+    if not res['ok']:
+        raise JsonOutputException(res['err'])
+    return res['data']['papers']['id']
+
+def put_paper_attachment_to_i3ke(paper_id, file_path, num):
+    url = 'http://www.i3ke.com/api/v2/papers/famous/id/{}/pics/{}'.format(paper_id, num)
+    headers = {
+        'content-type': "application/octet-stream",
+        'authorization': get_i3ke_token()
+    }
+    data = open(file_path, 'rb').read()
+    response = requests.put(url=url, data=data, headers=headers)
+    if not response.ok:
+        raise JsonOutputException('试卷上传失败')
+    res = response.json()
+    if not res['ok']:
+        raise JsonOutputException('试卷上传被拒绝')
+    return True
+
+
+    

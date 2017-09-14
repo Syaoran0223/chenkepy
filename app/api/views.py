@@ -336,6 +336,20 @@ def login():
         return user.to_dict()
     raise JsonOutputException('密码错误')
 
+@api_blueprint.route('/paper/attachment/upload/<int:id>')
+@login_required
+@permission_required('FAST_PERMISSION')
+def upload_paper_attachment(id):
+    paper = Exam.query.get_or_404(id)
+    if paper.is_fast != 1:
+        raise JsonOutputException('操作失败')
+    success = paper.push_attachments()
+    if success:
+        paper.is_fast = 2
+        paper.save()
+        return render_api({})
+    raise JsonOutputException('上传失败')
+
 @api_blueprint.route("/logout/")
 @api_login_required
 def logout():
