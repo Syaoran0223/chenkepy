@@ -165,6 +165,7 @@ class Question(db.Model, SessionMixin):
         pageSize = int(request.args.get('pageSize', 5))
         query = db.session.query(distinct(Question.exam_id)).\
             filter_by(state=state)
+        totalCount = query.count()
         query = query.\
             order_by(Question.order.desc()).\
             order_by(Question.created_at.desc()).\
@@ -192,7 +193,6 @@ class Question(db.Model, SessionMixin):
             exam_query = exam_query.filter(Exam.year==request.args.get('year'))
         if request.args.get('grade'):
             exam_query = exam_query.filter(Exam.grade==request.args.get('grade'))
-        totalCount = exam_query.count()
         totalPage = ceil(totalCount / pageSize)
         exams = exam_query.all()
         items = []
