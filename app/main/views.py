@@ -170,6 +170,14 @@ def todo():
 @main.route('/wechat/login')
 def wechat_login():
     return render_template('wechat/login.html')
+	
+@main.route('/wechat/register')
+def wechat_register():
+    return render_template('wechat/register.html')
+	
+@main.route('/wechat/fillInInfor')
+def wechat_fillInInfor():
+    return render_template('wechat/fill_in_infor.html')	
 
 @main.route('/wechat/index')
 def wechat_index():
