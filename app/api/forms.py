@@ -31,4 +31,18 @@ class PaperUploadForm(Form):
         validators.DataRequired('请选择考试时间')])
     is_fast = IntegerField('IsFast')
 
+class RegisterInfoForm(Form):
+    phone = StringField('Phone', validators=[validators.DataRequired('请输入手机号'),
+        validators.length(11, 11, '手机号不正确')])
+    user_name = StringField('用户名',validators=[validators.DataRequired('请输入用户名'), validators.length(1,64)])
+    password = StringField('密码',validators=[validators.DataRequired('请输入密码')])
+    repassword = StringField('密码',validators=[validators.DataRequired('请输入密码'), validators.equal_to('password', '两次输入密码不一致')])
+    email = StringField('邮箱', validators=[validators.DataRequired('请输入邮箱'),
+                                             validators.email("邮箱格式不正确")])
+    province_id = IntegerField('省', validators=[validators.DataRequired('请选择省')])
+    city_id = IntegerField('市', validators=[validators.DataRequired('请选择市')])
+    area_id = IntegerField('县/区', validators=[validators.DataRequired('请选择县/区')])
+    school_id = IntegerField('学校', validators=[validators.DataRequired('请选择学校')])
+    grade_id = IntegerField('年级', validators=[validators.DataRequired('请选择年级')])
+
 

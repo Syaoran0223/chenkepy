@@ -16,13 +16,28 @@
         "user_name": "test1"
     }
 
-*注册接口*
+*注册接口 参数*
 
     # 测试环境验证码随便填，不需要发送
     {
         "phone": "13805910002",
         "valid_code": "123456",
         "visit_code": 4444
+    }
+
+*注册详情 参数*
+
+    {
+        "phone": "13805910002",
+        "email": "chenke1991@qq.com",
+        "password": "123456",
+        "repassword": "123456",
+        "user_name": "ss",
+        "school_id": "1",
+        "city_id": "2",
+        "grade_id": "1",
+        "province_id": "1",
+        "area_id": "1"
     }
 
 ### 省/市/县/学校接口
