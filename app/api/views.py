@@ -1,5 +1,5 @@
 import json, math, os
-from flask import current_app
+from flask import current_app, session
 from PIL import Image
 from flask.ext.login import login_user,logout_user,login_required,current_user
 from app.exceptions import JsonOutputException, FormValidateError
@@ -362,3 +362,24 @@ def is_login():
     return {
         "code": 200
     }
+
+@api_blueprint.route('/register/', methods=['POST'])
+def api_register():
+    phone = request.json.get('phone')
+    valid_code = str(request.json.get('valid_code', ''))
+    visit_code = str(request.json.get('visit_code', ''))
+    if not phone or not valid_code or not visit_code:
+        raise JsonOutputException('参数错误')
+    if len(phone) != 11:
+        raise JsonOutputException('手机号格式错误') 
+    user = User.query.filter_by(phone=phone).first()
+    if user is not None:
+        raise JsonOutputException('该手机号已经注册过')
+    sms = SmsServer()
+    if not sms.check_code(valid_code, phone):
+        raise JsonOutputException('验证码错误')
+    if not (len(visit_code)==4 and sum([int(i) for i in visit_code])==16):
+        raise JsonOutputException('邀请码错误')
+    session['phone'] = phone
+    return render_api({})
+    

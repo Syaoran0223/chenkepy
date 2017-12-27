@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import random, json, time
+from flask import current_app
 from app.alidayu import AlibabaAliqinFcSmsNumSendRequest
 from app import cache
 
@@ -52,5 +53,7 @@ class SmsServer(object):
         }
 
     def check_code(self, code, phone):
+        if current_app.config['NOT_SEND']:
+            return True
         valid_code_key = "code_{}".format(phone)
-        return str(cache.get(valid_code_key)) == code
+        return str(cache.get(valid_code_key)) == str(code)

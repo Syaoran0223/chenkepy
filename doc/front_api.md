@@ -7,12 +7,22 @@
 | ---- | ----- | ----- |
 | /api/login/ | POST | 登录接口 |
 | /api/logout/ | GET | 登出 |
+| /api/register/ | POST | 注册 |
 
 *登录接口*
 
     {
         "password": "123456",
         "user_name": "test1"
+    }
+
+*注册接口*
+
+    # 测试环境验证码随便填，不需要发送
+    {
+        "phone": "13805910002",
+        "valid_code": "123456",
+        "visit_code": 4444
     }
 
 ### 省/市/县/学校接口

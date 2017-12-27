@@ -10,6 +10,8 @@ class Config:
     APP_PATH = '{}/app'.format(basedir)
 
     PER_PAGE = 20
+
+    NOT_SEND = False
     @staticmethod
     def init_app(app):
         pass
@@ -31,6 +33,8 @@ class DevelopmentConfig(Config):
         format(username=USER_NAME, password=PASSWORD, mysql_addr=MYSQL_ADDR, db_name=DB_NAME, mysql_port=MYQSL_PORT)
 
     SITE_URL = 'http://127.0.0.1:5000'
+    NOT_SEND = True
+    
 class TestingConfig(Config):
     TESTING = True
     WTF_CSRF_ENABLED = False
