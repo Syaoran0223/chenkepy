@@ -1,0 +1,140 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>试卷系统</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="{$=url_for('static',filename='wechat/public/weui4.2/style/weui.css')}"/>
+    <link rel="stylesheet" href="{$=url_for('static',filename='wechat/public/weui4.2/style/weui2.css')}"/>
+    <link rel="stylesheet" href="{$=url_for('static',filename='wechat/public/weui4.2/style/weui3.css')}"/>
+    <link rel="stylesheet" href="{$=url_for('static',filename='wechat/public/weui4.2/style/icon.css')}"/>
+    <script src="{$=url_for('static', filename='wechat/public/weui4.2/zepto.min.js')}"></script>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        .login1{
+            margin-top: 15px;
+            border-bottom:solid 1px #ccc;
+            height:40px;
+        }
+        .login1 input{
+            float:left;border:none;background:none;height:40px;text-indent:40px;font-size: 20px;
+            width:100%;
+        }
+        .login1 .teln2{
+            width:100%;
+        }
+        .login1 .code2{width:50%;
+        }
+        .login1 .invitecode2{
+        }
+        .teln{
+            background:url(/static/wechat/public/img/man.png) no-repeat 0 center;
+            background-color: white;
+            background-size:21px 22px;
+            background-position: 0 8px;
+        }
+        .invitecode{
+            background:url(/static/wechat/public/img/invite.png) no-repeat 0 center;
+            background-color: white;
+            background-size:21px 22px;
+            background-position: 0 8px;
+        }
+        .code{
+            margin-top: 20px;
+            background:url(/static/wechat/public/img/id_code.png) no-repeat 0 center;
+            background-color: white;
+            background-size:21px 22px;
+            background-position: 0 8px;
+        }
+        .hqcode{
+            -webkit-border-radius:20px;/*适配以webkit为核心的浏览器(chrome、safari等)*/
+            -moz-border-radius:20px;/*适配firefox浏览器*/
+            -ms-border-radius:20px;/*适配IE浏览器*/
+            -o-border-radius:20px;/*适配opera浏览器*/
+            border-radius:20px;
+            border:solid 1px rgb(191,191,191);
+            /*height: 30px;*/
+            padding: 10px;
+            line-height: 7px;
+            height:30px;
+            margin-top: 4px;
+            margin-right:5px;
+            background-color: rgb(238,238,238);
+            color: rgb(184,184,184);
+            /*float: right;*/
+        }
+
+        .login_button{
+            margin-top: 10px;
+        }
+        .login_button div{
+            text-align: right;
+            width: 60%;
+            margin: 0 auto;
+        }
+        .login_button  .uncode{
+            text-align: right;
+            color: rgb(234,161,47);
+            text-decoration:underline;
+            margin-top: 9px;
+            font-size: 13px;
+        }
+        .button{
+            height: 40px;
+            background-color:#2ca798 ;
+            -webkit-border-radius:37px;/*适配以webkit为核心的浏览器(chrome、safari等)*/
+            -moz-border-radius:37px;/*适配firefox浏览器*/
+            -ms-border-radius:37px;/*适配IE浏览器*/
+            -o-border-radius:37px;/*适配opera浏览器*/
+            border-radius:37px;
+            width: 100%;
+            border:1px solid #DBDBDB;
+            margin-top: 30px;
+            color:white;
+            /*font-weight: 700;*/
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body  >
+<div style="padding:1px">
+    <div style="width:35%;margin-top: 5% ;margin-left: auto;margin-right: auto" >
+        <img src="/static/wechat/public/img/logo_pic_.png" style="width: 100%" alt="">
+    </div>
+</div>
+<div>
+    <div style="width:35%;margin: 10px auto">
+        <img src="/static/wechat/public/img/parers_master.png" style="width: 100%" alt="">
+    </div>
+</div>
+<div style="text-align: center;margin-top: 18%" >
+    <div style="width:70%;margin: 0 auto;text-align: right">
+        <div class="login1 teln">
+            <input type="text" class="teln2" id="teln"  placeholder="手机号">
+        </div>
+        <div class="login1 code">
+            <button class="hqcode" id="hqCode"> 获取验证码</button>
+            <input type="text" class="code2" id="code" placeholder="验证码">
+        </div>
+        <div class="login1 invitecode">
+            <input type="text" class="invitecode2" id="invitecode"  placeholder="邀请码">
+        </div>
+        <!--<div class="uncode"><span>没收到验证码</span></div>-->
+    </div>
+</div>
+<div class="login_button">
+    <div>
+        <button class="button" id="login">下一步</button>
+        <div class="uncode"  style="width: 100%"><a style="color:rgb(234,161,47)" href="/wechat/login">已有帐号?&nbsp;登入>></a></div>
+    </div>
+</div>
+<div class="weui-footer weui-footer-fixed-bottom" >
+    <p class="weui-footer__text"> &copy;i3ke.com</p>
+</div>
+</body>
+
+<script src="{$=url_for('static', filename='wechat/public/js/register.js')}"></script>
+</html>
