@@ -7,7 +7,7 @@ from app.decorators import api_login_required, permission_required
 from app.models import Attachment, Exam, User, Message
 from app.utils import upload, pagination, image_save
 from flask import request, g
-from .forms import SmsForm, PaperUploadForm
+from .forms import SmsForm, PaperUploadForm, RegisterInfoForm
 from werkzeug.datastructures import MultiDict
 from app.const import EXAM_STATUS, PAPER_TYPE_ORDER
 from . import api_blueprint
@@ -382,4 +382,31 @@ def api_register():
         raise JsonOutputException('邀请码错误')
     session['phone'] = phone
     return render_api({})
+
+@api_blueprint.route('/register/info/', methods=['POST'])
+def api_register_info():
+    if not session.get('phone'):
+        raise JsonOutputException('请从注册页进入')
+    data = MultiDict(mapping=request.json)
+    form = RegisterInfoForm(data)
+    if form.validate():
+        user = User.query.filter_by(phone=form.phone.data).first()
+        if user is not None:
+            raise JsonOutputException('该手机号已经注册过')
+        user = User.query.filter_by(name=form.user_name.data).first()
+        if user is not None:
+            raise JsonOutputException('该用户名已被使用')
+        user = User(name=form.user_name.data,
+            phone=form.phone.data,
+            email=form.email.data,
+            password=form.password.data,
+            school_id=form.school_id.data,
+            city_id=form.city_id.data,
+            grade_id=form.grade_id.data,
+            province_id=form.province_id.data,
+            area_id=form.area_id.data)
+        user.save()
+        login_user(user)
+        return render_api({})
+    raise FormValidateError(form.errors)
     
