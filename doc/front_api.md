@@ -8,6 +8,7 @@
 | /api/login/ | POST | 登录接口 |
 | /api/logout/ | GET | 登出 |
 | /api/register/ | POST | 注册 |
+| /api/register/info/ | POST | 注册 |
 
 *登录接口*
 
