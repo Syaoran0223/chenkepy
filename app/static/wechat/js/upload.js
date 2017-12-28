@@ -2,7 +2,14 @@
  * Created by Administrator on 2017/6/22 0022.
  */
 $(function () {
-
+    function removeByValue(arr, val) {
+        for(var i=0; i<arr.length; i++) {
+            if(arr[i].id == val) {
+                arr.splice(i,1);
+                break;
+            }
+        }
+    }
     PAPER_TYPE = {
         'PAPER_UNIT': '单元考',
         'PAPER_MONTH': '月考',
@@ -91,27 +98,28 @@ $(function () {
             $("#loadingToast").removeAttr("style")
         },
         success: function(data) {
-            $('#loadingToast').css("display","none")
-            if(data.code!=403){
-            $.each(data.data.items,function (index,elme) {
-                var date=elme.updated_at.substring(0,10);var shenhe="";
-                if (elme.state==0){
-                   shenhe="未审核"
+            $('#loadingToast').css("display","none");
+            if(data.code==0){
+                if(data.code!=403){
+                    $.each(data.data.items,function (index,elme) {
+                        var date=elme.updated_at.substring(0,10);var shenhe="";
+                        if (elme.state==0){
+                            shenhe="未审核"
+                        }
+                        else{
+                            shenhe="已审核"
+                        }
+                        $("#continue").append("<div class='weui-cells page__category-content row' id='"+elme.id+"'> <a class='weui-cell weui-cell_access js_item'  href='javascript:;'> <div class='weui-cell__bd'><p style='float: left'>"+elme.name+"</p> <br><span style='color: #9b9b9b'>("+date+")</span></div> <div class='weui-cell__ft'>"+shenhe+" </div> </a> </div>")
+                    })
+                }else{
+                    alert("请登入后访问");
+                    window.location.href="/wechat/login";
                 }
-                else{
-                    shenhe="已审核"
-                }
-                $("#continue").append("<div class='weui-cells page__category-content row' id='"+elme.id+"'> <a class='weui-cell weui-cell_access js_item'  href='javascript:;'> <div class='weui-cell__bd'><p style='float: left'>"+elme.name+"</p> &nbsp;<sub style='color: #9b9b9b'>("+date+")</sub><span style='float: right'>"+shenhe+" &nbsp;</span> </div> <div class='weui-cell__ft'></div> </a> </div>")
-            })
-            }else{
-                alert("请登入后访问")
-                window.location.href="/wechat/login";
+            }else {
+                alert(data.msg);
+                window.location.href="/wechat/index";
             }
-            // $(".logout").show();
 
-            // $("#updated_at").find("span").html(data.data.updated_at)
-            // alert(1111)
-            // console.log(data)
         },
         error: function(err) {
             console.log(err)
@@ -141,21 +149,14 @@ $(function () {
 //     $(".weui-mask_transparent").click(function () {
 //         $('#loadingToast').css("display","none");
 //     })
+   arr = new Array(),sum=0;
   $(".row").click(function () {
-      $("#loadingToast").removeAttr("style")
+      $("#loadingToast").removeAttr("style");
 
-      var arr = new Array(),sum=0
-      uploadid=  $(this).attr("id")
+
+      uploadid=  $(this).attr("id");
       var winH = $(window).height();
-      var categorySpace = 10;
-      //刷新页面
-      // $("#tiaozhuan").click(function () {
-      //     location.reload([true])
-      // });
-      // $('.js_item').on('click', function(){
-      //     var id = $(this).data('id');
-      //     window.pageManager.go(id);
-      // });
+
 
       //改变tabbar样式
       $('.weui-tabbar__item').on('click', function () {
@@ -165,115 +166,63 @@ $(function () {
       var asd;
 
 
-      $gallery = $("#gallery"), $galleryImg = $("#galleryImg"),
-          $uploaderInput = $("#uploaderInput"),
-          $uploaderFiles = $("#uploaderFiles");
 
-      $uploaderInput.on("change", function(e){
-          // test++;
-          var t_files = this.files;
-          var src, url = window.URL || window.webkitURL || window.mozURL, files = e.target.files;
-          for (var i = 0, len = files.length; i < len; ++i) {
-              var file = files[i];
-              if (url) {
-                  src = url.createObjectURL(file);
+      // $uploaderInput.on("change", function(e){
+      //
+      //     var src, url = window.URL || window.webkitURL || window.mozURL, files = e.target.files;
+      //     for (var i = 0, len = files.length; i < len; ++i) {
+      //         var file = files[i];
+      //         if (url) {
+      //             src = url.createObjectURL(file);
+      //
+      //         } else {
+      //             src = e.target.result;
+      //         }
+      //         var formData = new FormData($("#uploadForm")[0]);
+      //         $.ajax({
+      //             url:'/api/uploads',
+      //             type:'post',
+      //             // data:{'photo': $uploaderInput[0].files[0].name},
+      //             // async: false,
+      //             // data: {"id":"WU_FILE_0"},
+      //             // data: {user_name: "test1", password: "123456"},
+      //             data: formData,
+      //
+      //             cache: false,
+      //             contentType: false,
+      //             processData: false,
+      //             beforeSend:function () {
+      //                 $('#loadingToast1').css("display","block")
+      //             },
+      //             success:function (date){
+      //                 $('#loadingToast1').css("display","none")
+      //                 arr.push({
+      //                     "url":String(date.data),
+      //                     "can_preview":true,  //如果是图片填true，word填false
+      //                     "name":$uploaderInput[0].files[0].name,
+      //                     "serverCode":0, // 填0
+      //                     "status":"success", // 填 success
+      //                     "percentage":"100%", // 填100%
+      //                     "id":"upfile_"+sum, // 唯一id upfile_开头
+      //                     "error_msg":""
+      //                 });
+      //
+      //                 var tmpl = '<li class="weui-uploader__file" id="upfile_'+sum+'" style="background-image:url(#asd)"></li>';
+      //                 $uploaderFiles.append($(tmpl.replace('#asd', src)));
+      //                 sum++;
+      //                 console.log(sum)
+      //                 $uploaderInput.val("");
+      //             },
+      //             error:function () {
+      //                 alert("ajax错误");
+      //             }
+      //         });
+      //     }
+      //     console.log(sum)
+      // });
 
-              } else {
-                  src = e.target.result;
-              }
-              // $uploaderFiles.append($(tmpl.replace('#asd', src)));
-//                $uploaderFiles.html($(tmpl.replace('#asd', src)));
-//                $("#shangchuang").hide();
-              var formData = new FormData($("#uploadForm")[0]);
-              // alert( $uploaderInput[0].files[0].name)
-
-              $.ajax({
-                  // url:'http://127.0.0.1:5000/api/uploads',
-                  url:'/api/uploads',
-                  type:'post',
-                  // data:{'photo': $uploaderInput[0].files[0].name},
-                  // async: false,
-                  // data: {"id":"WU_FILE_0"},
-                  // data: {user_name: "test1", password: "123456"},
-                  data: formData,
-
-                  cache: false,
-                  contentType: false,
-                  processData: false,
-                  beforeSend:function () {
-                      $('#loadingToast1').css("display","block")
-                  },
-                  success:function (date){
-                      $('#loadingToast1').css("display","none")
-                      arr.push({
-                          "url":String(date.data),
-                          "can_preview":true,  //如果是图片填true，word填false
-                          "name":$uploaderInput[0].files[0].name,
-                          "serverCode":0, // 填0
-                          "status":"success", // 填 success
-                          "percentage":"100%", // 填100%
-                          "id":"upfile_"+sum, // 唯一id upfile_开头
-                          "error_msg":""
-                      });
-                      console.log(arr)
-                      console.log(sum)
-
-                      var tmpl = '<li class="weui-uploader__file" id="upfile_'+sum+'" style="background-image:url(#asd)"></li>';
-                      $uploaderFiles.append($(tmpl.replace('#asd', src)));
-                      sum++;
-                      console.log(sum)
-                      $uploaderInput.val("");
-                  },
-                  error:function () {
-                      alert("ajax错误");
-                  }
-              });
-          }
-          console.log(sum)
-      });
-      //点击删除图片
-
-
-      function removeByValue(arr, val) {
-          for(var i=0; i<arr.length; i++) {
-              if(arr[i].id == val) {
-                  arr.splice(i, 1);
-                  break;
-              }
-          }
-      }
-//        var somearray = ["mon", "tue", "wed", "thur"]
-
-      $uploaderFiles.on("click", "li", function(){
-          $("#form").removeAttr("style").css("margin-bottom","50px");
-          that=this,jqthat=$(this);
-          $galleryImg.attr("style", this.getAttribute("style"));
-          $gallery.fadeIn(100);
-          $("#tabbar").hide();
-          console.log(arr);
-
-      });
-      $gallery.find("a div").click(function () {
-          that.remove();
-          var divID = jqthat.attr("id");
-          console.log(divID);
-          console.log(arr);
-          removeByValue(arr,divID);
-          console.log(arr);
-          // test--;
-          sum--;
-          console.log(sum)
-          $("#uploaderInput").val("");
-          $("#shangchuang").show();
-      })
-      $gallery.on("click", function(){
-          $gallery.fadeOut(100);
-          $("#tabbar").show();
-      });
           $.ajax({
               url: "/api/paper/upload/"+$(this).attr("id"),
-              // url: "http://127.0.0.1:5000/api/paper/upload/"+$(this).attr("id"),
-              // url: "http://127.0.0.1:5000/api/paper/upload/47",
               crossDomain: true,
               type: "get",
 //                data: JSON.stringify({user_name: "test1", password: "123456"}),
@@ -334,12 +283,11 @@ $(function () {
                       var tmpl = '<li class="weui-uploader__file" id="'+elme.id+'" style="background-image:url(#asd)"></li>';
                       $uploaderFiles.append($(tmpl.replace('#asd', elme.url)));
                       sum=elme.id.replace("upfile_","");
-                      console.log(sum)
-                      sum++
-                      console.log(sum)
+                      console.log(sum);
+                      sum++;
+                      console.log(sum);
                       console.log(elme.id)
-                      // test=sum;
-                  })
+                  });
                   diqu(positionid,cioptionid,optionid);
                   $("#continue").hide()
                   // $(".logout").hide();
@@ -349,17 +297,15 @@ $(function () {
               error: function(err) {
                   console.log(err)
               }
-          })
+          });
 
 // //
         //先载入地点学校
       function diqu(positionid,cioptionid,optionid){
           $.ajax({
               url: "/api/province",
-              // url: "http://127.0.0.1:5000/api/province",
               crossDomain: true,
               type: "get",
-              // data: JSON.stringify({user_name: "test1", password: "123456"}),
               contentType: "application/json",
               dataType: "json",
               beforeSend:function () {
@@ -443,11 +389,10 @@ $(function () {
                   if(data.data.length!=0){
                       $.each(data.data,function (index,elem) {
                           $("#school").append("<option id='"+elem.id+"' value='"+data.data[index].name+"' >"+data.data[index].name+"</option>");
-                          // alert(elem.title)
                       });
                   }
                   else{
-                      alert("暂无该区域学校信息1")
+                      alert("暂无该区域学校信息1");
                       $("#school").blur()
                   }
               },
@@ -461,12 +406,10 @@ $(function () {
 
     $("#year").change(function () {
         $(this).prev().html( $("#year").find("option:checked").text());
-        // $(this).prev().html( $(this).val());
-    })
+    });
     $("#Semester").change(function () {
         $(this).prev().html( $("#Semester").find("option:checked").text());
-        // $(this).prev().html( $(this).val());
-    })
+    });
     $("#province").change(function () {
         $(this).prev().html( $(this).val());
         $(this).prev().prev().val($(this).val());
@@ -494,7 +437,6 @@ $(function () {
                 $('#loadingToast').hide();
                 $.each(data.data,function (index,elem) {
                     $("#city").append("<option id='"+elem.id+"' value='"+data.data[index].name+"' >"+data.data[index].name+"</option>");
-                    // alert(elem.title)
                 });
 
 
@@ -535,10 +477,8 @@ $(function () {
             },
             success: function(data) {
                 $('#loadingToast').hide();
-                // console.log(data)
                 $.each(data.data,function (index,elem) {
                     $("#county").append("<option id='"+elem.id+"' value='"+data.data[index].name+"' >"+data.data[index].name+"</option>");
-                    // alert(elem.title)
                 });
             },
             error: function(err) {
@@ -553,7 +493,6 @@ $(function () {
             alert("请先选择城市")
             $("#county").blur()
         }
-
     }).change(function () {
         $(this).prev().html( $(this).val());
         $(this).prev().prev().val($(this).val());
@@ -582,7 +521,6 @@ $(function () {
                 if(data.data.length!=0){
                     $.each(data.data,function (index,elem) {
                         $("#school").append("<option id='"+elem.id+"' value='"+data.data[index].name+"' >"+data.data[index].name+"</option>");
-                        // alert(elem.title)
                     });
                 }
                 else{
@@ -604,11 +542,11 @@ $(function () {
         }
         if(Schoolnum==0)
         {
-            alert("暂无该区域学校信息")
+            alert("暂无该区域学校信息");
             $("#school").blur()
         }
     }).change(function () {
-        $(this).prev().html( $(this).val())
+        $(this).prev().html( $(this).val());
         $(this).prev().prev().val($(this).val());
         schoolid = $("#school")[0].options[$("#school")[0].selectedIndex];
         schoolid1= schoolid.id
@@ -691,6 +629,8 @@ $(function () {
         { alert('请输入试卷名称')}
         else  if(arr=='')
         { alert('请选择图片')}
+        else if(num!=sum)
+        { alert('请等待图片上传完成')}
         else {
             $("#loadingToast2").removeAttr("style")
             $.ajax({
@@ -772,17 +712,8 @@ $(function () {
           
       })
 
-    // $("#return").click(function () {
-    //
-    //     $("#continue").show()
-    //     $("#form").hide()
-    //     $("#uploaderInput").val("");
-    //     $('li').remove();
-    //     arr=[];
-    // })
       pushHistory();
       window.addEventListener("popstate", function(e) {
-
           $("#return").click() ;//根据自己的需求实现自己的功能
       }, false);
       function pushHistory() {
@@ -792,6 +723,99 @@ $(function () {
           };
           window.history.pushState(state, "title", "#");
       }
+
+      $("#form").css("margin-bottom","50px");
+
+  });
+    //点击删除图片
+    $gallery = $("#gallery"), $galleryImg = $("#galleryImg"),
+        $uploaderInput = $("#uploaderInput"),
+        $uploaderFiles = $("#uploaderFiles");
+
+
+    $uploaderInput.on("change", function(e){
+        num=sum;
+        var src, url = window.URL || window.webkitURL || window.mozURL, files = e.target.files;
+        var len = files.length;
+        for (var i=0; i < len; i++) {
+            num++;
+            console.log($uploaderInput[0].files[i].name);
+            files_name= $uploaderInput[0].files[i].name;
+            var file = files[i];
+            if (url) {
+                src = url.createObjectURL(file);
+            }else {
+                src = e.target.result;
+            }
+            lrz(files[i],{width:2000,fieldName:"file"}).then(function (rst) {
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/api/uploads');
+
+                xhr.onload = function () {
+                    $("#submit").removeAttr("disabled");
+                    if (xhr.status === 200) {
+                        var  data= eval('(' + xhr.responseText + ')');
+                        $('#loadingToast1').css("display","none");
+                        console.log(data);
+                        if(data.code!=403) {
+                            arr.push({
+                                "url": String(data.data),
+                                "can_preview": true,  //如果是图片填true，word填false
+                                "name":files_name,
+                                "serverCode": 0, // 填0
+                                "status": "success", // 填 success
+                                "percentage": "100%", // 填100%
+                                "id": "upfile_" + sum, // 唯一id upfile_开头
+                                "error_msg": ""
+                            });
+
+                            var tmpl = '<li class="weui-uploader__file" id="upfile_' + sum + '" style="background-image:url(#asd)"></li>';
+                            $uploaderFiles.append($(tmpl.replace('#asd', data.data[0])));
+                            $uploaderInput.val("");
+                            sum++;
+                            console.log(num,sum)
+                        }else{
+                            alert("请登入后上传");
+                            window.location.href="/wechat/login";
+                        }
+
+                    } else {
+
+                    }
+                };
+                xhr.onerror = function () {
+                    // 处理错误
+                };
+
+                xhr.upload.onprogress = function (e) {
+                    // 上传进度
+                    $("#submit").attr({"disabled":"disabled"});
+                    $("#loadingToast1").removeAttr("style");
+                };
+                // 添加参数
+                // console.log( rst.formData);
+                rst.formData.append('size', rst.fileLen);
+                // rst.formData.append('sign_id',sign_id );
+                // rst.formData.append('stu_name',$('#stu_name').html());
+                // rst.formData.append('state',state);
+
+                // rst.formData.append('base64', rst.base64);
+                // console.log( rst.formData);
+                // 触发上传
+                xhr.send(rst.formData);
+                return rst;
+            })
+
+                .catch(function (err) {
+                    alert(err);
+                })
+
+                .always(function () {// 不管是成功失败，这里都会执行
+                });
+
+        }//for end
+    });
     //点击删除
     $("#delete").click(function () {
         $("#delete_dialog").fadeIn(1)
@@ -800,9 +824,8 @@ $(function () {
         $("#delete_dialog").fadeOut(1)
     })
     $("#Confirm_delete").click(function () {
-        $("#delete_dialog").fadeOut(1)
+        $("#delete_dialog").fadeOut(1);
         $.ajax({
-            // url:'http://127.0.0.1:5000/api/paper/upload/'+uploadid,
             url:'/api/paper/upload/'+uploadid ,
             type:'delete',
             dataType: "json",
@@ -812,7 +835,7 @@ $(function () {
             },
             success:function (date){
                 $('#loadingToast3').hide();
-                alert('删除成功')
+                alert('删除成功');
                 // window.location.href="http://127.0.0.1:5000/wechat/upload";
                 window.location.href="/wechat/upload";
             },
@@ -821,9 +844,33 @@ $(function () {
             }
         });
     })
-      $("#form").css("margin-bottom","50px");
 
-  })
+//        var somearray = ["mon", "tue", "wed", "thur"]
+
+    $uploaderFiles.on("click", "li", function(){
+        $("#form").removeAttr("style").css("margin-bottom","50px");
+        that=this,jqthat=$(this);
+        $galleryImg.attr("style", this.getAttribute("style"));
+        $gallery.fadeIn(100);
+        $("#tabbar").hide();
+        console.log(arr);
+    });
+    $gallery.find("a div").click(function () {
+        that.remove();
+        var divID = jqthat.attr("id");
+        console.log(divID);
+        console.log(arr);
+        removeByValue(arr,divID);
+        console.log(arr);
+        // sum--;
+        console.log(sum);
+        $("#uploaderInput").val("");
+        $("#shangchuang").show();
+    });
+    $gallery.on("click", function(){
+        $gallery.fadeOut(100);
+        $("#tabbar").show();
+    });
 //     $("#logout").click(function () {
 //         $.ajax({
 // //                url: "http://127.0.0.1:5000/api/login/",

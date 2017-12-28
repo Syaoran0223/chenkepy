@@ -45,70 +45,144 @@ $(function(){
         $uploaderFiles = $("#uploaderFiles");
 
     $uploaderInput.on("change", function(e){
-        test++;
-        var t_files = this.files;
+
         var src, url = window.URL || window.webkitURL || window.mozURL, files = e.target.files;
-        console.log(files)
-        for (var i = 0, len = files.length; i < len; ++i) {
+        var len = files.length;
+        for (var i=0; i < len; i++) {
+            console.log($uploaderInput[0].files[i].name);
+           files_name= $uploaderInput[0].files[i].name
             var file = files[i];
             if (url) {
-                src = url.createObjectURL(file);
-
-            } else {
-                src = e.target.result;
+                            src = url.createObjectURL(file);
+            }else {
+                            src = e.target.result;
             }
-            var formData = new FormData($("#uploadForm")[0]);
-            // alert( $uploaderInput[0].files[0].name)
-            $.ajax({
-                url:'/api/uploads',
-                type:'post',
-                async: false,
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                beforeSend:function () {
-                    $("#loadingToast1").removeAttr("style");
-                },
-                success:function (date){
-                    $('#loadingToast1').css("display","none");
-                    console.log(date)
-                    if(date.code!=403) {
-                        arr[sum] = {
-                            "url": String(date.data),
-                            "can_preview": true,  //如果是图片填true，word填false
-                            "name": $uploaderInput[0].files[0].name,
-                            "serverCode": 0, // 填0
-                            "status": "success", // 填 success
-                            "percentage": "100%", // 填100%
-                            "id": "upfile_" + sum, // 唯一id upfile_开头
-                            "error_msg": ""
-                        };
-                        console.log(arr)
+            lrz(files[i],{width:2000,fieldName:"file"}).then(function (rst) {
+                test++;
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/api/uploads');
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        var  data= eval('(' + xhr.responseText + ')');
+                        $('#loadingToast1').css("display","none");
+                        if(data.code!=403) {
+                            arr.push({
+                                "url": String(data.data),
+                                "can_preview": true,  //如果是图片填true，word填false
+                                "name":files_name,
+                                "serverCode": 0, // 填0
+                                "status": "success", // 填 success
+                                "percentage": "100%", // 填100%
+                                "id": "upfile_" + sum, // 唯一id upfile_开头
+                                "error_msg": ""
+                            });
+                            console.log(arr);
 
-                        var tmpl = '<li class="weui-uploader__file" id="' + sum + '" style="background-image:url(#asd)"></li>';
-                        $uploaderFiles.append($(tmpl.replace('#asd', src)));
-                        $uploaderInput.val("");
-                        sum++;
-                    }else{
-                        alert("请登入后上传")
-                        window.location.href="/wechat/login";
+                            var tmpl = '<li class="weui-uploader__file" id="' + sum + '" style="background-image:url(#asd)"></li>';
+                            $uploaderFiles.append($(tmpl.replace('#asd', data.data[0])));
+                            $uploaderInput.val("");
+                            sum++;
+                            console.log(sum,test)
+                        }else{
+                            alert("请登入后上传");
+                            window.location.href="/wechat/login";
+                        }
+                    } else {
+
                     }
-                },
-                error:function () {
-                    alert("ajax错误");
-                }
-            });
-        }
-        // console.log(test,sum)
+                };
+
+                xhr.onerror = function () {
+
+                };
+
+                xhr.upload.onprogress = function (e) {
+                    // 上传进度
+                    // var percentComplete = ((e.loaded / e.total) || 0) * 100;
+                    $("#loadingToast1").removeAttr("style");
+                };
+                // 添加参数
+                rst.formData.append('size', rst.fileLen);
+
+                // 触发上传
+                xhr.send(rst.formData);
+                return rst;
+            })
+
+                .catch(function (err) {
+                    alert(err);
+                })
+
+                .always(function () {// 不管是成功失败，这里都会执行
+                });
+
+        }//for end
     });
+    // $uploaderInput.on("change", function(e){
+    //     test++;
+    //     var t_files = this.files;
+    //     var src, url = window.URL || window.webkitURL || window.mozURL, files = e.target.files;
+    //     console.log(files)
+    //     for (var i = 0, len = files.length; i < len; ++i) {
+    //         var file = files[i];
+    //         if (url) {
+    //             src = url.createObjectURL(file);
+    //
+    //         } else {
+    //             src = e.target.result;
+    //         }
+    //         var formData = new FormData($("#uploadForm")[0]);
+    //         // alert( $uploaderInput[0].files[0].name)
+    //         $.ajax({
+    //             url:'/api/uploads',
+    //             type:'post',
+    //             // async: false,
+    //             data: formData,
+    //             cache: false,
+    //             contentType: false,
+    //             processData: false,
+    //             beforeSend:function () {
+    //                 $("#loadingToast1").removeAttr("style");
+    //             },
+    //             success:function (date){
+    //                 $('#loadingToast1').css("display","none");
+    //                 console.log(date)
+    //                 if(date.code!=403) {
+    //                     arr[sum] = {
+    //                         "url": String(date.data),
+    //                         "can_preview": true,  //如果是图片填true，word填false
+    //                         "name": $uploaderInput[0].files[0].name,
+    //                         "serverCode": 0, // 填0
+    //                         "status": "success", // 填 success
+    //                         "percentage": "100%", // 填100%
+    //                         "id": "upfile_" + sum, // 唯一id upfile_开头
+    //                         "error_msg": ""
+    //                     };
+    //                     console.log(arr)
+    //
+    //                     var tmpl = '<li class="weui-uploader__file" id="' + sum + '" style="background-image:url(#asd)"></li>';
+    //                     $uploaderFiles.append($(tmpl.replace('#asd', src)));
+    //                     $uploaderInput.val("");
+    //                     sum++;
+    //                 }else{
+    //                     alert("请登入后上传")
+    //                     window.location.href="/wechat/login";
+    //                 }
+    //             },
+    //             error:function () {
+    //                 alert("ajax错误");
+    //             }
+    //         });
+    //     }
+    //     // console.log(test,sum)
+    // });
     //点击删除图片
 
 
     function removeByValue(arr, val) {
         for(var i=0; i<arr.length; i++) {
             if(arr[i].id == val) {
-                arr.splice(i, 1);
+                arr.splice(i,1);
                 break;
             }
         }
@@ -127,12 +201,10 @@ $(function(){
         var divID = "upfile_"+jqthat.attr("id");
         removeByValue(arr,divID);
         console.log(arr);
-        test--;
-        sum--;
-        console.log(test,sum)
+        console.log(test,sum);
         $("#uploaderInput").val("");
         $("#shangchuang").show();
-    })
+    });
     $gallery.on("click", function(){
         $gallery.fadeOut(100);
         $("#tabbar").show();
@@ -200,19 +272,20 @@ $(function(){
                     $("#submit").attr({"disabled":"disabled"});
 
                 },
-                success:function (date){
-                    // console.log(date);
-                    // alert(date)
-                    // var  json=eval('('+date+')')
-                    // if(date)
-                    // {alert("上传成功")}
-                    $('#formpaper')[0].reset();
-                    $("#uploaderInput").val("");
-                    $('li').remove();
-                    arr=[];
-                    alert('上传成功')
-                    // window.location.href="http://127.0.0.1:5000/wechat/upload";
-                    window.location.href="/wechat/upload";
+                success:function (data){
+                    if(data.code==0){
+                        $("#submit").removeAttr("disabled");
+                        $('#formpaper')[0].reset();
+                        $("#uploaderInput").val("");
+                        $('li').remove();
+                        arr=[];
+                        alert('上传成功');
+                        window.location.href="/wechat/upload";
+                    }else {
+                        $("#submit").removeAttr("disabled");
+                        alert(data.msg)
+                    }
+
                 },
                 error:function () {
                     alert("ajax错误");

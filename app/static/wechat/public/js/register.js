@@ -49,18 +49,11 @@ $(function () {
                 type: "get",
                 data: {phone: $('#teln').val()},
                 success: function (data) {
-                    if(data.code==404){
-                        $.toptips('后台未查询到您的电话信息，如有疑问请联系思明前台','warning');
-
-                    }else if(data.code==0){
+                    if(data.code==0){
                         $.toptips('短信发送成功','ok');
                         time(code_this);
-                    }else if(data.code==400){
-                        if(data.msg=='isv.MOBILE_NUMBER_ILLEGAL'){
-                            $.toptips('电话号码格式不正确','warning');
-                        }else{
-                            $.toptips('获取验证码次数过多','warning');
-                        }
+                    }else {
+                            $.toptips(data.msg,'warning');
                     }
                    console.log(data)
                 },
@@ -70,7 +63,7 @@ $(function () {
             });
         }
     });
-    $('#login').on('click',function () {
+    $('#register').on('click',function () {
         if($('#teln').val().length!=11 ){
             $.toptips('请输入11位手机号码','warning');
         }else if(isNaN($('#teln').val())){
@@ -78,31 +71,30 @@ $(function () {
         }else if($('#code').val()==''){
             $.toptips('请先填写验证码','warning');
         }else {
-            window.location.href="/wechat/fillInInfor";
-        // $.ajax({
-        //     url: "/api/login/",
-        //     crossDomain: true,
-        //     type: "post",
-        //     data: JSON.stringify({user_name:$("#user").val(), password: $("#pass").val()}),
-        //     contentType: "application/json",
-        //     dataType: "json",
-        //     beforeSend: function () {
-        //         $.showLoading('登入中');
-        //     },
-        //     success: function(data) {
-        //         $.hideLoading();
-        //         if(data.code!=400){
-        //             $.toptips('登入成功','ok');
-        //             window.location.href="/wechat/index";
-        //         }
-        //         else {
-        //             $.toptips('用户名或密码错误','warning');
-        //         }
-        //     },
-        //     error: function(err) {
-        //         console.log(err)
-        //     }
-        // });
+
+        $.ajax({
+            url: "/api/register/",
+            crossDomain: true,
+            type: "post",
+            data: JSON.stringify({phone:$("#teln").val(), valid_code: $("#code").val(),visit_code:$("#invitecode").val()}),
+            contentType: "application/json",
+            dataType: "json",
+            beforeSend: function () {
+                $.showLoading('验证中');
+            },
+            success: function(data) {
+                $.hideLoading();
+                if(data.code==0){
+                    window.location.href="/wechat/fillInInfor?teln="+$("#teln").val();
+                }
+                else {
+                    $.toptips(data.msg,'warning');
+                }
+            },
+            error: function(err) {
+                console.log(err)
+            }
+        });
         }
     });
 
@@ -115,7 +107,7 @@ $(function () {
             wait = 60;
             return;
         } else {
-            obj.attr('disabled',true);
+            obj.removeAttr('disabled');
             obj.html("重新发送(" + wait + ")");
             wait--;
             setTimeout(function() {

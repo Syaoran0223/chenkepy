@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
-    <title>试卷提交</title>
+    <title>试卷上传</title>
     <link rel="stylesheet" href="{$=url_for('static', filename='wechat/css/weui.min.css')}"/>
     <link rel="stylesheet" href="{$=url_for('static', filename='wechat/css/example.css')}"/>
     <link rel="stylesheet" href="{$=url_for('static', filename='wechat/css/date.css')}"/>
@@ -14,6 +14,7 @@
     <!--<script src="{$=url_for('static', filename='wechat/js/laydate/laydate.js')}"></script>-->
     <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
     <script src="https://res.wx.qq.com/open/libs/weuijs/1.0.0/weui.min.js"></script>
+	 <script src="{$=url_for('static', filename='wechat/public/weui4.2/lrz.min.js')}"></script>
 	 <script src="{$=url_for('static', filename='wechat/js/index.js')}"></script>
      <script src="{$=url_for('static', filename='wechat/js/selcity.js')}"></script>
     <script type="text/javascript">
@@ -134,7 +135,7 @@
                     </div>
                     <div class="weui-cell__bd  text-center">
                         <span class="weui-select">请选择</span>
-                        <input class="weui_input" type="text" value="2016-12-10" id='date'/>
+                        <input class="weui_input" type="text" value="" id='date'/>
                     </div>
                 </div>
                 <div class="weui-cell weui-cell_select weui-cell_select-after">
@@ -262,7 +263,7 @@
                             <div class="weui-cell__bd">
                                 <div class="weui-uploader">
                                     <div class="weui-uploader__hd">
-                                        <p class="weui-uploader__title">图片上传</p>
+                                        <p class="weui-uploader__title">图片上传 <sub style="color: #9d9d9d">(点击图片可删除)</sub>    </p>
                                         <!--<div class="weui-uploader__info">0/2</div>-->
                                     </div>
                                     <div class="weui-uploader__bd">
@@ -279,7 +280,8 @@
                                                 <!--<input type="text" name="type" value="image/png"  style="display: none">-->
                                                 <!--<input type="text" name="lastModifiedDate" value="Tue Apr 18 2017 02:54:50 GMT+0800"  style="display: none">-->
                                                 <!--<input type="text" name="size" value="101150"  style="display: none">-->
-                                                <input id="uploaderInput" class="weui-uploader__input"  name="file" type="file" accept="image/*" multiple >
+                                                <!--<input id="uploaderInput" class="weui-uploader__input"  name="file" type="file" accept="image/*" multiple >-->
+                                                <input class="weui-uploader__input"  name="file"   capture="camera"    type="file"  accept="image/*"  id="uploaderInput" multiple>
 
 
                                             </div>
@@ -293,7 +295,13 @@
            </div>
         <div class="weui-tabbar" id="tabbar">
             <!--<a href="http://127.0.0.1:5000/wechat/index" class="weui-tabbar__item weui-bar__item_on">-->
-
+            <!--<a href="/wechat/login" class="weui-tabbar__item">-->
+                    <!--<span style="display: inline-block;position: relative;">-->
+                        <!--<img src="/static/wechat/images/icon_tabbar.png" alt="" class="weui-tabbar__icon">-->
+                        <!--&lt;!&ndash;<span class="weui-badge weui-badge_dot" style="position: absolute;top: 0;right: -6px;"></span>&ndash;&gt;-->
+                    <!--</span>-->
+                <!--<p class="weui-tabbar__label">登入</p>-->
+            <!--</a>-->
             <a href="/wechat/index" class="weui-tabbar__item weui-bar__item_on">
                     <span style="display: inline-block;position: relative;">
                         <img src="/static/wechat/images/icon_tabbar.png" alt="" class="weui-tabbar__icon">

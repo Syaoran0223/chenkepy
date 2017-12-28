@@ -177,7 +177,8 @@ def wechat_register():
 	
 @main.route('/wechat/fillInInfor')
 def wechat_fillInInfor():
-    return render_template('wechat/fill_in_infor.html')	
+    subjects = get_subjects()
+    return render_template('wechat/fill_in_infor.html', subjects=subjects)	
 
 @main.route('/wechat/index')
 def wechat_index():
