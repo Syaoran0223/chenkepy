@@ -51,6 +51,8 @@ $(function () {
                 }
             },
             error: function(err) {
+                $.hideLoading();
+                $.toptips('用户名或密码错误','warning');
                 console.log(err)
             }
         });
