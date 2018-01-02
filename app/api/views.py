@@ -106,14 +106,16 @@ def cropper_image():
     box = request.json.get('box')
     if not file_url:
         raise JsonOutputException('请传入图片')
-    if not box or len(box) != 4:
+    if not box or len(box) != 5:
         raise JsonOutputException('切割参数错误')
     app_path = current_app.config['APP_PATH']
     file_path = '{}{}'.format(app_path, file_url)
     if not os.path.isfile(file_path):
         raise JsonOutputException('图片不存在')
     origin_image = Image.open(file_path)
-    dest_image = origin_image.crop(box)
+    degree= -box[-1]
+    box = box[0:4]
+    dest_image = origin_image.rotate(degree).crop(box)
     return image_save(dest_image)
 
 #上传试卷
