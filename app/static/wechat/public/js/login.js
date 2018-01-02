@@ -29,31 +29,39 @@ $(function () {
     };
 
     $('#login').on('click',function () {
-
-        $.ajax({
-            url: "/api/login/",
-            crossDomain: true,
-            type: "post",
-            data: JSON.stringify({user_name:$("#user").val(), password: $("#pass").val()}),
-            contentType: "application/json",
-            dataType: "json",
-            beforeSend: function () {
-                $.showLoading('登入中');
-            },
-            success: function(data) {
-                $.hideLoading();
-                if(data.code!=400){
-                    $.toptips('登入成功','ok');
-                    window.location.href="/wechat/index";
-                }
-                else {
+        if($("#user").val()==''){
+            $.toptips('帐号不能为空','warning');
+        }else if($("#pass").val()==''){
+            $.toptips('密码不能为空','warning');
+        }else {
+            $.ajax({
+                url: "/api/login/",
+                crossDomain: true,
+                type: "post",
+                data: JSON.stringify({user_name:$("#user").val(), password: $("#pass").val()}),
+                contentType: "application/json",
+                dataType: "json",
+                beforeSend: function () {
+                    $.showLoading('登入中');
+                },
+                success: function(data) {
+                    $.hideLoading();
+                    if(data.code!=400){
+                        $.toptips('登入成功','ok');
+                        window.location.href="/wechat/index";
+                    }
+                    else {
+                        $.toptips('用户名或密码错误','warning');
+                    }
+                },
+                error: function(err) {
+                    $.hideLoading();
                     $.toptips('用户名或密码错误','warning');
+                    console.log(err)
                 }
-            },
-            error: function(err) {
-                console.log(err)
-            }
-        });
+            });
+        }
+
 
     });
 
