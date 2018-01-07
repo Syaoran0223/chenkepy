@@ -143,10 +143,12 @@ def cancel_fast(id):
 def listexam():
     exam_query = Exam.query.filter(Exam.state == EXAM_STATUS['未审核'],
         Exam.is_fast==0,
-        Exam.upload_user!=g.user.id,
-        Exam.school_id==g.user.school_id).\
+        Exam.upload_user!=g.user.id).\
             order_by(Exam.order.desc()).\
             order_by(Exam.created_at.desc())
+    # 思明教育学校下的用户可以审核所有
+    if g.user.school_id != 3906:
+        exam_query = exam_query.filter(Exam.school_id==g.user.school_id)
     if request.args.get('name'):
         exam_query = exam_query.filter(Exam.name.like('%{}%'.format(request.args.get('name'))))
     if request.args.get('subject'):
@@ -183,7 +185,7 @@ def review_exam(id):
         raise JsonOutputException('试卷不存在')
     if not exam.state in (EXAM_STATUS['正在审核'], EXAM_STATUS['未审核']):
         raise JsonOutputException('试卷状态错误')
-    if exam.school_id != g.user.school_id:
+    if exam.school_id != g.user.school_id and g.user.school_id != 3906:
         raise JsonOutputException('没有权限审核该试卷')
     review_data = Review.query.\
         filter_by(exam_id=exam.id).\
