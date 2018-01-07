@@ -261,7 +261,7 @@ def review_exam_update(id):
 def list_examreview_log():
     query = Review.query.\
         filter_by(reviewer_id=g.user.id).\
-        order_by(Review.created_at.desc())
+        order_by(Review.review_date.desc())
     res = pagination(query)
     items = res.get('items', [])
     items = Exam.bind_auto(items, ['name', 'section', 'school_id', 'subject', 'grade', 'paper_types'])
