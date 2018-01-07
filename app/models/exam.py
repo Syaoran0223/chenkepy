@@ -61,6 +61,24 @@ class Exam(db.Model, SessionMixin):
         query = Exam.query.\
             filter(Exam.upload_user == upload_user, Exam.state >= EXAM_STATUS['审核不通过']).\
             order_by(Exam.created_at.desc(), Exam.state)
+        if request.args.get('name'):
+            query = query.filter(Exam.name.like('%{}%'.format(request.args.get('name'))))
+        if request.args.get('subject'):
+            query = query.filter(Exam.subject==request.args.get('subject'))
+        if request.args.get('paper_types'):
+            query = query.filter(Exam.paper_types==request.args.get('paper_types'))
+        if request.args.get('province_id'):
+            query = query.filter(Exam.province_id==request.args.get('province_id'))
+        if request.args.get('city_id'):
+            query = query.filter(Exam.city_id==request.args.get('city_id'))
+        if request.args.get('area_id'):
+            query = query.filter(Exam.area_id==request.args.get('area_id'))
+        if request.args.get('school_id'):
+            query = query.filter(Exam.school_id==request.args.get('school_id'))
+        if request.args.get('year'):
+            query = query.filter(Exam.year==request.args.get('year'))
+        if request.args.get('grade'):
+            query = query.filter(Exam.grade==request.args.get('grade'))
         res = pagination(query)
         return res
 
