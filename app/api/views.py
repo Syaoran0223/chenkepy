@@ -115,7 +115,7 @@ def cropper_image():
     origin_image = Image.open(file_path)
     degree= -box[-1]
     box = box[0:4]
-    dest_image = origin_image.rotate(degree).crop(box)
+    dest_image = origin_image.rotate(degree, expand=1).crop(box)
     return image_save(dest_image)
 
 #上传试卷
