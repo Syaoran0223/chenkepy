@@ -304,7 +304,6 @@ def q_search():
     response = connection.getresponse()
     jsonStr = response.read().decode()
     jsonResult = json.loads(jsonStr)
-    print(jsonResult)
     if jsonResult['code'] != 0:
         raise JsonOutputException('参数错误')
 

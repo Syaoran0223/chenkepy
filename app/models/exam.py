@@ -161,7 +161,7 @@ class Exam(db.Model, SessionMixin):
             questions = deal_obj.query.\
                 filter_by(operator_id=g.user.id).\
                 filter_by(exam_id=item['id']).\
-                order_by(deal_obj.created_at.desc()).\
+                order_by(deal_obj.quest_no.asc()).\
                 all()
             
             questions = [q.get_question_dtl() for q in questions]
