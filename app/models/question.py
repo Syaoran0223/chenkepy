@@ -174,7 +174,7 @@ class Question(db.Model, SessionMixin):
         exam_ids = query.all()
         
         exam_ids = [id[0] for id in exam_ids]
-        exam_query = Exam.query.filter(Exam.id.in_(exam_ids))
+        exam_query = Exam.query.filter(Exam.id.in_(exam_ids)).order_by(Exam.created_at.desc())
         if request.args.get('name'):
             exam_query = exam_query.filter(Exam.name.like('%{}%'.format(request.args.get('name'))))
         if request.args.get('subject'):
