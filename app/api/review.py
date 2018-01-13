@@ -5,7 +5,7 @@ from app.utils import upload, pagination
 from flask import request, g
 from app.const import EXAM_STATUS
 from . import api_blueprint
-from app.models import Exam, School, ExamLog, Review
+from app.models import Exam, School, ExamLog, Review, Region
 from app.utils import render_api
 import datetime
 
@@ -261,11 +261,33 @@ def review_exam_update(id):
 def list_examreview_log():
     query = Review.query.\
         filter_by(reviewer_id=g.user.id).\
-        order_by(Review.review_date.desc())
+        order_by(Review.review_date.desc()).\
+        join(Exam, Exam.id==Review.exam_id)
+    if request.args.get('name'):
+        query = query.filter(Exam.name.like('%{}%'.format(request.args.get('name'))))
+    if request.args.get('subject'):
+        query = query.filter(Exam.subject==request.args.get('subject'))
+    if request.args.get('paper_types'):
+        query = query.filter(Exam.paper_types==request.args.get('paper_types'))
+    if request.args.get('province_id'):
+        query = query.filter(Exam.province_id==request.args.get('province_id'))
+    if request.args.get('city_id'):
+        query = query.filter(Exam.city_id==request.args.get('city_id'))
+    if request.args.get('area_id'):
+        query = query.filter(Exam.area_id==request.args.get('area_id'))
+    if request.args.get('school_id'):
+        query = query.filter(Exam.school_id==request.args.get('school_id'))
+    if request.args.get('year'):
+        query = query.filter(Exam.year==request.args.get('year'))
+    if request.args.get('grade'):
+        query = query.filter(Exam.grade==request.args.get('grade'))
     res = pagination(query)
     items = res.get('items', [])
-    items = Exam.bind_auto(items, ['name', 'section', 'school_id', 'subject', 'grade', 'paper_types'])
+    items = Exam.bind_auto(items, ['name', 'section', 'school_id', 'subject', 'grade', 'paper_types', 'province_id', 'city_id', 'area_id'])
     items = School.bind_auto(items, 'name', 'exam_school_id', 'id', 'school')
+    items = Region.bind_auto(items, 'name', 'exam_province_id', 'id', 'province')
+    items = Region.bind_auto(items, 'name', 'exam_city_id', 'id', 'city')
+    items = Region.bind_auto(items, 'name', 'exam_area_id', 'id', 'area')
     res['items'] = items
     return render_api(res)
 
