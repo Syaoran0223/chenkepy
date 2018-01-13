@@ -150,11 +150,28 @@ class Exam(db.Model, SessionMixin):
     @staticmethod
     def get_deal_list(deal_obj):
         query = db.session.query(distinct(deal_obj.exam_id)).\
-            filter_by(operator_id=g.user.id).\
-            order_by(deal_obj.created_at.desc())
+            filter_by(operator_id=g.user.id)
         exam_ids = query.all()
         exam_ids = [id[0] for id in exam_ids]
-        exam_query = Exam.query.filter(Exam.id.in_(exam_ids))
+        exam_query = Exam.query.filter(Exam.id.in_(exam_ids)).order_by(Exam.created_at.desc())
+        if request.args.get('name'):
+            exam_query = exam_query.filter(Exam.name.like('%{}%'.format(request.args.get('name'))))
+        if request.args.get('subject'):
+            exam_query = exam_query.filter(Exam.subject==request.args.get('subject'))
+        if request.args.get('paper_types'):
+            exam_query = exam_query.filter(Exam.paper_types==request.args.get('paper_types'))
+        if request.args.get('province_id'):
+            exam_query = exam_query.filter(Exam.province_id==request.args.get('province_id'))
+        if request.args.get('city_id'):
+            exam_query = exam_query.filter(Exam.city_id==request.args.get('city_id'))
+        if request.args.get('area_id'):
+            exam_query = exam_query.filter(Exam.area_id==request.args.get('area_id'))
+        if request.args.get('school_id'):
+            exam_query = exam_query.filter(Exam.school_id==request.args.get('school_id'))
+        if request.args.get('year'):
+            exam_query = exam_query.filter(Exam.year==request.args.get('year'))
+        if request.args.get('grade'):
+            exam_query = exam_query.filter(Exam.grade==request.args.get('grade'))
         exams = pagination(exam_query)
         items = []
         for item in exams['items']:
