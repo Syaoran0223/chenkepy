@@ -154,6 +154,13 @@ def get_exams():
     data = Exam.get_exams(g.user.id)
     return render_api(data)
 
+#试卷校对列表
+@api_blueprint.route('/paper/check/list', methods=['GET'])
+@api_login_required
+def get_check_exams():
+    data = Exam.list_all_exams()
+    return render_api(data)
+
 #试卷明细查看
 @api_blueprint.route('/paper/upload/<int:id>', methods=['GET'])
 @api_login_required

@@ -82,6 +82,9 @@ def verify_right(id):
     db.session.add(quest_verify_data)
     db.session.add(question)
     db.session.commit()
+    # 检查试卷是否录题完成
+    exam = Exam.query.get(question.exam_id)
+    exam.check_question_complete()
     return render_api({})
 
 # 重新输入答案
@@ -156,4 +159,9 @@ def verify_quest(id):
     db.session.add(quest_verify_data)
     db.session.add(question)
     db.session.commit()
+
+    # 检查试卷是否录题完成
+    exam = Exam.query.get(question.exam_id)
+    exam.check_question_complete()
+    
     return render_api({})

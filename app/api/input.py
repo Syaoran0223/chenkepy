@@ -77,6 +77,10 @@ def input_quest(id):
         db.session.add(quest_typing_data)
         db.session.add(question)
         db.session.commit()
+
+        # 检查试卷是否录题完毕
+        exam = Exam.query.get(question.exam_id)
+        exam.check_question_complete()
         return render_api({})
     if not quest_content_html:
         raise JsonOutputException('请输入题目')

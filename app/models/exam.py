@@ -5,7 +5,7 @@ from app import db
 from ._base import SessionMixin
 from app.utils import pagination, post_paper_to_i3ke, put_paper_attachment_to_i3ke
 from app.models import School, Region
-from app.const import EXAM_STATUS
+from app.const import EXAM_STATUS, QUEST_STATUS
 import datetime
 class Exam(db.Model, SessionMixin):
     __tablename__ = 'exam'
@@ -109,6 +109,37 @@ class Exam(db.Model, SessionMixin):
         return res
 
     @staticmethod
+    def list_all_exams():
+        '''
+            获取所有试卷
+        '''
+        query = Exam.query.filter(Exam.state != EXAM_STATUS['已删除']).\
+                order_by(Exam.order.desc()).\
+                order_by(Exam.created_at.desc())
+        if request.args.get('name'):
+            query = query.filter(Exam.name.like('%{}%'.format(request.args.get('name'))))
+        if request.args.get('subject'):
+            query = query.filter(Exam.subject==request.args.get('subject'))
+        if request.args.get('paper_types'):
+            query = query.filter(Exam.paper_types==request.args.get('paper_types'))
+        if request.args.get('province_id'):
+            query = query.filter(Exam.province_id==request.args.get('province_id'))
+        if request.args.get('city_id'):
+            query = query.filter(Exam.city_id==request.args.get('city_id'))
+        if request.args.get('area_id'):
+            query = query.filter(Exam.area_id==request.args.get('area_id'))
+        if request.args.get('school_id'):
+            query = query.filter(Exam.school_id==request.args.get('school_id'))
+        if request.args.get('year'):
+            query = query.filter(Exam.year==request.args.get('year'))
+        if request.args.get('grade'):
+            query = query.filter(Exam.grade==request.args.get('grade'))
+        if request.args.get('state'):
+            query = query.filter(Exam.state==request.args.get('state'))
+        res = pagination(query)
+        return res
+
+    @staticmethod
     def get_exam(id):
         result = Exam.query.get(int(id))
         if result is not None:
@@ -121,6 +152,19 @@ class Exam(db.Model, SessionMixin):
         result = School.bind_auto(result, 'name', 'school_id', 'id', 'school')
 
         return result
+
+    def check_question_complete(self):
+        '''
+            检查是否所有的题目已经录入完毕
+        '''
+        from app.models import Question
+        count = Question.query.\
+            filter(Question.state!=QUEST_STATUS['结束录题']).\
+            filter(Question.state!=QUEST_STATUS['已删除']).count()
+        if count == 0:
+            self.state = EXAM_STATUS['录题完成']
+            self.save()
+
 
     def get_history(self):
         start_date = self.exam_date - datetime.timedelta(days=5)
