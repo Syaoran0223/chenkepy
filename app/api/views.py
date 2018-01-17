@@ -404,15 +404,29 @@ def api_register_info():
         user = User.query.filter_by(name=form.user_name.data).first()
         if user is not None:
             raise JsonOutputException('该用户名已被使用')
-        user = User(name=form.user_name.data,
-            phone=form.phone.data,
+        user = None
+        if session.get('openid'):
+            user = User.query.filter_by(openid=session.get('openid')).first()
+        if user:
+            user.name = form.user_name.data
+            user.phone = form.phone.data
             email=form.email.data,
-            password=form.password.data,
-            school_id=form.school_id.data,
-            city_id=form.city_id.data,
-            grade_id=form.grade_id.data,
-            province_id=form.province_id.data,
-            area_id=form.area_id.data)
+            user.password=form.password.data
+            user.school_id=form.school_id.data
+            user.city_id=form.city_id.data
+            user.grade_id=form.grade_id.data
+            user.province_id=form.province_id.data
+            user.area_id=form.area_id.data
+        else:
+            user = User(name=form.user_name.data,
+                phone=form.phone.data,
+                email=form.email.data,
+                password=form.password.data,
+                school_id=form.school_id.data,
+                city_id=form.city_id.data,
+                grade_id=form.grade_id.data,
+                province_id=form.province_id.data,
+                area_id=form.area_id.data)
         user.save()
         login_user(user)
         return render_api({})

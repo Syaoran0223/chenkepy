@@ -199,3 +199,24 @@ def wechat_upload():
     subjects = get_subjects()
 
     return render_template('wechat/upload_record.html', subjects=subjects)
+
+@main.route('/wechat/user/<string:openid>')
+def get_user_by_openid(openid):
+    user = User.query.filter_by(openid=openid).first()
+    session['openid'] = openid
+    if not user:
+        user = User(openid=openid)
+        user.save()
+        return render_api({
+            'status': 'unregister'
+        })
+    if not user.phone:
+        return render_api({
+            'status': 'unregister'
+        })
+    login_user(user)
+    data = user.to_dict()
+    return render_api({
+        'status': 'success',
+        'user': data
+    })
