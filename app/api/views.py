@@ -338,7 +338,7 @@ def login():
     if user is None:
         user = User.query.filter_by(phone=user_name).first()
     if user is None:
-        raise ('参数错误')('用户不存在')
+        raise JsonOutputException('用户不存在')
     if user.verify_password(password):
         login_user(user)
         return user.to_dict()
