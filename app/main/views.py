@@ -9,10 +9,10 @@ from . import main
 
 from .forms import LoginForm, RegisterForm, PasswordResetRequestForm, PasswordResetForm, RegisterInfoForm
 from app.models import User, Region, School, InviteCode, QType
-
+from app.utils import render_api
 from app.sms import SmsServer
 
-def get_subjects():
+def get_subjects_json():
     connection = http.client.HTTPConnection('i3ke.com', 80, timeout=10)
     headers = {'Content-type': 'application/json'}
     params = "{}"
@@ -24,9 +24,17 @@ def get_subjects():
     subjects = []
     if subject_res.get('ok'):
         subjects = subject_res['data']['subjects']
+    return subjects
+
+def get_subjects():
+    subjects = get_subjects_json()
     subjects = json.dumps(subjects)
     return subjects
 
+@main.route('/api/subjects', methods=['GET'])
+def get_subjects_api():
+    data = get_subjects_json()
+    return render_api(data)
 
 @main.route('/register/', methods=['GET', 'POST'])
 def register():
