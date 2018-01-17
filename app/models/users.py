@@ -37,7 +37,7 @@ class User(db.Model, SessionMixin, UserMixin):
     phone = db.Column(db.String(16))
     code = db.Column(db.String(12))
     permissions = db.Column(db.JsonBlob(), default=[])
-    openid = db.Column(db.String(400))
+    openid = db.Column(db.String(400), default='')
     scores = db.relationship('Score', backref='user',
                                 lazy='dynamic')
     messages = db.relationship('Message', backref='user',
