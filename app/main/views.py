@@ -2,6 +2,7 @@
 
 import json
 import http.client, urllib.parse
+import requests
 from flask import render_template, request, url_for, flash, redirect, session, g, current_app
 from flask.ext.login import login_user,logout_user,login_required,current_user
 
@@ -11,6 +12,7 @@ from .forms import LoginForm, RegisterForm, PasswordResetRequestForm, PasswordRe
 from app.models import User, Region, School, InviteCode, QType
 from app.utils import render_api
 from app.sms import SmsServer
+from app.exceptions import JsonOutputException
 
 def get_subjects_json():
     connection = http.client.HTTPConnection('i3ke.com', 80, timeout=10)
@@ -200,8 +202,24 @@ def wechat_upload():
 
     return render_template('wechat/upload_record.html', subjects=subjects)
 
-@main.route('/wechat/user/<string:openid>')
-def get_user_by_openid(openid):
+@main.route('/wechat/user/<string:code>')
+def get_user_by_openid(code):
+    # 获取openid
+    url = "https://api.weixin.qq.com/sns/jscode2session"
+    querystring = {
+        "appid": current_app.config['WECHAT_APPID'],
+        "secret": current_app.config['WECHAT_SECRET'],
+        "js_code": code,
+        "grant_type": "authorization_code"
+    }
+    response = requests.request("GET", url, params=querystring)
+    if not response.ok:
+        raise JsonOutputException('openid获取失败')
+    res = response.json()
+    if res.get('errcode'):
+        raise JsonOutputException(res['errmsg'])
+    openid = res['openid']
+
     user = User.query.filter_by(openid=openid).first()
     session['openid'] = openid
     if not user:

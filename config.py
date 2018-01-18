@@ -18,6 +18,8 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
+    WECHAT_APPID = 'wxcdb8d17efab6d78f'
+    WECHAT_SECRET = 'bf2afb7bae78f89488f8aee5d7d8339c'
     #mysql数据库IP地址
     MYSQL_ADDR = '139.162.109.187'
     MYQSL_PORT = 3306
@@ -43,6 +45,8 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     #mysql数据库IP地址
+    WECHAT_APPID = 'wxcdb8d17efab6d78f'
+    WECHAT_SECRET = 'bf2afb7bae78f89488f8aee5d7d8339c'
     MYSQL_ADDR = "127.0.0.1"
     DB_NAME = 'info'
     USER_NAME = 'info'
