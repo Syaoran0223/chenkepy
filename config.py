@@ -21,11 +21,16 @@ class DevelopmentConfig(Config):
     WECHAT_APPID = 'wxcdb8d17efab6d78f'
     WECHAT_SECRET = 'bf2afb7bae78f89488f8aee5d7d8339c'
     #mysql数据库IP地址
-    MYSQL_ADDR = '139.162.109.187'
+    # MYSQL_ADDR = '139.162.109.187'
+    # MYQSL_PORT = 3306
+    # DB_NAME = 'pdb'
+    # USER_NAME = 'chenke91'
+    # PASSWORD = 'chenke91.com'
+    MYSQL_ADDR = '192.168.1.115'
     MYQSL_PORT = 3306
-    DB_NAME = 'pdb'
-    USER_NAME = 'chenke91'
-    PASSWORD = 'chenke91.com'
+    DB_NAME = 'info'
+    USER_NAME = 'dev'
+    PASSWORD = '123456'
 
     CACHE_TYPE ='simple'
     SQLALCHEMY_POOL_SIZE = 20

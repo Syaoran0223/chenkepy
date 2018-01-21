@@ -162,7 +162,7 @@ def get_check_exams():
     return render_api(data)
 
 #试卷详情
-@api_blueprint.route('/paper/prevew/<int:paper_id>')
+@api_blueprint.route('/paper/preview/<int:paper_id>')
 # @api_login_required
 def get_paper_preview(paper_id):
     paper = Exam.query.get_or_404(paper_id)
@@ -172,7 +172,7 @@ def get_paper_preview(paper_id):
     questions = [q.to_dict() for q in query.all()]
     data = paper.to_dict()
     data['questions'] = questions
-    return data
+    return render_api(data)
 
 #试卷明细查看
 @api_blueprint.route('/paper/upload/<int:id>', methods=['GET'])
