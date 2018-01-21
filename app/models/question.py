@@ -163,7 +163,7 @@ class Question(db.Model, SessionMixin):
     def get_exam_by_state(state):
         page = int(request.args.get('pageIndex', 0))
         pageSize = int(request.args.get('pageSize', 5))
-        query = db.session.query(distinct(Question.exam_id)).\
+        query = db.session.query(distinct(Question.exam_id), Question.order, Question.created_at).\
             filter_by(state=state)
         totalCount = query.count()
         query = query.\
