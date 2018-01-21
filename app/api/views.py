@@ -4,7 +4,7 @@ from PIL import Image
 from flask.ext.login import login_user,logout_user,login_required,current_user
 from app.exceptions import JsonOutputException, FormValidateError
 from app.decorators import api_login_required, permission_required
-from app.models import Attachment, Exam, User, Message
+from app.models import Attachment, Exam, User, Message, Question
 from app.utils import upload, pagination, image_save
 from flask import request, g
 from .forms import SmsForm, PaperUploadForm, RegisterInfoForm
@@ -160,6 +160,19 @@ def get_exams():
 def get_check_exams():
     data = Exam.list_all_exams()
     return render_api(data)
+
+#试卷详情
+@api_blueprint.route('/paper/prevew/<int:paper_id>')
+# @api_login_required
+def get_paper_preview(paper_id):
+    paper = Exam.query.get_or_404(paper_id)
+    query = Question.query.\
+        filter_by(exam_id=paper.id).\
+        order_by(Question.quest_no)
+    questions = [q.to_dict() for q in query.all()]
+    data = paper.to_dict()
+    data['questions'] = questions
+    return data
 
 #试卷明细查看
 @api_blueprint.route('/paper/upload/<int:id>', methods=['GET'])
