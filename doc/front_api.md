@@ -168,3 +168,6 @@
         'GS015': '心理',
         'GS016': '其他'
     }
+
+### 试卷预览
+`/api/paper/preview/<int:paperid>` `GET`
